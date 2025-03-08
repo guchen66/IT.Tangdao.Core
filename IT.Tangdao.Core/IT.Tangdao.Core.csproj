@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+   
+	<TargetFramework>net6.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<Title>一个简易开发的工具类库包</Title>
+	<Authors>liuxin</Authors>
+	<Version>2.0.7</Version>
+	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+	<AssemblyVersion>2.0.2</AssemblyVersion>
+    
+  </PropertyGroup>
+
+ <ItemGroup>
+   <None Include="..\LICENSE.md">
+     <Pack>True</Pack>
+     <PackagePath>\</PackagePath>
+   </None>
+ </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <Reference Include="Microsoft.Windows.SDK.NET">
+		  <HintPath>E:\nuget\MyPackages\Microsoft.Windows.SDK.NET.dll</HintPath>
+	  </Reference>
+	  <Reference Include="WinRT.Runtime">
+		  <HintPath>E:\nuget\MyPackages\WinRT.Runtime.dll</HintPath>
+	  </Reference>
+  </ItemGroup>
+
+</Project>
