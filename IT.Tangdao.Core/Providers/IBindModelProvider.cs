@@ -40,26 +40,4 @@ namespace IT.Tangdao.Core.Providers
             Default = XmlFolderHelper.Deserialize<T>(xmlData);
         }
     }
-
-    public class Test : BindModelProvider<Student>
-    {
-        private Student _student;
-
-        public Student Student
-        {
-            get => _student;
-            set => SetProperty(ref _student, value);
-        }
-
-        public Test()
-        {
-            Student = Default;
-        }
-    }
-
-    public class Student
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
 }

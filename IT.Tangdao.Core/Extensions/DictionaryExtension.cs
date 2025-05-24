@@ -66,7 +66,7 @@ namespace IT.Tangdao.Core.Extensions
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Dictionary<TKey, TValue> OrderBy<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue value)
+        public static Dictionary<TKey, TValue> TryOrderBy<TKey, TValue>(this Dictionary<TKey, TValue> dict)
         {
             var sortedDicts = dict.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             return sortedDicts;

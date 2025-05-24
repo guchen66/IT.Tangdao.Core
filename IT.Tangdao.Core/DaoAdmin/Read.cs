@@ -17,14 +17,36 @@ using System.Collections;
 using System.Configuration;
 using IT.Tangdao.Core.DaoCommon;
 using IT.Tangdao.Core.Providers;
+using System.Windows.Input;
 
 namespace IT.Tangdao.Core.DaoAdmin
 {
     public sealed class Read : IRead
     {
-        public string XMLData { get; set; }
+        // 属性改造（自动同步_fileType）
+        private string _xmlData;
 
-        public string JsonData { get; set; }
+        public string XMLData
+        {
+            get => _xmlData;
+            set
+            {
+                _xmlData = value;
+                _fileType = DaoFileType.Xml; // 自动标记类型
+            }
+        }
+
+        private string _jsonFileName;
+
+        public string JsonFileName
+        {
+            get => _jsonFileName;
+            set
+            {
+                _jsonFileName = value;
+                _fileType = DaoFileType.Json; // 自动标记类型
+            }
+        }
 
         public string ReadObject
         {
@@ -42,6 +64,18 @@ namespace IT.Tangdao.Core.DaoAdmin
                 _readObject = readObject;
                 return this;
             }
+        }
+
+        private DaoFileType _fileType;
+
+        public void Load()
+        {
+            _ = _fileType switch
+            {
+                DaoFileType.Xml => XMLData,
+                DaoFileType.Json => JsonFileName,
+                _ => throw new InvalidOperationException($"不支持的文件类型: {_fileType}")
+            };
         }
 
         public IReadResult SelectNode(string text)
@@ -94,7 +128,7 @@ namespace IT.Tangdao.Core.DaoAdmin
         public IReadResult SelectKeys()
         {
             List<string> keys = new List<string>();
-            JObject jsonObject = JObject.Parse(JsonData);
+            JObject jsonObject = JObject.Parse(JsonFileName);
 
             // 递归方法，用于获取所有键
             void GetKeys(JToken token)
@@ -120,12 +154,21 @@ namespace IT.Tangdao.Core.DaoAdmin
             return new IReadResult(true, keys);
         }
 
+        /// <summary>
+        /// 跟据key读取指定value
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public IReadResult SelectValue(string key)
         {
-            var path = DirectoryHelper.SelectDirectoryByName(JsonData);
+            var path = DirectoryHelper.SelectDirectoryByName(JsonFileName);
             string jsonContent = File.ReadAllText(path);
             JObject jsonObject = JObject.Parse(jsonContent);
-            JToken valueToken = jsonObject[ReadObject][key];
+            if (ReadObject == null)
+            {
+                return new IReadResult("转换失败，未设置索引器", false);
+            }
+            JToken valueToken = jsonObject.SelectToken($"{ReadObject}.{key}");
 
             if (valueToken == null || valueToken.Type == JTokenType.Null)
             {

@@ -7,11 +7,10 @@ using System.Windows.Controls;
 
 namespace IT.Tangdao.Core.DaoException
 {
-   public class TypeErrorException : Exception
-   {
+    public class TypeErrorException : Exception
+    {
         public TypeErrorException(string message) : base(message)
         {
-            
         }
     }
 
@@ -41,7 +40,7 @@ namespace IT.Tangdao.Core.DaoException
     // 自定义异常类：命名不规范
     public class ImproperNamingException : Exception
     {
-        public ImproperNamingException(string message): base(message)
+        public ImproperNamingException(string message) : base(message)
         {
         }
     }

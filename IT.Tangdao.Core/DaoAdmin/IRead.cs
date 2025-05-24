@@ -16,7 +16,7 @@ namespace IT.Tangdao.Core.DaoAdmin
     {
         string XMLData { get; set; }
 
-        string JsonData { get; set; }
+        string JsonFileName { get; set; }
 
         IReadResult SelectNode(string text);
 
@@ -26,12 +26,28 @@ namespace IT.Tangdao.Core.DaoAdmin
 
         IReadResult SelectKeys();
 
+        /// <summary>
+        /// 跟据Key读取Value
+        /// 用于数组读取
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         IReadResult SelectValue(string key);
+
+        /// <summary>
+        /// 读取Json对象
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="Result"></param>
+        /// <returns></returns>
+       // IReadResult SelectJsonObject<TResult>(TResult @Result);
 
         IReadResult SelectConfig(string section);
 
         IReadResult SelectCustomConfig(string configName, string section);
 
-        IRead this[string readObject] { get; }
+        public IRead this[string readObject] { get; }
+
+        public void Load();
     }
 }

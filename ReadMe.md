@@ -6,6 +6,17 @@
 
 静态命令：MinidaoCommand
 
+对TextBlock等没有命令的控件增加命令附加属性
+
+````js
+ <TextBlock Text="点击我执行简单命令" 
+                   local:CommandBehavior.Command="{Binding SimpleCommand}"
+                   Margin="10" Padding="10"
+                   Background="LightBlue" Cursor="Hand"/>
+````
+
+
+
 #### 2、事件聚合器
 
 用于父子组件的通讯
@@ -96,8 +107,18 @@ readService.Current.SelectNode("");
 
 读取根目录下的Json
 
+```js
+ "GeneratorData": {
+   "Title": "SqlServer",
+   "IsGenerator": "true", //初始化数据库和表格
+   "IsSeedData": "false" //自动生成表数据
+ }
+```
+
 ```json
-readService.Current.SelectValue("");
+  IReadService readService = new ReadService();
+  readService.Current.JsonData = "AppConfig.json";
+  readService.Current["GeneratorData"].SelectValue("Title");
 ```
 
 读取指定地址下的txt文件
@@ -122,6 +143,20 @@ readService.Read("");
  _readService.Load("appsetting.json", DaoFileType.Json);
  var s1 = _readService.Current["WCF"].SelectValue("Id").Value;
 ```
+
+读取根目录下所有json文件名称
+
+```js
+JsonConverHelper.GetRootJsonFileNames();
+```
+
+读取json文件的内容
+
+```js
+JsonConverHelper.GetJsonContent("AppConfig.json","WCF");
+```
+
+
 
 读取Config的时候可以写
 
@@ -157,6 +192,28 @@ if (model is Dictionary<string, string> dicts)
 </Tangdao>
 ```
 
+菜单的配置读取
+
+```
+// 初始化
+var menuProvider = new MenuProvider();
+
+// 添加监控
+menuProvider.Watch("header/user", item => 
+{
+    Console.WriteLine($"用户菜单变更: {item.Value}");
+});
+
+// 设置菜单值
+menuProvider.Root["header/title"].Value = "首页";
+menuProvider.Root["header/user"].Value = "张三";
+
+// 获取菜单值
+string username = menuProvider.Root["header/user"].Value;
+```
+
+
+
 #### 6、选择器
 
 ###### 1、时间选择器
@@ -174,3 +231,35 @@ xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.C
 ###### 2、文件选择器
 
 ###### 3、设备选择器
+
+#### 7、自动生成器
+
+可以自动生成虚假数据，用于平时调试
+
+在WPF可以这样使用
+
+```js
+ public class MainWindowViewModel : BindableBase
+ {
+     private ObservableCollection<Student> _students;
+
+     public ObservableCollection<Student> Students
+     {
+         get => _students;
+         set => SetProperty(ref _students, value);
+     }
+
+     public MainWindowViewModel()
+     {
+         Loaded();
+     }
+
+     private void Loaded()
+     {
+         var generator = new DaoFakeDataGeneratorProvider<Student>();
+         List<Student> randomStudents = generator.GenerateRandomData(10);
+         Students = new ObservableCollection<Student>(randomStudents);
+     }
+ }
+```
+

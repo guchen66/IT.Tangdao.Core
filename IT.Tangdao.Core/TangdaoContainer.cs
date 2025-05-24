@@ -17,6 +17,7 @@ using System.ComponentModel;
 using IT.Tangdao.Core.DaoEvents;
 using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
+using System.Windows;
 
 namespace IT.Tangdao.Core
 {
@@ -70,7 +71,7 @@ namespace IT.Tangdao.Core
         public ITangdaoProvider Builder()
         {
             // 创建一个根提供者，不需要传递任何上下文
-            return new TangdaoProvider();
+            return TangdaoContainerBuilder.Builder();
         }
 
         public ITangdaoContainer Register(Type serviceType, Type implementationType)
@@ -114,8 +115,5 @@ namespace IT.Tangdao.Core
         {
             _factories[typeof(TService)] = () => factory(this);
         }
-
-        // 用于跟踪当前正在解析的类型，以避免递归
-        private Stack<Type> ResolvingTypes { get; } = new Stack<Type>();
     }
 }

@@ -1,8 +1,14 @@
-﻿using System;
+﻿using IT.Tangdao.Core.DaoAdmin.IServices;
+using IT.Tangdao.Core.DaoAdmin.Services;
+using IT.Tangdao.Core.DaoCommon;
+using IT.Tangdao.Core.DaoEvents;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace IT.Tangdao.Core
 {
@@ -15,6 +21,9 @@ namespace IT.Tangdao.Core
         {
             var container = new TangdaoContainer();
             container.Register<ITangdaoProvider, TangdaoProvider>();
+            container.Register<IEventTransmit, EventTransmit>();
+            container.Register<IReadService, ReadService>();
+            container.Register<IWriteService, WriteService>();
             return container;
         });
 

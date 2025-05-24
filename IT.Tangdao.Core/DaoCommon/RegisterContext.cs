@@ -32,6 +32,11 @@ namespace IT.Tangdao.Core.DaoCommon
         public bool IsResolving { get; set; }
 
         /// <summary>
+        /// 可以直接解析该服务
+        /// </summary>
+        public bool IsDirectResolve { get; set; }
+
+        /// <summary>
         /// 生命周期
         /// </summary>
         public Lifecycle Lifecycle { get; set; }

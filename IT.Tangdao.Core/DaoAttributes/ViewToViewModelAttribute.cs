@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.DaoAttributes
 {
-    public class ViewToViewModelAttribute: Attribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class ViewToViewModelAttribute : Attribute
     {
-        public ViewToViewModelAttribute() { }
-    }
+        public string ViewName { get; }
 
-    public static class ViewToViewModelExtension
-    {
-
+        public ViewToViewModelAttribute(string viewName)
+        {
+            ViewName = viewName;
+        }
     }
 }

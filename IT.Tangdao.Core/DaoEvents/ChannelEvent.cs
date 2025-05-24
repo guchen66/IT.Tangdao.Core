@@ -14,6 +14,11 @@ namespace IT.Tangdao.Core.DaoEvents
     public static class ChannelEvent
     {
         /// <summary>
+        /// 存储bool值
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, bool> _localBoolValues = new ConcurrentDictionary<string, bool>();
+
+        /// <summary>
         /// 存储字符串
         /// </summary>
         private static readonly ConcurrentDictionary<string, string> _localValues = new ConcurrentDictionary<string, string>();
@@ -24,9 +29,14 @@ namespace IT.Tangdao.Core.DaoEvents
         private static readonly ConcurrentDictionary<string, Delegate> _actions = new ConcurrentDictionary<string, Delegate>();
 
         /// <summary>
-        /// 存储数据上下文
+        /// 存储注册数据上下文
         /// </summary>
         private static readonly ConcurrentDictionary<Type, RegisterContext> _contexts = new ConcurrentDictionary<Type, RegisterContext>();
+
+        /// <summary>
+        /// 全局Tangdao数据上下文
+        /// </summary>
+        private static readonly ConcurrentDictionary<ITangdaoProvider, TangdaoContext> _tangdaocontexts = new ConcurrentDictionary<ITangdaoProvider, TangdaoContext>();
 
         /// <summary>
         /// 存储工厂
@@ -42,6 +52,17 @@ namespace IT.Tangdao.Core.DaoEvents
         /// 存储解析容器
         /// </summary>
         private static readonly ConcurrentDictionary<Type, ITangdaoProvider> _providers = new ConcurrentDictionary<Type, ITangdaoProvider>();
+
+        public static void SetLocalBoolValue(string name, bool value)
+        {
+            _localBoolValues[name] = value;
+        }
+
+        public static bool GetLocalBoolValue(string name)
+        {
+            _localBoolValues.TryGetValue(name, out var value);
+            return value;
+        }
 
         public static void SetLocalValue(string name, string value)
         {
@@ -133,6 +154,17 @@ namespace IT.Tangdao.Core.DaoEvents
                 }
                 throw new InvalidOperationException($"No instance factory registered for type {t.FullName}");
             });
+        }
+
+        public static void SetTangdaoContext(ITangdaoProvider provider, TangdaoContext context)
+        {
+            _tangdaocontexts[provider] = context;
+        }
+
+        public static TangdaoContext GetTangdaoContext(ITangdaoProvider provider)
+        {
+            _tangdaocontexts.TryGetValue(provider, out var context);
+            return context;
         }
     }
 }

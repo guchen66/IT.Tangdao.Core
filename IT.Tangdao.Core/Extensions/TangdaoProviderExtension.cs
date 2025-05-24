@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.DaoEnums;
+﻿using IT.Tangdao.Core.DaoCommon;
+using IT.Tangdao.Core.DaoEnums;
 using IT.Tangdao.Core.DaoEvents;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace IT.Tangdao.Core.Extensions
 {
@@ -15,7 +17,16 @@ namespace IT.Tangdao.Core.Extensions
     {
         public static TService Resolve<TService>(this ITangdaoProvider provider)
         {
-            var context = ChannelEvent.GetContext<TService>();
+            Type serviceType = typeof(TService);
+            //如果此类具有无参构造器，可以直接解析注册
+            if (serviceType.GetConstructor(Type.EmptyTypes) != null)
+            {
+                return (TService)provider.Resolve(serviceType);
+            }
+
+            //否则，解析时，跟据数据通道传递数据上下文
+            RegisterContext context = ChannelEvent.GetContext<TService>();
+
             if (context == null)
             {
                 throw new InvalidOperationException($"Unable to resolve type: {typeof(TService)}");
