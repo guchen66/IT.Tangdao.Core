@@ -1,5 +1,6 @@
 ﻿using IT.Tangdao.Core.DaoAttributes;
 using IT.Tangdao.Core.DaoEnums;
+using IT.Tangdao.Core.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,17 +17,6 @@ namespace IT.Tangdao.Core.Providers
         private static readonly ConcurrentDictionary<string, Action<T, object>> _propertySetters =
             new ConcurrentDictionary<string, Action<T, object>>();
 
-        private static readonly Random _random = new Random();
-        private static readonly HashSet<int> _usedIds = new HashSet<int>();
-
-        // 常用数据池
-        private static readonly string[] ChineseCities = { "北京", "上海", "广州", "深圳", "杭州", "成都", "武汉", "南京" };
-
-        private static readonly string[] CommonHobbies = { "阅读", "旅行", "摄影", "烹饪", "运动", "音乐", "电影" };
-
-        // 自增ID计数器
-        private static int _intIdCounter = 1;
-
         public List<T> GenerateRandomData(int count)
         {
             var result = new List<T>();
@@ -34,37 +24,21 @@ namespace IT.Tangdao.Core.Providers
             {
                 result.Add(CreateRandomInstance());
             }
-            // 重置自增计数器（可选，根据需求决定）
-            _intIdCounter = 1;
-            _usedIds.Clear(); // 清空已使用的ID，以便下次生成
+            FakeDataHelper.ResetCounters();
             return result;
-        }
-
-        private T CreateRandomInstance()
-        {
-            var instance = new T();  //调用无参构造器
-            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);   //获取所有公共属性
-
-            foreach (var property in properties)
-            {
-                var setter = GetOrCreateSetter(property);         //获取属性设置器委托
-                var randomValue = GenerateRandomValue(property);  //生成随机值
-                setter(instance, randomValue);                    //设置属性值
-            }
-
-            return instance;
         }
 
         private Action<T, object> GetOrCreateSetter(PropertyInfo property)
         {
-            string key = property.Name;
-
-            return _propertySetters.GetOrAdd(key, k =>
+            return _propertySetters.GetOrAdd(property.Name, key =>
             {
+                if (!property.CanWrite || property.SetMethod?.IsPublic != true)
+                {
+                    return (_, _) => { };
+                }
+
                 var instanceParam = Expression.Parameter(typeof(T), "instance");
                 var valueParam = Expression.Parameter(typeof(object), "value");
-
-                // 转换并设置属性
                 var convertedValue = Expression.Convert(valueParam, property.PropertyType);
                 var propertyAccess = Expression.Property(instanceParam, property);
                 var assign = Expression.Assign(propertyAccess, convertedValue);
@@ -73,94 +47,152 @@ namespace IT.Tangdao.Core.Providers
             });
         }
 
+        private T CreateRandomInstance()
+        {
+            var instance = new T();  // 1. 创建新实例
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);// 2. 获取所有公共实例属性
+
+            foreach (var property in properties)  // 3. 遍历每个属性
+            {
+                var setter = GetOrCreateSetter(property);  // 4. 获取设置器委托
+                var randomValue = GenerateRandomValue(property);  // 5. 生成随机值
+                setter(instance, randomValue);  // 6. 设置属性值
+            }
+            return instance;
+        }
+
         private object GenerateRandomValue(PropertyInfo property)
         {
-            if (property.Name.Equals("Id", StringComparison.OrdinalIgnoreCase) &&
-                (property.PropertyType == typeof(int) || property.PropertyType == typeof(long)))
+            // 1. 优先处理ID属性
+            if (IsIdProperty(property))
             {
-                return _intIdCounter++;
+                return HandleIdProperty(property);
             }
-            // 检查是否有自定义特性
+
             var fakeDataAttr = property.GetCustomAttribute<DaoFakeDataInfoAttribute>();
 
+            // 2. 处理带有特性的属性
             if (fakeDataAttr != null)
             {
-                // 根据特性信息生成数据
-                switch (fakeDataAttr.Message)
+                // 2.1 最高优先级：DefaultValue
+                if (!string.IsNullOrEmpty(fakeDataAttr.DefaultValue))
                 {
-                    case "姓名":
-                        return GetRandomEnumValue<DaoName>().ToString();
+                    //使用C#内置的类型转换
+                    return Convert.ChangeType(fakeDataAttr.DefaultValue, property.PropertyType);
+                }
 
-                    case "城市":
-                        return ChineseCities[_random.Next(ChineseCities.Length)];
+                // 2.2 第二优先级：Length
+                if (fakeDataAttr.Length > 0 && IsLengthSupportedType(property.PropertyType))
+                {
+                    return GenerateByLength(
+                        propertyType: property.PropertyType,
+                        length: fakeDataAttr.Length
+                    );
+                }
+                // 2.3 第三优先级：DataType
+                if (fakeDataAttr.DataType != null)
+                {
+                    if (fakeDataAttr.DataType != null)
+                    {
+                        // 专用于枚举/特殊类型生成
+                        return GenerateByDataType(dataType: fakeDataAttr.DataType, targetPropertyType: property.PropertyType);
+                    }
+                }
 
-                    case "爱好":
-                        if (fakeDataAttr.EnumType != null)
-                            return GetRandomEnumValue(fakeDataAttr.EnumType);
-                        return CommonHobbies[_random.Next(CommonHobbies.Length)];
-                        // 可以添加更多自定义类型
+                // 2.5 只有Description时
+                if (!string.IsNullOrEmpty(fakeDataAttr.Description))
+                {
+                    return GenerateByDescription(fakeDataAttr.Description, fakeDataAttr.Length);
                 }
             }
-            if (property.PropertyType == typeof(int))
-            {
-                return GenerateUniqueId();
-            }
 
-            if (property.PropertyType == typeof(string))
-            {
-                return GenerateRandomString();
-            }
+            // 3. 默认类型处理
+            return GenerateByPropertyType(property.PropertyType);
+        }
 
-            if (property.PropertyType == typeof(DateTime))
-            {
-                return GenerateRandomDateTime();
-            }
+        private bool IsIdProperty(PropertyInfo property)
+        {
+            return property.Name.Contains("Id", StringComparison.OrdinalIgnoreCase) &&
+                   (property.PropertyType == typeof(int) || property.PropertyType == typeof(long));
+        }
 
-            // 默认值处理
-            if (property.PropertyType.IsValueType)
-            {
-                return Activator.CreateInstance(property.PropertyType);
-            }
-
+        private object HandleIdProperty(PropertyInfo property)
+        {
+            if (property.PropertyType == typeof(int)) return FakeDataHelper.GetNextAutoIncrementId();
+            if (property.PropertyType == typeof(long)) return (long)FakeDataHelper.GetNextAutoIncrementId();
             return null;
         }
 
-        private int GenerateUniqueId()
+        private object ApplyDescriptionModifier(object baseValue, string description)
         {
-            int id;
-            do
+            // 这里实现你的修饰逻辑，例如：
+            // 如果是字符串类型，可以添加前缀/后缀
+            if (baseValue is string strValue)
             {
-                id = _random.Next(1, 1000);
-            } while (_usedIds.Contains(id));
-
-            _usedIds.Add(id);
-            return id;
+                return $"{description}:{strValue}";
+            }
+            return baseValue;
         }
 
-        private string GenerateRandomString()
+        private object GenerateByDataType(Type dataType, Type targetPropertyType)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            return new string(Enumerable.Repeat(chars, 6)
-                .Select(s => s[_random.Next(s.Length)]).ToArray());
+            if (dataType.IsEnum)
+            {
+                // 如果目标属性是string，则返回枚举的字符串表示
+                bool returnString = targetPropertyType == typeof(string);
+                return FakeDataHelper.GetRandomEnumValue(dataType, returnString);
+            }
+
+            // 其他数据类型处理...
+            throw new NotSupportedException($"不支持的数据类型: {dataType.Name}");
         }
 
-        private DateTime GenerateRandomDateTime()
+        private object GenerateByDescription(string description, int? length)
         {
-            DateTime start = new DateTime(1990, 1, 1);
-            int range = (DateTime.Today - start).Days;
-            return start.AddDays(_random.Next(range));
+            // 这里可以根据description返回特定类型的随机数据
+            // 检查是否是手机号描述
+            if (FakeDataHelper.IsMobilePhoneDescription(description))
+            {
+                return FakeDataHelper.GenerateChineseMobileNumber();
+            }
+            switch (description.ToLower())
+            {
+                case "姓名": return FakeDataHelper.GetRandomChineseName();
+                case "城市": return FakeDataHelper.GetRandomChineseCity();
+                case "爱好": return FakeDataHelper.GetRandomHobby();
+
+                default:
+                    return length.HasValue ?
+                    FakeDataHelper.GenerateRandomString(length.Value) :
+                    description;
+            }
         }
 
-        private object GetRandomEnumValue(Type enumType)
+        // 判断属性类型是否支持Length控制
+        private bool IsLengthSupportedType(Type type) =>
+            type == typeof(int) || type == typeof(long) || type == typeof(string);
+
+        private object GenerateByLength(Type propertyType, int length)
         {
-            var values = Enum.GetValues(enumType);
-            return values.GetValue(_random.Next(values.Length));
+            if (propertyType == typeof(string))
+                return FakeDataHelper.GenerateRandomString(length);
+
+            if (propertyType == typeof(int) || propertyType == typeof(long))
+                return FakeDataHelper.GenerateUniqueNumber(length);
+
+            throw new NotSupportedException($"Length not supported for type {propertyType.Name}");
         }
 
-        private TEnum GetRandomEnumValue<TEnum>() where TEnum : Enum
+        private object GenerateByPropertyType(Type propertyType)
         {
-            var values = Enum.GetValues(typeof(TEnum));
-            return (TEnum)values.GetValue(_random.Next(values.Length));
+            if (propertyType == typeof(string)) return FakeDataHelper.GenerateRandomString();
+            if (propertyType == typeof(int)) return FakeDataHelper.GenerateUniqueId();
+            if (propertyType == typeof(long)) return (long)FakeDataHelper.GenerateUniqueId();
+            if (propertyType == typeof(DateTime)) return FakeDataHelper.GenerateRandomDateTime();
+            if (propertyType == typeof(bool)) return FakeDataHelper.GetRandomBoolean();
+            if (propertyType.IsEnum) return FakeDataHelper.GetRandomEnumValue(propertyType);
+
+            return propertyType.IsValueType ? Activator.CreateInstance(propertyType) : null;
         }
     }
 }

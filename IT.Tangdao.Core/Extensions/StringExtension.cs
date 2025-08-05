@@ -21,7 +21,7 @@ namespace IT.Tangdao.Core.Extensions
             {
                 return int.Parse(str);
             }
-            catch (FormatException e) when (e.Message=="")
+            catch (FormatException e) when (e.Message == "")
             {
                 // 可以选择返回一个特殊值，比如 -1，或者抛出一个新的异常
                 return -1;
@@ -94,13 +94,13 @@ namespace IT.Tangdao.Core.Extensions
         /// <param name="path"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static StreamReader ToStreamReader(this string path,Encoding encoding=null)
+        public static StreamReader ToStreamReader(this string path, Encoding encoding = null)
         {
             if (encoding is null)
             {
                 encoding = Encoding.UTF8;
             }
-            var result= new StreamReader(path, encoding);
+            var result = new StreamReader(path, encoding);
             return result;
         }
 
@@ -121,9 +121,9 @@ namespace IT.Tangdao.Core.Extensions
                 // 返回null或者空字符串，取决于您的需求
                 return null;
             }
-            string content=string.Empty;
+            string content = string.Empty;
 
-            using (var stream= new StreamReader(path, encoding))
+            using (var stream = new StreamReader(path, encoding))
             {
                 content = stream.ReadToEnd();
             }
@@ -156,13 +156,11 @@ namespace IT.Tangdao.Core.Extensions
             {
                 encoding = Encoding.UTF8;
             }
-            using (var fileStream=new FileStream(path,FileMode.OpenOrCreate))
+            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
             {
                 fileStream.WriteByte(contents);
             }
-            
         }
-
 
         /// <summary>
         /// 继续创建文件
@@ -174,6 +172,7 @@ namespace IT.Tangdao.Core.Extensions
         {
             return new FileStream(localPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write, 1024 * 1024);
         }
+
 #if SUPPORTS_VALUETUPLE
 
         public static FileStream Slice(this FileStream stream, Tuple<long, long> block)
@@ -199,8 +198,6 @@ namespace IT.Tangdao.Core.Extensions
 #endif
         // 只有当 SUPPORTS_VALUETUPLE 编译符号被定义时才包含此代码
 
-
-     
         /// <summary>
         /// 生成一个指定长度的随机字符串，RNGCryptoServiceProvider确保安全性
         /// 使用场景，生成随机密码，会话标识
@@ -295,6 +292,22 @@ namespace IT.Tangdao.Core.Extensions
             }
 
             return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// 将路径中的斜杠(/)转换为反斜杠(\), 适合Windows路径
+        /// </summary>
+        public static string ToBackSlash(this string path)
+        {
+            return path?.Replace("//", "\\");
+        }
+
+        /// <summary>
+        /// 将路径中的反斜杠(\)转换为斜杠(/), 适合URL或跨平台路径
+        /// </summary>
+        public static string ToForwardSlash(this string path)
+        {
+            return path?.Replace("\\", "//");
         }
     }
 }

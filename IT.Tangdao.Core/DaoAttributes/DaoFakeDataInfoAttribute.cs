@@ -9,12 +9,56 @@ namespace IT.Tangdao.Core.DaoAttributes
     [AttributeUsage(AttributeTargets.Property)]
     public class DaoFakeDataInfoAttribute : Attribute
     {
-        public string Message { get; }
-        public Type EnumType { get; set; } // 用于指定枚举类型
+        private string _description;
 
-        public DaoFakeDataInfoAttribute(string message)
+        public string Description
         {
-            Message = message;
+            get => _description;
+            set => _description = value;
+        }
+
+        /// <summary>
+        /// 用于指定数据类型
+        /// </summary>
+        private Type _datatype;
+
+        public Type DataType
+        {
+            get => _datatype;
+            set => _datatype = value;
+        }
+
+        /// <summary>
+        /// 用来指定输出长度
+        /// </summary>
+        private int _length;
+
+        public int Length
+        {
+            get => _length;
+            set => _length = value;
+        }
+
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        private string _defaultValue;
+
+        public string DefaultValue
+        {
+            get => _defaultValue;
+            set => _defaultValue = value;
+        }
+
+        /// <summary>
+        /// 用于指定bool值是否随机
+        /// </summary>
+        private bool _random;
+
+        public bool Random
+        {
+            get => _random;
+            set => _random = value;
         }
     }
 }

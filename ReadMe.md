@@ -261,5 +261,146 @@ xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.C
          Students = new ObservableCollection<Student>(randomStudents);
      }
  }
+ public class Student
+ {
+     public int Id { get; set; }
+
+     [DaoFakeDataInfo("姓名")] // 使用 DaoName 枚举生成姓名
+     public string Name { get; set; }
+
+     public int Age { get; set; }
+
+     [DaoFakeDataInfo("爱好")] // 使用 DaoHobby 枚举生成爱好
+     public string Hobby { get; set; }
+
+     [DaoFakeDataInfo("城市")] // 使用 ChineseCities 数组生成城市
+     public string Address { get; set; }
+ }
+```
+
+#### 8、增加IRouter路由导航
+
+```C#
+<Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <!--  路由视图容器  -->
+    <ContentControl Grid.Row="0" Content="{Binding Router.CurrentView}" />
+
+    <!--  导航控制  -->
+    <StackPanel
+        Grid.Row="1"
+        HorizontalAlignment="Right"
+        Orientation="Horizontal">
+
+        <Button
+            Margin="2"
+            Command="{Binding GoBackCommand}"
+            Content="◄"
+            IsEnabled="{Binding Router.CanGoBack}"
+            ToolTip="上一页" />
+        <Button
+            Margin="2"
+            Command="{Binding GoForwardCommand}"
+            Content="►"
+            IsEnabled="{Binding Router.CanGoForward}"
+            ToolTip="下一页" />
+
+        <Button
+            Margin="5"
+            Command="{Binding GoToStudentListCommand}"
+            Content="学生列表" />
+        <Button
+            Margin="5"
+            Command="{Binding GoToDashboardCommand}"
+            Content="仪表盘" />
+    </StackPanel>
+</Grid>
+```
+
+```C#
+ public class MainWindowViewModel : BindableBase
+ {
+     public IRouter Router { get; }
+     public ICommand GoBackCommand { get; set; }
+     public ICommand GoForwardCommand { get; set; }
+     public ICommand GoToStudentListCommand { get; set; }
+     public ICommand GoToDashboardCommand { get; set; }
+     public StudentViewModel StudentViewModel { get; } = new StudentViewModel();
+
+     public MainWindowViewModel()
+     {
+         // var fake = new DaoFakeDataGeneratorProvider<Student>();
+         // var students = fake.GenerateRandomData(300);
+         // Students = new ObservableCollection<Student>(students);
+         Router = new Router();
+
+         // 注册页面
+         Router.RegisterPage<StudentListViewModel>();
+         Router.RegisterPage<DashboardViewModel>();
+
+         // 设置命令
+         GoBackCommand = new DelegateCommand(Router.GoBack, () => Router.CanGoBack);
+
+         GoForwardCommand = new DelegateCommand(Router.GoForward, () => Router.CanGoForward);
+
+         GoToStudentListCommand = new DelegateCommand<StudentListViewModel>(Router.NavigateTo<StudentListViewModel>);
+
+         GoToDashboardCommand = new DelegateCommand<DashboardViewModel>(Router.NavigateTo<DashboardViewModel>);
+
+         // 初始导航
+         Router.NavigateTo<StudentListViewModel>("StudentListViewModel");
+         //Router.NavigateTo<DashboardViewModel>("DashboardViewModel");
+     }
+ }
+```
+
+#### 9、时间轮
+
+```
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        // 创建时间轮实例
+        var timeWheel = new TimeWheel<Student>();
+        timeWheel.Start(); // 启动时间轮
+        
+        // 创建几个学生
+        var student1 = new Student { Id = 1, Name = "张三", Grade = 3 };
+        var student2 = new Student { Id = 2, Name = "李四", Grade = 2 };
+        var student3 = new Student { Id = 3, Name = "王五", Grade = 1 };
+        
+        Console.WriteLine($"当前时间: {DateTime.Now:HH:mm:ss}");
+        
+        // 添加任务：5秒后打印学生信息
+        await timeWheel.AddTaskAsync(5, student1, async s => 
+        {
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} - 处理学生1: {s}");
+            await Task.Delay(100); // 模拟异步工作
+        });
+        
+        // 添加任务：10秒后升级学生年级
+        await timeWheel.AddTaskAsync(10, student2, async s => 
+        {
+            s.Grade++;
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} - {s.Name}升级到{s.Grade}年级");
+            await Task.Delay(100);
+        });
+        
+        // 添加任务：15秒后发送通知
+        await timeWheel.AddTaskAsync(15, student3, async s => 
+        {
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} - 发送通知给{s.Name}的家长");
+            await Task.Delay(100);
+        });
+        
+        // 防止程序退出
+        Console.ReadLine();
+    }
+}
 ```
 
