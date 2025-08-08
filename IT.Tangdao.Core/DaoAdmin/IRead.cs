@@ -22,6 +22,8 @@ namespace IT.Tangdao.Core.DaoAdmin
 
         IReadResult SelectNodes(string path);
 
+        IReadResult<List<T>> SelectNodes<T>() where T : new();
+
         IReadResult<List<T>> SelectNodes<T>(string rootElement, Func<XElement, T> selector);
 
         IReadResult SelectKeys();
@@ -48,6 +50,8 @@ namespace IT.Tangdao.Core.DaoAdmin
 
         public IRead this[string readObject] { get; }
 
-        public void Load();
+        public IRead this[int readIndex] { get; }
+
+        public void Load(string data);
     }
 }
