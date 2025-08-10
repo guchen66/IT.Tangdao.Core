@@ -18,6 +18,8 @@ namespace IT.Tangdao.Core.DaoAdmin
 
         string JsonFileName { get; set; }
 
+        string ConfigData { get; set; }
+
         IReadResult SelectNode(string text);
 
         IReadResult SelectNodes(string path);

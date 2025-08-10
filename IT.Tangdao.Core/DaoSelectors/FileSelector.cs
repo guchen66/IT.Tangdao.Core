@@ -50,6 +50,31 @@ namespace IT.Tangdao.Core.DaoSelectors
             }
         }
 
+        public static DaoXmlType DetectXmlStructure(XDocument doc)
+        {
+            if (doc == null) return DaoXmlType.Empty;
+
+            var root = doc.Root;
+
+            // 检查是否只有XML声明没有内容
+            if (root == null) return DaoXmlType.None;
+
+            // 检查根节点是否有子元素
+            if (!root.HasElements) return DaoXmlType.Empty;
+
+            // 获取根节点的直接子元素
+            var elements = root.Elements();
+
+            // 只有一个子元素的情况
+            if (elements.Count() == 1)
+            {
+                return DaoXmlType.Single;
+            }
+
+            // 多个子元素的情况
+            return DaoXmlType.Multiple;
+        }
+
         public static void MapXElementToObject<T>(XElement node, T instance)
         {
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);

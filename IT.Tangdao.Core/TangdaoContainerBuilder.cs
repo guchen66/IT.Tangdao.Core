@@ -21,7 +21,7 @@ namespace IT.Tangdao.Core
         {
             var container = new TangdaoContainer();
             container.Register<ITangdaoProvider, TangdaoProvider>();
-            container.Register<IEventTransmit, EventTransmit>();
+            container.Register<IDaoEventAggregator, DaoEventAggregator>();
             container.Register<IReadService, ReadService>();
             container.Register<IWriteService, WriteService>();
             return container;
