@@ -1,4 +1,5 @@
 ﻿using IT.Tangdao.Core.DaoAdmin.IServices;
+using IT.Tangdao.Core.DaoAdmin.Results;
 using IT.Tangdao.Core.DaoEnums;
 using System;
 using System.Collections.Generic;
@@ -20,15 +21,15 @@ namespace IT.Tangdao.Core.DaoAdmin
 
         string ConfigData { get; set; }
 
-        IReadResult SelectNode(string text);
+        ReadResult SelectNode(string text);
 
-        IReadResult SelectNodes(string path);
+        ReadResult SelectNodes(string path);
 
-        IReadResult<List<T>> SelectNodes<T>() where T : new();
+        ReadResult<List<T>> SelectNodes<T>() where T : new();
 
-        IReadResult<List<T>> SelectNodes<T>(string rootElement, Func<XElement, T> selector);
+        ReadResult<List<T>> SelectNodes<T>(string rootElement, Func<XElement, T> selector);
 
-        IReadResult SelectKeys();
+        ReadResult SelectKeys();
 
         /// <summary>
         /// 跟据Key读取Value
@@ -36,7 +37,7 @@ namespace IT.Tangdao.Core.DaoAdmin
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        IReadResult SelectValue(string key);
+        ReadResult SelectValue(string key);
 
         /// <summary>
         /// 读取Json对象
@@ -44,11 +45,11 @@ namespace IT.Tangdao.Core.DaoAdmin
         /// <typeparam name="TResult"></typeparam>
         /// <param name="Result"></param>
         /// <returns></returns>
-       // IReadResult SelectJsonObject<TResult>(TResult @Result);
+       // ReadResult SelectJsonObject<TResult>(TResult @Result);
 
-        IReadResult SelectConfig(string section);
+        ReadResult SelectConfig(string section);
 
-        IReadResult SelectCustomConfig(string configName, string section);
+        ReadResult SelectCustomConfig(string configName, string section);
 
         public IRead this[string readObject] { get; }
 

@@ -465,3 +465,48 @@ class Program
 }
 ```
 
+#### 10、增加文本监控
+
+在程序启动时，注册事件
+
+```
+ protected override void OnLaunch()
+  {
+      base.OnLaunch();
+      // 启动监控服务
+      var monitorService = Container.Get<IMonitorService>();
+      monitorService.FileChanged += OnFileChanged;
+      monitorService.StartMonitoring();
+  }
+
+  private void OnFileChanged(object sender, DaoFileChangedEventArgs e)
+  {
+      Logger.WriteLocal($"XML 文件变化: {e.FilePath}, 变化类型: {e.ChangeType}，变化详情：{e.ChangeDetails}，old:{e.OldContent},new:{e.NewContent}");
+  }
+```
+
+注册代码
+
+```
+// 注册配置
+ Bind<FileMonitorConfig>().ToFactory(container =>
+ {
+     return new FileMonitorConfig
+     {
+         MonitorRootPath = @"E:\IgniteDatas\",
+         IncludeSubdirectories = true,
+         MonitorFileTypes = new List<DaoFileType>
+         {
+             DaoFileType.Xml,
+            // DaoFileType.Config,
+           //  DaoFileType.Json
+         },
+         DebounceMilliseconds = 800,
+         FileReadRetryCount = 3
+     };
+ }).InSingletonScope();
+
+ // 注册监控服务
+ Bind<IMonitorService>().To<FileMonitorService>().InSingletonScope();
+```
+

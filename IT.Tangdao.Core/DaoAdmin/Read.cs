@@ -20,6 +20,7 @@ using IT.Tangdao.Core.Providers;
 using System.Windows.Input;
 using IT.Tangdao.Core.DaoSelectors;
 using System.Reflection.Metadata.Ecma335;
+using IT.Tangdao.Core.DaoAdmin.Results;
 
 namespace IT.Tangdao.Core.DaoAdmin
 {
@@ -110,11 +111,11 @@ namespace IT.Tangdao.Core.DaoAdmin
 
         #region-- 读取XML数据--
 
-        public IReadResult SelectNode(string node)
+        public ReadResult SelectNode(string node)
         {
             if (XMLData == null)
             {
-                return new IReadResult("未进行Load操作", false);
+                return ReadResult.Failure("未进行Load操作");
             }
 
             try
@@ -126,19 +127,19 @@ namespace IT.Tangdao.Core.DaoAdmin
                 switch (xmlType)
                 {
                     case DaoXmlType.Empty:
-                        return new IReadResult("XML内容为空", false);
+                        return ReadResult.Failure("XML内容为空");
 
                     case DaoXmlType.None:
-                        return new IReadResult("XML只有声明没有内容", false);
+                        return ReadResult.Failure("XML只有声明没有内容");
 
                     case DaoXmlType.Single:
                         // 单节点结构 - 直接查找目标节点
                         var singleElement = root.Element(node) ?? root.Elements().First().Element(node);
                         if (singleElement == null)
                         {
-                            return new IReadResult($"节点 '{node}' 不存在", false);
+                            return ReadResult.Failure($"节点 '{node}' 不存在");
                         }
-                        return new IReadResult(singleElement.Value, true);
+                        return ReadResult.Success(singleElement.Value);
 
                     case DaoXmlType.Multiple:
                         if (ReadIndex < 0)
@@ -147,9 +148,9 @@ namespace IT.Tangdao.Core.DaoAdmin
                             var directElement = root.Element(node);
                             if (directElement != null)
                             {
-                                return new IReadResult(directElement.Value, true);
+                                return ReadResult.Success(directElement.Value);
                             }
-                            return new IReadResult("存在多个节点，请指定索引", false);
+                            return ReadResult.Failure("存在多个节点，请指定索引");
                         }
                         else
                         {
@@ -157,25 +158,25 @@ namespace IT.Tangdao.Core.DaoAdmin
                             var parentNode = root.Elements().ElementAtOrDefault(ReadIndex);
                             if (parentNode == null)
                             {
-                                return new IReadResult($"索引 {ReadIndex} 超出范围", false);
+                                return ReadResult.Failure($"索引 {ReadIndex} 超出范围");
                             }
 
                             var targetElement = parentNode.Element(node);
                             if (targetElement == null)
                             {
-                                return new IReadResult($"子节点 '{node}' 不存在", false);
+                                return ReadResult.Success($"子节点 '{node}' 不存在");
                             }
 
-                            return new IReadResult(targetElement.Value, true);
+                            return ReadResult.Success(targetElement.Value);
                         }
 
                     default:
-                        return new IReadResult("未知的XML结构类型", false);
+                        return ReadResult.Failure("未知的XML结构类型");
                 }
             }
             catch (Exception ex)
             {
-                return new IReadResult($"XML解析错误: {ex.Message}", false);
+                return ReadResult.FromException(ex, $"XML解析错误: {ex.Message}");
             }
         }
 
@@ -183,19 +184,19 @@ namespace IT.Tangdao.Core.DaoAdmin
         /// </summary>
         /// <param name="path">这里的path是uri地址，不是XML具体数据</param>
         /// <returns></returns>
-        public IReadResult SelectNodes(string path)
+        public ReadResult SelectNodes(string path)
         {
             XElement xElement = XElement.Load(path);
             List<XElement> xElements = xElement.Descendants().ToList();
 
             if (xElements == null)
             {
-                return new IReadResult($"Element '{path}' not found.", false);
+                return ReadResult.Failure($"Element '{path}' not found.");
             }
-            return new IReadResult(true, result: xElements);
+            return ReadResult<List<XElement>>.Success(xElements);
         }
 
-        public IReadResult<List<T>> SelectNodes<T>(string rootElement, Func<XElement, T> selector)
+        public ReadResult<List<T>> SelectNodes<T>(string rootElement, Func<XElement, T> selector)
         {
             try
             {
@@ -204,24 +205,24 @@ namespace IT.Tangdao.Core.DaoAdmin
 
                 if (elements == null || !elements.Any())
                 {
-                    return new IReadResult<List<T>>("未找到指定的元素。", false);
+                    return ReadResult<List<T>>.Failure("未找到指定的元素。");
                 }
 
                 List<T> result = elements.Select(selector).ToList();
-                return new IReadResult<List<T>>(true, result: result);
+                return ReadResult<List<T>>.Success(result);
             }
             catch (Exception ex)
             {
-                return new IReadResult<List<T>>($"解析 XML 失败: {ex.Message}", false);
+                return ReadResult<List<T>>.FromException(ex);
             }
         }
 
-        public IReadResult<List<T>> SelectNodes<T>() where T : new()
+        public ReadResult<List<T>> SelectNodes<T>() where T : new()
         {
             try
             {
                 if (XMLData == null)
-                    return new IReadResult<List<T>>("未进行Load操作", false);
+                    return ReadResult<List<T>>.Failure("未进行Load操作");
 
                 var doc = XDocument.Parse(XMLData);
                 var result = new List<T>();
@@ -233,11 +234,11 @@ namespace IT.Tangdao.Core.DaoAdmin
                     result.Add(instance);
                 }
 
-                return new IReadResult<List<T>>(true, result);
+                return ReadResult<List<T>>.Success(result);
             }
             catch (Exception ex)
             {
-                return new IReadResult<List<T>>($"解析失败: {ex.Message}", false);
+                return ReadResult<List<T>>.FromException(ex);
             }
         }
 
@@ -245,7 +246,7 @@ namespace IT.Tangdao.Core.DaoAdmin
 
         #region-- 读取Json数据--
 
-        public IReadResult SelectKeys()
+        public ReadResult SelectKeys()
         {
             List<string> keys = new List<string>();
             JObject jsonObject = JObject.Parse(JsonFileName);
@@ -271,7 +272,7 @@ namespace IT.Tangdao.Core.DaoAdmin
             }
 
             GetKeys(jsonObject);
-            return new IReadResult(true, keys);
+            return ReadResult<List<string>>.Success(keys);
         }
 
         /// <summary>
@@ -279,23 +280,23 @@ namespace IT.Tangdao.Core.DaoAdmin
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public IReadResult SelectValue(string key)
+        public ReadResult SelectValue(string key)
         {
             var path = DirectoryHelper.SelectDirectoryByName(JsonFileName);
             string jsonContent = File.ReadAllText(path);
             JObject jsonObject = JObject.Parse(jsonContent);
             if (ReadObject == null)
             {
-                return new IReadResult("转换失败，未设置索引器", false);
+                return ReadResult.Failure("转换失败，未设置索引器");
             }
             JToken valueToken = jsonObject.SelectToken($"{ReadObject}.{key}");
 
             if (valueToken == null || valueToken.Type == JTokenType.Null)
             {
                 // 键不存在或值为 null
-                return new IReadResult("转换失败，JToken为null", false);
+                return ReadResult.Failure("转换失败，JToken为null");
             }
-            return new IReadResult(valueToken.ToString(), true);
+            return ReadResult.Success(valueToken.ToString());
         }
 
         #endregion
@@ -308,18 +309,18 @@ namespace IT.Tangdao.Core.DaoAdmin
         /// 使用了struct后，如果传递数据的扩展方法，需要加上ref
         /// </summary>
         /// <param name="menuList"></param>
-        public IReadResult SelectConfig(string section)
+        public ReadResult SelectConfig(string section)
         {
             IDictionary idict = (IDictionary)ConfigurationManager.GetSection(section);
             Dictionary<string, string> dict = idict.Cast<DictionaryEntry>().ToDictionary(de => de.Key.ToString(), de => de.Value.ToString());
-            return new IReadResult(true, result: dict);
+            return ReadResult<Dictionary<string, string>>.Success(dict);
         }
 
         /// <summary>
         /// 读取自定义的config文件
         /// </summary>
         /// <param name="menuList"></param>
-        public IReadResult SelectCustomConfig(string configName, string section)
+        public ReadResult SelectCustomConfig(string configName, string section)
         {
             Dictionary<string, string> dicts = new Dictionary<string, string>();
             ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap
@@ -333,13 +334,13 @@ namespace IT.Tangdao.Core.DaoAdmin
             if (customSection == null)
             {
                 dicts.Add("null", null);
-                return new IReadResult(false, result: dicts);
+                return ReadResult<Dictionary<string, string>>.Failure(null);
             }
             foreach (MenuElement menu in customSection.Menus)
             {
                 dicts.TryAdd(menu.Title, menu.Value);
             }
-            return new IReadResult(true, result: dicts);
+            return ReadResult<Dictionary<string, string>>.Success(dicts);
         }
 
         #endregion

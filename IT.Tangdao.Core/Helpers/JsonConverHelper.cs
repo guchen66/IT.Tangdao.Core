@@ -110,7 +110,7 @@ namespace IT.Tangdao.Core.Helpers
             }
         }
 
-        //public static IReadResult GetJsonObject(string objectKey)
+        //public static ReadResult GetJsonObject(string objectKey)
         //{
         //    JObject jsonObject = JObject.Parse(jsonContent);
 
@@ -119,9 +119,9 @@ namespace IT.Tangdao.Core.Helpers
         //    if (valueToken == null || valueToken.Type == JTokenType.Null)
         //    {
         //        // 键不存在或值为 null
-        //        return new IReadResult("转换失败，JToken为null", false);
+        //        return new ReadResult("转换失败，JToken为null", false);
         //    }
-        //    return new IReadResult(valueToken.ToString(), true);
+        //    return new ReadResult(valueToken.ToString(), true);
         //}
     }
 }

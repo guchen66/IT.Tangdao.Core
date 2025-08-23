@@ -2,6 +2,7 @@
 using IT.Tangdao.Core.DaoEnums;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -94,6 +95,48 @@ namespace IT.Tangdao.Core.DaoSelectors
                     // 类型转换失败时跳过（或记录日志）
                 }
             }
+        }
+
+        /// <summary>
+        /// 搜索指定目录的所有指定后缀的文件
+        /// </summary>
+        /// <param name="rootDir"></param>
+        /// <param name="fileType"></param>
+        /// <param name="searchSubdirectories"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> SelectFilesByDaoFileType(string rootDir, DaoFileType fileType, bool searchSubdirectories = true)
+        {
+            if (fileType == DaoFileType.None)
+                return Enumerable.Empty<string>();
+
+            string extension = GetExtensionFromFileType(fileType);
+            if (string.IsNullOrEmpty(extension))
+                return Enumerable.Empty<string>();
+
+            var searchOption = searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+            try
+            {
+                return Directory.EnumerateFiles(rootDir, $"*{extension}", searchOption);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        public static string GetExtensionFromFileType(DaoFileType fileType)
+        {
+            return fileType switch
+            {
+                DaoFileType.Txt => ".txt",
+                DaoFileType.Xml => ".xml",
+                DaoFileType.Xlsx => ".xlsx",
+                DaoFileType.Xaml => ".xaml",
+                DaoFileType.Json => ".json",
+                DaoFileType.Config => ".config",
+                _ => null
+            };
         }
 
         /// <summary>
