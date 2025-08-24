@@ -76,7 +76,7 @@ StringExtension 可以方便一些代码
 
 CryptoHelper进行加密解密
 
-```json
+```C#
  string originalText = "Hello, 这是一个测试消息！";
  Console.WriteLine("原始文本: " + originalText);
 
@@ -93,7 +93,7 @@ CryptoHelper进行加密解密
 
 例如xml文档如下
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <UserInfo>
   <Login Id="0">
@@ -115,7 +115,7 @@ CryptoHelper进行加密解密
 
 使用方式
 
-```
+```C#
 // 正确调用（多节点必须指定索引）
 var ip1 = _readService.Current[1].SelectNode("IP").Value;
 
@@ -129,7 +129,7 @@ var ip3 = _readService.Current.SelectNode("IP").Value;
 
 优化繁琐的读取,不需要知道类的所有属性
 
-```
+```C#
   var readResult = _readService.Current.SelectNodes("ProcessItem", x => new ProcessItem
   {
       Name = x.Element("Name")?.Value,
@@ -146,7 +146,7 @@ var ip3 = _readService.Current.SelectNode("IP").Value;
 
 直接通过反射+泛型
 
-```
+```C#
  var readResult = _readService.Current.SelectNodes<ProcessItem>();
 ```
 
@@ -162,13 +162,13 @@ DirectoryHelper
 
 读取根目录节点的XML
 
-```json
+```C#
 readService.Current.SelectNode("");
 ```
 
 读取根目录下的Json
 
-```js
+```C#
  "GeneratorData": {
    "Title": "SqlServer",
    "IsGenerator": "true", //初始化数据库和表格
@@ -176,7 +176,7 @@ readService.Current.SelectNode("");
  }
 ```
 
-```json
+```C#
   IReadService readService = new ReadService();
   readService.Current.JsonData = "AppConfig.json";
   readService.Current["GeneratorData"].SelectValue("Title");
@@ -184,7 +184,7 @@ readService.Current.SelectNode("");
 
 读取指定地址下的txt文件
 
-```json
+```C#
 readService.Read("");
 ```
 
@@ -200,20 +200,20 @@ readService.Read("");
 
 读取json的时候可以写
 
-```json
+```C#
  _readService.Load("appsetting.json", DaoFileType.Json);
  var s1 = _readService.Current["WCF"].SelectValue("Id").Value;
 ```
 
 读取根目录下所有json文件名称
 
-```js
+```C#
 JsonConverHelper.GetRootJsonFileNames();
 ```
 
 读取json文件的内容
 
-```js
+```C#
 JsonConverHelper.GetJsonContent("AppConfig.json","WCF");
 ```
 
@@ -221,7 +221,7 @@ JsonConverHelper.GetJsonContent("AppConfig.json","WCF");
 
 读取Config的时候可以写
 
-```json
+```C#
 var model = _readService.Current.SelectCustomConfig("unity.config", "Tangdao").Result;
 if (model is Dictionary<string, string> dicts)
 {
@@ -236,7 +236,7 @@ if (model is Dictionary<string, string> dicts)
 
 其中unity.config可以写
 
-```
+```C#
 <configSections>
 <section name="Tangdao" type="IT.Tangdao.Framework.DaoCommon.TangdaoMenuSection,IT.Tangdao.Core" />
 </configSections>
@@ -255,7 +255,7 @@ if (model is Dictionary<string, string> dicts)
 
 菜单的配置读取
 
-```
+```C#
 // 初始化
 var menuProvider = new MenuProvider();
 
@@ -281,11 +281,11 @@ string username = menuProvider.Root["header/user"].Value;
 
 获取当前时间，用法：
 
-```js
+```C#
 xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.Core"
 ```
 
-```
+```C#
  <TextBlock Text="{Binding Source={x:Static selector:DateTimeSelector.Instance}, Path=CurrentDate, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
 ```
 
@@ -299,7 +299,7 @@ xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.C
 
 在WPF可以这样使用
 
-```js
+```C#
  public class MainWindowViewModel : BindableBase
  {
      private ObservableCollection<Student> _students;
@@ -421,7 +421,7 @@ xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.C
 
 #### 9、时间轮
 
-```
+```C#
 class Program
 {
     static async Task Main(string[] args)
@@ -469,7 +469,7 @@ class Program
 
 在程序启动时，注册事件
 
-```
+```C#
  protected override void OnLaunch()
   {
       base.OnLaunch();
@@ -487,7 +487,7 @@ class Program
 
 注册代码
 
-```
+```C#
 // 注册配置
  Bind<FileMonitorConfig>().ToFactory(container =>
  {
@@ -508,5 +508,22 @@ class Program
 
  // 注册监控服务
  Bind<IMonitorService>().To<FileMonitorService>().InSingletonScope();
+```
+
+#### 11、任务调度器TangdaoTaskScheduler
+
+```C#
+ TangdaoTaskScheduler.Execute(dao: daoTask =>
+ {
+     
+ });
+
+         
+ TangdaoTaskScheduler.Execute(daoAsync: daoTask =>
+ {
+    
+ });
+
+ TangdaoTaskScheduler.Execute(daoAsync => { }, dao => { });
 ```
 
