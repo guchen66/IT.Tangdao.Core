@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.DaoIoc
+namespace IT.Tangdao.Core.DaoAdmin.Navigates
 {
     public interface ITangdaoPage
     {
@@ -12,10 +12,10 @@ namespace IT.Tangdao.Core.DaoIoc
         string PageTitle { get; }
 
         // 页面加载时执行
-        Task OnNavigatedToAsync(object parameters = null);
+        Task OnNavigatedTo(ITangdaoParameter parameters = null);
 
         // 页面离开时执行
-        Task OnNavigatedFromAsync();
+        Task OnNavigatedFrom();
 
         // 页面是否允许离开（用于阻止导航）
         bool CanNavigateAway();

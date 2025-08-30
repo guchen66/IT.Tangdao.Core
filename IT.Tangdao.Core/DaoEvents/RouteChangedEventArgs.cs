@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.DaoIoc;
+﻿using IT.Tangdao.Core.DaoAdmin.Navigates;
+using IT.Tangdao.Core.DaoIoc;
 using System;
 using System.Collections.Generic;
 using System.Linq;

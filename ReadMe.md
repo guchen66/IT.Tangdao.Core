@@ -6,14 +6,13 @@
 
 静态命令：MinidaoCommand
 
-对TextBlock等没有命令的控件增加命令附加属性
+1-1、用法
 
-````js
- <TextBlock Text="点击我执行简单命令" 
-                   local:CommandBehavior.Command="{Binding SimpleCommand}"
-                   Margin="10" Padding="10"
-                   Background="LightBlue" Cursor="Hand"/>
-````
+```C#
+TangdaoCommand  taodao=new TangdaoCommand();
+TangdaoAsyncCommand taodaoAsync=new TangdaoAsyncCommand();
+MinidaoCommand.Create();
+```
 
 
 
@@ -46,11 +45,26 @@ LoginViewModel:接收
  }
 ```
 
-
-
 #### 2、容器
 
 ITangdaoContainer
+
+```C#
+//容器的初始化
+ITangdaoContainer container = new TangdaoContainer();
+
+//解析器的初始化
+var provider = container.Builder();
+
+//构建一个全局服务定位器
+ServerLocator.InitContainer(container);
+
+//注册接口和实体类
+container.RegisterType<IReadService,ReadService>();
+container.RegisterType<IWriteService,WriteService>();
+```
+
+
 
 对PLC的读取进行了扩展未完成
 
@@ -72,28 +86,100 @@ ITangdaoContainer
 
 #### 3、扩展方法
 
+3-1、读写
+
 StringExtension 可以方便一些代码
 
-CryptoHelper进行加密解密
+读取本地txt文件的方法
+
+```c#
+string path = "E://Temp.txt";
+string xmlContent=TxtFolderHelper.ReadByFileStream(path);
+```
+
+如果是测试读取文件的话，可以简单的读取
+
+```c#
+ string path = "E://Temp.txt";
+ string content=path.CreateFolder().UseStreamReadToEnd();
+```
+
+读取本地xml文件的方法
 
 ```C#
- string originalText = "Hello, 这是一个测试消息！";
- Console.WriteLine("原始文本: " + originalText);
+ string path = "E://Temp//Student.xml";
+ string xmlContent=TxtFolderHelper.ReadByFileStream(path);
+ Student student=XmlFolderHelper.Deserialize<Student>(xmlContent);
+```
 
- // 加密
- string encryptedText = CryptoHelper.Encrypt(originalText);
- Console.WriteLine("加密后的文本: " + encryptedText);
+也可以使用接口读取
 
- // 解密
- string decryptedText = CryptoHelper.Decrypt(encryptedText);
- Console.WriteLine("解密后的文本: " + decryptedText);
+xml文件是
+
+```C#
+<?xml version="1.0" encoding="utf-8"?>
+<Student target="学生">
+	<Id target="009">1</Id>
+	<Age>18</Age>
+	<Name>李四</Name>
+</Student>
+```
+
+实体类为
+
+```c#
+ [XmlRoot("Student")]
+ public class Student
+ {
+     [XmlAttribute("target")]
+     public string Target { get; set; }
+
+     [XmlElement("Id")]
+     public int Id { get; set; }
+
+     [XmlElement("Age")]
+     public int Age { get; set; }
+
+     [XmlElement("Name")]
+     public string Name { get; set; }
+    
+ }
+```
+
+注册接口，然后读取
+
+```c#
+  string path = "E://Temp//Student.xml";
+  Student stu= await _readService.ReadXmlToEntityAsync<Student>(path,DaoFileType.Xml);
+```
+
+简单的读取写入
+
+```C#
+  await _writeService.WriteAsync("E://Temp//100.txt","HelloWorld");
+
+  await _readService.ReadAsync("E://Temp//100.txt");
+```
+
+以及增加了XML的序列化和反序列化
+
+将对象转成XML，以字符串保存
+
+```c#
+string xml=XmlFolderHelper.SerializeXML<Student>(student);
+```
+
+XML字符串反序列化为对象
+
+```c#
+Student student=XmlFolderHelper.Deserialize<Student>(xml);
 ```
 
 使用SelectNode读取xml节点
 
 例如xml文档如下
 
-```xml
+```C#
 <?xml version="1.0" encoding="utf-8"?>
 <UserInfo>
   <Login Id="0">
@@ -156,142 +242,22 @@ var ip3 = _readService.Current.SelectNode("IP").Value;
 
 DirectoryHelper
 
-#### 5、读取数据
-
-使用IReadService读取数据
-
-读取根目录节点的XML
+#### 5、强制组件通信
 
 ```C#
-readService.Current.SelectNode("");
-```
+//同级别窗体通信 
+//tangdaoParameter为发送的数据，可以在打开窗体的时候直接发送数据过去
+this.RunSameLevelWindowAsync<LoginView>(tangdaoParameter);
 
-读取根目录下的Json
-
-```C#
- "GeneratorData": {
-   "Title": "SqlServer",
-   "IsGenerator": "true", //初始化数据库和表格
-   "IsSeedData": "false" //自动生成表数据
- }
-```
-
-```C#
-  IReadService readService = new ReadService();
-  readService.Current.JsonData = "AppConfig.json";
-  readService.Current["GeneratorData"].SelectValue("Title");
-```
-
-读取指定地址下的txt文件
-
-```C#
-readService.Read("");
-```
-
-如果json的格式是
-
-```json
- "WCF": {
-   "Id": "001",
-   "Name": "IgniteWeb",
-   "Startup": false,
- },
-```
-
-读取json的时候可以写
-
-```C#
- _readService.Load("appsetting.json", DaoFileType.Json);
- var s1 = _readService.Current["WCF"].SelectValue("Id").Value;
-```
-
-读取根目录下所有json文件名称
-
-```C#
-JsonConverHelper.GetRootJsonFileNames();
-```
-
-读取json文件的内容
-
-```C#
-JsonConverHelper.GetJsonContent("AppConfig.json","WCF");
+//父子窗体通信
+this.RunChildWindowAsync<LoginView>();
 ```
 
 
 
-读取Config的时候可以写
+#### 6、日志DaoLogger
 
-```C#
-var model = _readService.Current.SelectCustomConfig("unity.config", "Tangdao").Result;
-if (model is Dictionary<string, string> dicts)
-{
-    List<HomeMenuItem> menuItems = dicts.Select(kvp => new HomeMenuItem
-    {
-        Title = kvp.Key,
-        ViewModelName = kvp.Value
-    }).ToList();
-    HomeMenuItems.AddRange(menuItems);
-}
-```
-
-其中unity.config可以写
-
-```C#
-<configSections>
-<section name="Tangdao" type="IT.Tangdao.Framework.DaoCommon.TangdaoMenuSection,IT.Tangdao.Core" />
-</configSections>
-<Tangdao>
-	<menus>
-		<add title="首页" value="DefaultViewModel" />
-		<add title="用户信息" value="UserInfoViewModel" />
-		<add title="设置" value="SetViewModel" />
-		<add title="监控" value="MonitorViewModel" />
-		<add title="维护" value="MaintionViewModel" />
-		<add title="配方" value="RecipeViewModel" />
-		<add title="标定" value="CalibrationViewModel" />
-	</menus>
-</Tangdao>
-```
-
-菜单的配置读取
-
-```C#
-// 初始化
-var menuProvider = new MenuProvider();
-
-// 添加监控
-menuProvider.Watch("header/user", item => 
-{
-    Console.WriteLine($"用户菜单变更: {item.Value}");
-});
-
-// 设置菜单值
-menuProvider.Root["header/title"].Value = "首页";
-menuProvider.Root["header/user"].Value = "张三";
-
-// 获取菜单值
-string username = menuProvider.Root["header/user"].Value;
-```
-
-
-
-#### 6、选择器
-
-###### 1、时间选择器
-
-获取当前时间，用法：
-
-```C#
-xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.Core"
-```
-
-```C#
- <TextBlock Text="{Binding Source={x:Static selector:DateTimeSelector.Instance}, Path=CurrentDate, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
-```
-
-###### 2、文件选择器
-
-###### 3、设备选择器
+日志默认是写在桌面上的
 
 #### 7、自动生成器
 
@@ -300,7 +266,7 @@ xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.C
 在WPF可以这样使用
 
 ```C#
- public class MainWindowViewModel : BindableBase
+public class MainWindowViewModel : BindableBase
  {
      private ObservableCollection<Student> _students;
 
@@ -339,85 +305,213 @@ xmlns:selector="clr-namespace:IT.Tangdao.Core.DaoSelectors;assembly=IT.Tangdao.C
  }
 ```
 
+
+
 #### 8、增加IRouter路由导航
 
-```C#
-<Grid>
-    <Grid.RowDefinitions>
-        <RowDefinition Height="*" />
-        <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
+###### 1、简单的导航，具有翻页功能ISingleRouter
 
-    <!--  路由视图容器  -->
-    <ContentControl Grid.Row="0" Content="{Binding Router.CurrentView}" />
+使用方式，与ISingleNavigateView配合使用
 
-    <!--  导航控制  -->
-    <StackPanel
-        Grid.Row="1"
-        HorizontalAlignment="Right"
-        Orientation="Horizontal">
+使用IOC容器注册所有的视图
 
-        <Button
-            Margin="2"
-            Command="{Binding GoBackCommand}"
-            Content="◄"
-            IsEnabled="{Binding Router.CanGoBack}"
-            ToolTip="上一页" />
-        <Button
-            Margin="2"
-            Command="{Binding GoForwardCommand}"
-            Content="►"
-            IsEnabled="{Binding Router.CanGoForward}"
-            ToolTip="下一页" />
+XAML Code：
 
-        <Button
-            Margin="5"
-            Command="{Binding GoToStudentListCommand}"
-            Content="学生列表" />
-        <Button
-            Margin="5"
-            Command="{Binding GoToDashboardCommand}"
-            Content="仪表盘" />
-    </StackPanel>
-</Grid>
+```
+ <!--  动态内容区  -->
+ <ContentControl
+     HorizontalContentAlignment="Stretch"
+     VerticalContentAlignment="Stretch"
+     s:View.Model="{Binding CurrentView}" />
+
+ <!--  智能控制栏  -->
+ <Border
+     Grid.Row="1"
+     Padding="10"
+     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+         <!--  导航按钮  -->
+         <Button
+             Width="100"
+             Command="{s:Action Previous}"
+             Content="◄ 上一页"
+             IsEnabled="{Binding CanPrevious}" />
+
+         <!--  自动轮播开关 Mode=OneWay允许 UI 反映状态，但禁止 UI 修改状态  -->
+         <ToggleButton
+             Width="200"
+             Margin="20,0"
+             Background="{Binding IsAutoRotating, Converter={StaticResource BoolToColorConverter}}"
+             Command="{s:Action ToggleAutoCarousel}"
+             Content="{Binding AutoRotateStatusText}"
+             IsChecked="{Binding IsAutoRotating, Mode=OneWay}" />
+
+         <!--  导航按钮  -->
+         <Button
+             Width="100"
+             Command="{s:Action Next}"
+             Content="下一页 ►"
+             IsEnabled="{Binding CanNext}" />
+     </StackPanel>
+ </Border>
 ```
 
-```C#
- public class MainWindowViewModel : BindableBase
+CS Code：
+
+```
+ public class GlobalPhotoViewModel : Screen
  {
-     public IRouter Router { get; }
-     public ICommand GoBackCommand { get; set; }
-     public ICommand GoForwardCommand { get; set; }
-     public ICommand GoToStudentListCommand { get; set; }
-     public ICommand GoToDashboardCommand { get; set; }
-     public StudentViewModel StudentViewModel { get; } = new StudentViewModel();
+     private readonly ISingleRouter _router;
 
-     public MainWindowViewModel()
+     public ISingleNavigateView CurrentView => _router.CurrentView;
+     public bool CanPrevious => _router.CanPrevious;
+     public bool CanNext => _router.CanNext;
+     public bool IsAutoRotating => _router.IsAutoRotating;
+     public string AutoRotateStatusText => _router.IsAutoRotating ? "自动轮播开启中" : "自动轮播已禁用";
+
+     public GlobalPhotoViewModel(ISingleRouter router)
      {
-         // var fake = new DaoFakeDataGeneratorProvider<Student>();
-         // var students = fake.GenerateRandomData(300);
-         // Students = new ObservableCollection<Student>(students);
-         Router = new Router();
+         _router = router;
+         _router.PropertyChanged += OnRouterPropertyChanged;
+         _router.NavigationChanged += OnRouterNavigationChanged;
+     }
 
-         // 注册页面
-         Router.RegisterPage<StudentListViewModel>();
-         Router.RegisterPage<DashboardViewModel>();
+     public void Previous()
+     {
+         _router.Previous();
+     }
 
-         // 设置命令
-         GoBackCommand = new DelegateCommand(Router.GoBack, () => Router.CanGoBack);
+     public void Next()
+     {
+         _router.Next();
+     }
 
-         GoForwardCommand = new DelegateCommand(Router.GoForward, () => Router.CanGoForward);
+     public void ToggleAutoCarousel() => _router.ToggleAutoCarousel();
 
-         GoToStudentListCommand = new DelegateCommand<StudentListViewModel>(Router.NavigateTo<StudentListViewModel>);
+     private void OnRouterPropertyChanged(object sender, PropertyChangedEventArgs e)
+     {
+         // 将路由器的属性变化转发到视图模型
+         NotifyOfPropertyChange(e.PropertyName);
 
-         GoToDashboardCommand = new DelegateCommand<DashboardViewModel>(Router.NavigateTo<DashboardViewModel>);
+         if (e.PropertyName == nameof(ISingleRouter.IsAutoRotating))
+         {
+             NotifyOfPropertyChange(nameof(AutoRotateStatusText));
+         }
+     }
 
-         // 初始导航
-         Router.NavigateTo<StudentListViewModel>("StudentListViewModel");
-         //Router.NavigateTo<DashboardViewModel>("DashboardViewModel");
+     private void OnRouterNavigationChanged(object sender, EventArgs e)
+     {
+         NotifyOfPropertyChange(nameof(CurrentView));
+         NotifyOfPropertyChange(nameof(CanPrevious));
+         NotifyOfPropertyChange(nameof(CanNext));
+     }
+
+     protected override void OnDeactivate()
+     {
+         _router.IsAutoRotating = false;
+         base.OnDeactivate();
      }
  }
 ```
+
+
+
+###### 2、工业级别导航，具有拦截器ITangdaoRouter
+
+使用时与ITangdaoPage配合
+
+XAML Code：
+
+```C#
+  <!--  路由视图容器  -->
+  <ContentControl Grid.Row="0" Content="{Binding Router.CurrentView}" />
+
+  <!--  导航控制  -->
+  <StackPanel
+      Grid.Row="1"
+      HorizontalAlignment="Right"
+      Orientation="Horizontal">
+
+      <Button
+          Margin="2"
+          Command="{Binding GoBackCommand}"
+          Content="◄"
+          IsEnabled="{Binding Router.CanGoBack}"
+          ToolTip="上一页" />
+      <Button
+          Margin="2"
+          Command="{Binding GoForwardCommand}"
+          Content="►"
+          IsEnabled="{Binding Router.CanGoForward}"
+          ToolTip="下一页" />
+      <Button
+          Margin="5"
+          Command="{s:Action GoToVacuumGaugeView}"
+          Content="真空表" />
+      <Button
+          Margin="5"
+          Command="{s:Action GoToDigitalSmartGaugeView}"
+          Content="数字智能测量仪" />
+  </StackPanel>
+```
+
+CS Code:
+
+```
+ public class PressureViewModel : BaseDeviceViewModel, IRouteComponent
+ {
+     public ITangdaoRouter Router { get; set; }
+     public IContainer _container;
+
+     public PressureViewModel(ITangdaoRouter router, IContainer container) : base("Pressure")
+     {
+         Router = router;
+         _container = container;
+         Router.RouteComponent = this;
+         Router.RegisterPage<DigitalSmartGaugeViewModel>();
+         Router.RegisterPage<DifferentialGaugeViewModel>();
+         Router.RegisterPage<VacuumGaugeViewModel>();
+         GoBackCommand = MinidaoCommand.Create(ExecuteGoBack);
+         GoForwardCommand = MinidaoCommand.Create(ExecuteGoForward);
+     }
+
+     private void ExecuteGoForward()
+     {
+         Router.GoForward();
+     }
+
+     private void ExecuteGoBack()
+     {
+         Router.GoBack();
+     }
+
+     public ICommand GoBackCommand { get; set; }
+     public ICommand GoForwardCommand { get; set; }
+
+     public void GoToDigitalSmartGaugeView()
+     {
+         Router.NavigateTo<DigitalSmartGaugeViewModel>();
+     }
+
+     public void GoToVacuumGaugeView()
+     {
+         Router.NavigateTo<VacuumGaugeViewModel>();
+     }
+
+     protected override void OnViewLoaded()
+     {
+         base.OnViewLoaded();
+     }
+
+     public ITangdaoPage ResolvePage(string route)
+     {
+         var result = _container.Get<ITangdaoPage>(route);
+         return result;
+     }
+ }
+```
+
+
 
 #### 9、时间轮
 
@@ -465,12 +559,14 @@ class Program
 }
 ```
 
+
+
 #### 10、增加文本监控
 
-在程序启动时，注册事件
+在程序启动时注册事件
 
 ```C#
- protected override void OnLaunch()
+  protected override void OnLaunch()
   {
       base.OnLaunch();
       // 启动监控服务
@@ -488,7 +584,7 @@ class Program
 注册代码
 
 ```C#
-// 注册配置
+ // 注册配置
  Bind<FileMonitorConfig>().ToFactory(container =>
  {
      return new FileMonitorConfig
@@ -513,17 +609,17 @@ class Program
 #### 11、任务调度器TangdaoTaskScheduler
 
 ```C#
- TangdaoTaskScheduler.Execute(dao: daoTask =>
- {
-     
- });
+  TangdaoTaskScheduler.Execute(dao: daoTask =>
+  {
+      
+  });
 
          
- TangdaoTaskScheduler.Execute(daoAsync: daoTask =>
- {
-    
- });
+  TangdaoTaskScheduler.Execute(daoAsync: daoTask =>
+  {
+     
+  });
 
- TangdaoTaskScheduler.Execute(daoAsync => { }, dao => { });
+  TangdaoTaskScheduler.Execute(daoAsync => { }, dao => { });
 ```
 
