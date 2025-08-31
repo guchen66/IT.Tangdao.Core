@@ -16,6 +16,7 @@ namespace IT.Tangdao.Core.DaoAdmin.Navigates
         bool CanPrevious { get; }
         bool CanNext { get; }
         bool IsAutoRotating { get; set; }
+        string CurrentGroupKey { get; set; }
 
         event EventHandler NavigationChanged;
 
