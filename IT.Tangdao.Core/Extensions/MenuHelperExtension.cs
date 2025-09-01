@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoDtos.Items;
+﻿using IT.Tangdao.Core.DaoParameters.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace IT.Tangdao.Core.Extensions
 {
     public static class MenuHelperExtension
     {
-        public static IMenuItem Find(this IMenuItem menuItem, string key, bool create = false)
+        public static ITangdaoMenuItem Find(this ITangdaoMenuItem menuItem, string key, bool create = false)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -17,7 +17,7 @@ namespace IT.Tangdao.Core.Extensions
             }
 
             string[] pathSegments = key.Split('/'); // 假设用/分隔路径
-            IMenuItem current = menuItem;
+            ITangdaoMenuItem current = menuItem;
 
             foreach (string segment in pathSegments)
             {
@@ -30,9 +30,9 @@ namespace IT.Tangdao.Core.Extensions
                     child = new TangdaoMenuItem
                     {
                         MenuName = segment,
-                        Childs = new List<IMenuItem>()
+                        Childs = new List<ITangdaoMenuItem>()
                     };
-                    current.Childs ??= new List<IMenuItem>();
+                    current.Childs ??= new List<ITangdaoMenuItem>();
                     current.Childs.Add(child);
                 }
 

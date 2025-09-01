@@ -1,4 +1,6 @@
-﻿using System;
+﻿using IT.Tangdao.Core.DaoParameters.Infrastructure;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,25 +11,23 @@ namespace IT.Tangdao.Core
     public class TangdaoParameter : ITangdaoParameter
     {
         // 存储参数
-        private readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
+        private readonly ConcurrentDictionary<string, ITangdaoValue> _parameters = new ConcurrentDictionary<string, ITangdaoValue>();
 
         // 存储命令
-        private readonly Dictionary<string, Delegate> _commands = new Dictionary<string, Delegate>();
+        private readonly ConcurrentDictionary<string, Delegate> _commands = new ConcurrentDictionary<string, Delegate>();
 
         // 添加参数
         public void Add<T>(string key, T value)
         {
-            _parameters[key] = value;
+            _parameters[key] = new TangdaoValue<T>(value);
         }
 
         // 获取参数
         public T Get<T>(string key)
         {
-            if (_parameters.TryGetValue(key, out var value))
-            {
-                return (T)value;
-            }
-            return default(T);
+            if (_parameters.TryGetValue(key, out var box) && box is TangdaoValue<T> b)
+                return b.Value;                // 无拆箱
+            return default;
         }
 
         // 添加无参数、无返回值的命令

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.DaoDtos.Items
+namespace IT.Tangdao.Core.DaoParameters.Infrastructure
 {
     /// <summary>
     /// 用于配置菜单
     /// </summary>
-    public interface IMenuItem
+    public interface ITangdaoMenuItem
     {
         /// <summary>
         /// 配置Id
@@ -29,7 +29,7 @@ namespace IT.Tangdao.Core.DaoDtos.Items
         /// <summary>
         /// 子级
         /// </summary>
-        IList<IMenuItem> Childs { get; set; }
+        IList<ITangdaoMenuItem> Childs { get; set; }
 
         /// <summary>
         /// 获取或设置配置值
