@@ -6,7 +6,7 @@
 	<UseWPF>true</UseWPF>
 	<Title>一个简易开发的工具类库包</Title>
 	<Authors>liuxin</Authors>
-	<Version>2.0.18</Version>
+	<Version>2.0.20</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>2.0.2</AssemblyVersion>
     
@@ -20,7 +20,15 @@
  </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Roslynator.Analyzers" Version="4.14.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
 	  <Reference Include="Microsoft.Windows.SDK.NET">
 		  <HintPath>E:\nuget\MyPackages\Microsoft.Windows.SDK.NET.dll</HintPath>
 	  </Reference>

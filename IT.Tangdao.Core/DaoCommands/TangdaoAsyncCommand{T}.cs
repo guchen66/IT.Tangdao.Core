@@ -9,13 +9,13 @@ namespace IT.Tangdao.Core.DaoCommands
 {
     public class TangdaoAsyncCommand<T> : ICommand
     {
-        private readonly Func<T,Task> _executeAsync;
+        private readonly Func<T, Task> _executeAsync;
 
-        private readonly Func<T,bool> _canExecuteAsync;
+        private readonly Func<T, bool> _canExecuteAsync;
 
-        private bool _isExecuting = false;
+        private bool _isExecuting;
 
-        public TangdaoAsyncCommand(Func<T,Task> executeAsync, Func<T,bool> canExecuteAsync = null)
+        public TangdaoAsyncCommand(Func<T, Task> executeAsync, Func<T, bool> canExecuteAsync = null)
         {
             this._executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
             this._canExecuteAsync = canExecuteAsync;

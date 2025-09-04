@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.DaoAttributes
 {
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
     public class TangdaoAttribute : Attribute
     {
         public string Name { get; set; }

@@ -13,7 +13,7 @@ namespace IT.Tangdao.Core.DaoCommands
 
         private readonly Func<bool> _canExecuteAsync;
 
-        private bool _isExecuting = false;
+        private bool _isExecuting;
 
         public TangdaoAsyncCommand(Func<Task> executeAsync, Func<bool> canExecuteAsync = null)
         {
@@ -34,11 +34,11 @@ namespace IT.Tangdao.Core.DaoCommands
 
         public async void Execute(object parameter)
         {
-            if (CanExecute(parameter)) 
+            if (CanExecute(parameter))
             {
                 _isExecuting = true;
                 await _executeAsync();
-                _isExecuting=false;
+                _isExecuting = false;
             }
         }
     }

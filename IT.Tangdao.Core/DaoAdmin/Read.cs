@@ -24,7 +24,7 @@ using IT.Tangdao.Core.DaoAdmin.Results;
 
 namespace IT.Tangdao.Core.DaoAdmin
 {
-    public sealed class Read : IRead
+    internal sealed class Read : IRead
     {
         private string _xmlData;
 

@@ -21,7 +21,7 @@ namespace IT.Tangdao.Core.DaoConverters
         {
             if (serviceProvider == null)
             {
-                throw new ArgumentNullException("类型必须是枚举类型");
+                throw new ArgumentNullException(nameof(serviceProvider), "serviceProvider 不能为 null");
             }
             var actualType = Nullable.GetUnderlyingType(_enumType) ?? _enumType;
             var enumType = Enum.GetValues(_enumType);

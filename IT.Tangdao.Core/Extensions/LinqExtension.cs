@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ namespace IT.Tangdao.Core.Extensions
         public static IEnumerable<string> OnlyAdd(this IEnumerable<string> source, string newItem)
         {
             if (source == null)
-                throw new ArgumentNullException(nameof(source));
+                ArgumentNullException.ThrowIfNull(nameof(source));
 
             // 转换为HashSet提高查询效率
             var existingItems = new HashSet<string>(source, StringComparer.Ordinal);
@@ -55,10 +56,9 @@ namespace IT.Tangdao.Core.Extensions
             where T : IAddParent
         {
             if (source == null)
-                throw new ArgumentNullException(nameof(source));
+                ArgumentNullException.ThrowIfNull(nameof(source));
             if (newItem == null)
-                throw new ArgumentNullException(nameof(newItem));
-
+                ArgumentNullException.ThrowIfNull(nameof(newItem));
             // 检查是否已存在相同ID的项
             bool exists = source.Any(item => item.Id == newItem.Id);
 
@@ -68,6 +68,24 @@ namespace IT.Tangdao.Core.Extensions
             }
 
             return source;
+        }
+
+        public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
+        {
+            if (collection == null) ArgumentNullException.ThrowIfNull(nameof(collection));
+            if (items == null) ArgumentNullException.ThrowIfNull(nameof(items));
+
+            TangdaoTaskScheduler.Execute(dao: daoTask =>
+            {
+                // 先检查是否有元素
+                var itemList = items as IList<T> ?? items.ToList();
+                if (itemList.Count == 0) return;
+
+                foreach (var item in itemList)
+                {
+                    collection.Add(item);
+                }
+            });
         }
     }
 
