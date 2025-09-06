@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.DaoDtos;
+﻿using IT.Tangdao.Core.DaoAdmin.Results;
+using IT.Tangdao.Core.DaoDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace IT.Tangdao.Core.DaoAdmin.IServices
 {
     public interface IAlarmReadService
     {
-        Task<TangdaoResponse> ReadAlarm<TEntity>(TEntity entity, string alarmId);
+        //Task<ReadResult> ReadAlarm<TEntity>(TEntity entity, string alarmId);
     }
 }

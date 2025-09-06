@@ -1,4 +1,5 @@
 ﻿using IT.Tangdao.Core.DaoAdmin.IServices;
+using IT.Tangdao.Core.DaoAdmin.Results;
 using IT.Tangdao.Core.DaoDtos;
 using System;
 using System.Collections.Generic;
@@ -16,21 +17,20 @@ namespace IT.Tangdao.Core.DaoAdmin.Services
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public async Task<TangdaoResponse> ReadLocalFile(string filePath)
+        public async Task<ReadResult> ReadLocalFile(string filePath)
         {
-            if (filePath !=null)
+            if (filePath != null)
             {
                 using (var sr = new StreamReader(filePath))
                 {
-                    var result=await sr.ReadToEndAsync();
-                    return new TangdaoResponse(result, true);
+                    var result = await sr.ReadToEndAsync();
+                    return ReadResult.Success();
                 }
-
             }
-            return new TangdaoResponse(false, AlarmBackResult.Failt);
+            return ReadResult.Failure("文本不存在");
         }
 
-        public Task<TangdaoResponse> ReadNetFile(string filePath)
+        public Task<ReadResult> ReadNetFile(string filePath)
         {
             throw new NotImplementedException();
         }

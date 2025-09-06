@@ -16,8 +16,8 @@ namespace IT.Tangdao.Core.Helpers
         /// </summary>
         public static void GetLocalIPByDns()
         {
-            IPHostEntry entry=Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress[] addresss=entry.AddressList;
+            IPHostEntry entry = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress[] addresss = entry.AddressList;
             foreach (IPAddress addr in addresss)
             {
                 Console.WriteLine(addr);
@@ -33,11 +33,10 @@ namespace IT.Tangdao.Core.Helpers
             IPAddress[] addresss = entry.AddressList;
             foreach (IPAddress ip in addresss)
             {
-                if (ip.AddressFamily==System.Net.Sockets.AddressFamily.InterNetwork)
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                 {
                     Console.WriteLine(ip.ToString());
                 }
-               
             }
         }
 
@@ -114,6 +113,35 @@ namespace IT.Tangdao.Core.Helpers
                 ip = endPoint.Address.ToString();
             }
             Console.WriteLine(ip);
+        }
+
+        /// <summary>
+        /// Uri转换未IP
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public static IPAddress UriToIPAddress(Uri uri)
+        {
+            if (uri.HostNameType == UriHostNameType.IPv4 ||
+                uri.HostNameType == UriHostNameType.IPv6)
+                return IPAddress.Parse(uri.Host);          // 192.168.1.100
+
+            // 如果是Dns名，先解析
+            return Dns.GetHostAddresses(uri.Host)[0];      // 返回第一个地址
+        }
+
+        /// <summary>
+        /// IP转Uri
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="scheme"></param>
+        /// <returns></returns>
+        public static Uri IPAddressToUri(IPAddress ip, int port, string scheme = "tcp")
+        {
+            // 0.0.0.0 特殊处理：监听地址写成 0.0.0.0，但 Uri 里建议写 *
+            string host = ip.Equals(IPAddress.Any) ? "*" : ip.ToString();
+            return new Uri($"{scheme}://{host}:{port}");
         }
     }
 }

@@ -6,7 +6,7 @@
 	<UseWPF>true</UseWPF>
 	<Title>一个简易开发的工具类库包</Title>
 	<Authors>liuxin</Authors>
-	<Version>2.0.20</Version>
+	<Version>2.0.21</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>2.0.2</AssemblyVersion>
     
@@ -29,6 +29,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.IO.Ports" Version="9.0.8" />
 	  <Reference Include="Microsoft.Windows.SDK.NET">
 		  <HintPath>E:\nuget\MyPackages\Microsoft.Windows.SDK.NET.dll</HintPath>
 	  </Reference>

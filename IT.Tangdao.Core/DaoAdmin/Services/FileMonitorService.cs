@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace IT.Tangdao.Core.DaoAdmin.Services
 
         public void StartMonitoring(FileMonitorConfig config)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (config == null) ArgumentNullException.ThrowIfNull(nameof(config));
 
             _config = config;
             _status = DaoMonitorStatus.Monitoring;
@@ -278,9 +279,9 @@ namespace IT.Tangdao.Core.DaoAdmin.Services
         {
             if (string.IsNullOrEmpty(content)) return string.Empty;
 
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            using (var sha256 = SHA256.Create())
             {
-                var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(content));
+                var hash = SHA256.HashData(Encoding.UTF8.GetBytes(content));
                 return Convert.ToBase64String(hash);
             }
         }
@@ -328,7 +329,7 @@ namespace IT.Tangdao.Core.DaoAdmin.Services
                 }
             }
 
-            return changes.Any() ? string.Join("; ", changes.Take(3)) + (changes.Count > 3 ? "..." : "") : "格式变化";
+            return changes.Count > 0 ? string.Join("; ", changes.Take(3)) + (changes.Count > 3 ? "..." : "") : "格式变化";
         }
 
         private string CompareJsonChanges(string oldJson, string newJson)

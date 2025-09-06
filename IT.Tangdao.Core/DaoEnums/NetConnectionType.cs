@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.DaoEnums
 {
-    public enum ConnectMode
+    public enum NetConnectionType
     {
         /// <summary>
         /// 未知模式
@@ -26,6 +26,6 @@ namespace IT.Tangdao.Core.DaoEnums
         /// <summary>
         /// 串口通讯
         /// </summary>
-        Port
+        Serial
     }
 }
