@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Windows;
 
-namespace IT.Tangdao.Core.DaoConverters
+namespace IT.Tangdao.Core.DaoMarkup
 {
+    /// <summary>
+    /// 获取当前控件所在的Window实例
+    /// </summary>
     public class GetWindowExtension : MarkupExtension
     {
         public override object ProvideValue(IServiceProvider serviceProvider)

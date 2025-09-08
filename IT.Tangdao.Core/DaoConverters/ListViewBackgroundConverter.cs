@@ -11,16 +11,14 @@ using System.Windows.Media;
 
 namespace IT.Tangdao.Core.DaoConverters
 {
-    public class ListViewBackgroundConverter : ValueConverterBase
+    public class ListViewBackgroundConverter : NoBindingValueConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             ListViewItem item = (ListViewItem)value;
-            ListView listView =
-                ItemsControl.ItemsControlFromItemContainer(item) as ListView;
+            ListView listView = ItemsControl.ItemsControlFromItemContainer(item) as ListView;
             // Get the index of a ListViewItem
-            int index =
-                listView.ItemContainerGenerator.IndexFromContainer(item);
+            int index = listView.ItemContainerGenerator.IndexFromContainer(item);
 
             if (index % 2 == 0)
             {
@@ -30,11 +28,6 @@ namespace IT.Tangdao.Core.DaoConverters
             {
                 return Brushes.White;
             }
-        }
-
-        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

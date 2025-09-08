@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-namespace IT.Tangdao.Core.DaoConverters
+namespace IT.Tangdao.Core.DaoMarkup
 {
-    public class EnumBindSourceValueConverter : MarkupExtension
+    public class EnumBindSourceExtension : MarkupExtension
     {
         private Type _enumType;
 

@@ -9,9 +9,9 @@ using System.Windows.Media.Imaging;
 
 namespace IT.Tangdao.Core.DaoConverters
 {
-    public class StringToImageRelativeConverter : IValueConverter
+    public class StringToImageRelativeConverter : NoBindingValueConverterBase
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string path = (string)value;
             if (!string.IsNullOrEmpty(path))
@@ -22,11 +22,6 @@ namespace IT.Tangdao.Core.DaoConverters
             {
                 return null;
             }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return null;
         }
     }
 }
