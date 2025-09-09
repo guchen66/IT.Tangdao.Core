@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace IT.Tangdao.Core.DaoConverters
+namespace IT.Tangdao.Core.DaoConverters.Wpf
 {
     public abstract class NoBindingValueConverterBase : ValueConverterBase
     {

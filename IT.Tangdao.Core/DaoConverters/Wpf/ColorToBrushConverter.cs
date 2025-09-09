@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace IT.Tangdao.Core.DaoConverters
+namespace IT.Tangdao.Core.DaoConverters.Wpf
 {
     public class ColorToBrushConverter : NoBindingValueConverterBase
     {

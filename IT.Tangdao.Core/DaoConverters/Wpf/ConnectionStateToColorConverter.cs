@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace IT.Tangdao.Core.DaoConverters
+namespace IT.Tangdao.Core.DaoConverters.Wpf
 {
     public class ConnectionStateToColorConverter : ValueConverterBase
     {
@@ -28,11 +28,6 @@ namespace IT.Tangdao.Core.DaoConverters
 
             // 默认情况下返回透明色
             return new SolidColorBrush(Colors.Transparent);
-        }
-
-        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

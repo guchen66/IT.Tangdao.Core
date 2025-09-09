@@ -3,28 +3,29 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core
+namespace IT.Tangdao.Core.DaoTasks
 {
-    public sealed class TangdaoTask : IDisposable
+    public sealed class TangdaoTaskAsync : IDisposable
     {
         private readonly Stopwatch _sw = Stopwatch.StartNew();
-        private bool _disposed;                       // 防止重复 Dispose
-        private readonly object _lock = new object(); // 线程安全
+        private bool _disposed;
+        private readonly object _lock = new object();
 
-        #region ---- 对外只读状态 ----
-
+        // 1. 对外只读状态
         public TimeSpan Elapsed => _sw.Elapsed;
-        public string Duration => _sw.Elapsed.ToString(@"hh\:mm\:ss\.fff");
+
+        public string Duration => _sw.Elapsed.ToString(@"hh\\:mm\\:ss\\.fff");
         public TaskStatus Status { get; private set; } = TaskStatus.Running;
         public Exception Error { get; private set; }
         public bool IsCompletedSuccessfully => Status == TaskStatus.RanToCompletion;
 
-        #endregion ---- 对外只读状态 ----
+        // 2. 取消令牌源（由调度器注入，业务代码只读）
+        public CancellationToken CancellationToken { get; internal set; }
 
-        #region ---- 生命周期钩子（调度器会调用） ----
-
+        // 3. 生命周期钩子（调度器调用）
         internal void MarkCompleted()
         {
             lock (_lock)
@@ -44,9 +45,9 @@ namespace IT.Tangdao.Core
             }
         }
 
-        #endregion ---- 生命周期钩子（调度器会调用） ----
-
-        #region ---- IDisposable ----
+        // 4. 业务侧 helpers
+        public void ThrowIfCancellationRequested()
+            => CancellationToken.ThrowIfCancellationRequested();
 
         public void Dispose()
         {
@@ -60,7 +61,5 @@ namespace IT.Tangdao.Core
                             : Status;
             }
         }
-
-        #endregion ---- IDisposable ----
     }
 }

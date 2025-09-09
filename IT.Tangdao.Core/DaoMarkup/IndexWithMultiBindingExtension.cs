@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows;
-using IT.Tangdao.Core.DaoConverters;
+using IT.Tangdao.Core.DaoConverters.Wpf;
 
 namespace IT.Tangdao.Core.DaoMarkup
 {

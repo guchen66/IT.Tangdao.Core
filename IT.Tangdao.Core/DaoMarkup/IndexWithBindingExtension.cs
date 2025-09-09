@@ -1,4 +1,5 @@
 ﻿using IT.Tangdao.Core.DaoConverters;
+using IT.Tangdao.Core.DaoConverters.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;

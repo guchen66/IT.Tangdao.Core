@@ -9,10 +9,29 @@ namespace IT.Tangdao.Core.DaoAdmin.Results
     /// <summary>
     /// 基础结果接口
     /// </summary>
+    /// <summary>
+    /// 基础查询结果接口（适用于所有查询操作）
+    /// </summary>
     public interface IQueryableResult
     {
+        /// <summary>
+        /// 操作是否成功
+        /// </summary>
         bool IsSuccess { get; }
+
+        /// <summary>
+        /// 结果消息
+        /// </summary>
         string Message { get; }
+
+        /// <summary>
+        /// 操作时间戳
+        /// </summary>
         DateTime Timestamp { get; }
+
+        /// <summary>
+        /// 异常信息（如果有）
+        /// </summary>
+        Exception Exception { get; }
     }
 }

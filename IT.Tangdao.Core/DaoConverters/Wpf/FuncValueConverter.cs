@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace IT.Tangdao.Core.DaoConverters
+namespace IT.Tangdao.Core.DaoConverters.Wpf
 {
     public sealed class FuncValueConverter<TIn, TOut> : ValueConverterBase
     {

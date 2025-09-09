@@ -7,43 +7,61 @@ using System.Threading.Tasks;
 namespace IT.Tangdao.Core.DaoAdmin.Results
 {
     /// <summary>
-    /// 写入操作结果
+    /// 非泛型写入结果
     /// </summary>
-    public class WriteResult : IQueryableResult
+    public class WriteResult : QueryableResult
     {
-        public bool IsSuccess { get; protected set; }
-        public string Message { get; protected set; }
-        public DateTime Timestamp { get; } = DateTime.UtcNow;
-        public Exception Exception { get; protected set; }
-        public int AffectedCount { get; protected set; }
+        public string Result { get; protected set; }
+        public long Size { get; protected set; }
+        public string Format { get; protected set; }
 
-        public WriteResult()
+        protected WriteResult()
         { }
 
-        public static WriteResult Success(int affectedCount = 0, string message = "写入成功")
+        // 成功方法
+        public static WriteResult Success(string result = null, string message = "写入成功",
+                                      long size = 0, string format = null)
         {
             return new WriteResult
             {
                 IsSuccess = true,
                 Message = message,
-                AffectedCount = affectedCount
+                Result = result,
+                Size = size,
+                Format = format,
+                OperationType = "WriteOperation"
             };
         }
 
-        public static WriteResult Failure(string message, Exception exception = null, int affectedCount = 0)
+        public new static WriteResult Failure(string message, Exception exception = null,
+                                     string result = null)
         {
             return new WriteResult
             {
                 IsSuccess = false,
                 Message = message,
                 Exception = exception,
-                AffectedCount = affectedCount
+                Result = result,
+                OperationType = "WriteOperation"
             };
         }
 
-        public static WriteResult FromException(Exception ex, int affectedCount = 0)
+        public new static WriteResult FromException(Exception exception, string source = null)
         {
-            return Failure($"写入过程中发生异常: {ex.Message}", ex, affectedCount);
+            return Failure($"读取异常: {exception.Message}", exception, source);
+        }
+
+        /// <summary>
+        /// 将非泛型WriteResult转换为泛型WriteResult<T>
+        /// </summary>
+        public WriteResult<T> ToWriteResult<T>()
+        {
+            // 如果已经是目标类型，直接返回
+            if (this is WriteResult<T> typedResult)
+            {
+                return typedResult;
+            }
+            throw new InvalidOperationException($"无法将 {GetType().Name} 转换为 WriteResult<{typeof(T).Name}>");
         }
     }
 }

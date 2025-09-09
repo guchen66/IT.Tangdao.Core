@@ -181,8 +181,9 @@ namespace IT.Tangdao.Core.DaoAdmin
         }
 
         /// <summary>
+        /// 这里的path是uri地址，不是XML具体数据
         /// </summary>
-        /// <param name="path">这里的path是uri地址，不是XML具体数据</param>
+        /// <param name="path"></param>
         /// <returns></returns>
         public ReadResult SelectNodes(string path)
         {
@@ -203,7 +204,7 @@ namespace IT.Tangdao.Core.DaoAdmin
                 var doc = XDocument.Parse(XMLData);
                 var elements = doc.Root.Elements().Select(node => node).ToList();
 
-                if (elements == null || !elements.Any())
+                if (elements == null || elements.Count > 0)
                 {
                     return ReadResult<List<T>>.Failure("未找到指定的元素。");
                 }
@@ -308,7 +309,6 @@ namespace IT.Tangdao.Core.DaoAdmin
         /// 这两个引用没有传递值，是读取config的值，所以不需要使用ref，
         /// 使用了struct后，如果传递数据的扩展方法，需要加上ref
         /// </summary>
-        /// <param name="menuList"></param>
         public ReadResult SelectConfig(string section)
         {
             IDictionary idict = (IDictionary)ConfigurationManager.GetSection(section);
@@ -316,10 +316,35 @@ namespace IT.Tangdao.Core.DaoAdmin
             return ReadResult<Dictionary<string, string>>.Success(dict);
         }
 
+        public ReadResult SelectConfig<T>(string section) where T : class, new()
+        {
+            IDictionary idict = (IDictionary)ConfigurationManager.GetSection(section);
+
+            var dict = idict.Cast<DictionaryEntry>()
+                           .ToDictionary(
+                               de => de.Key.ToString(),
+                               de => Convert.ChangeType(de.Value, typeof(T)) as T
+                           );
+
+            return ReadResult<Dictionary<string, T>>.Success(dict);
+        }
+
+        public ReadResult SelectConfigByJsonConvert<T>(string section) where T : class, new()
+        {
+            T Target = new T();
+            IDictionary idict = (IDictionary)ConfigurationManager.GetSection(section);
+            var dict = idict.Cast<DictionaryEntry>()
+                   .ToDictionary(
+                       de => de.Key.ToString(),
+                       de => JsonConvert.DeserializeObject<T>(de.Value.ToString())
+                   );
+
+            return ReadResult<Dictionary<string, T>>.Success(dict);
+        }
+
         /// <summary>
         /// 读取自定义的config文件
         /// </summary>
-        /// <param name="menuList"></param>
         public ReadResult SelectCustomConfig(string configName, string section)
         {
             Dictionary<string, string> dicts = new Dictionary<string, string>();

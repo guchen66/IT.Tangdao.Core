@@ -7,43 +7,61 @@ using System.Threading.Tasks;
 namespace IT.Tangdao.Core.DaoAdmin.Results
 {
     /// <summary>
-    /// 读取操作结果
+    /// 非泛型读取结果
     /// </summary>
-    public class ReadResult : IQueryableResult
+    public class ReadResult : QueryableResult
     {
-        public bool IsSuccess { get; protected set; }
-        public string Message { get; protected set; }
-        public DateTime Timestamp { get; } = DateTime.UtcNow;
-        public Exception Exception { get; protected set; }
-        public string RawValue { get; protected set; }
+        public string Result { get; protected set; }
+        public long Size { get; protected set; }
+        public string Format { get; protected set; }
 
         protected ReadResult()
         { }
 
-        public static ReadResult Success(string rawValue = null, string message = "读取成功")
+        // 成功方法
+        public static ReadResult Success(string result = null, string message = "读取成功",
+                                      long size = 0, string format = null)
         {
             return new ReadResult
             {
                 IsSuccess = true,
                 Message = message,
-                RawValue = rawValue
+                Result = result,
+                Size = size,
+                Format = format,
+                OperationType = "ReadOperation"
             };
         }
 
-        public static ReadResult Failure(string message, Exception exception = null, string rawValue = null)
+        public new static ReadResult Failure(string message, Exception exception = null,
+                                     string result = null)
         {
             return new ReadResult
             {
                 IsSuccess = false,
                 Message = message,
                 Exception = exception,
-                RawValue = rawValue
+                Result = result,
+                OperationType = "ReadOperation"
             };
         }
 
-        public static ReadResult FromException(Exception ex, string rawValue = null)
+        public new static ReadResult FromException(Exception exception, string source = null)
         {
-            return Failure($"读取过程中发生异常: {ex.Message}", ex, rawValue);
+            return Failure($"读取异常: {exception.Message}", exception, source);
+        }
+
+        /// <summary>
+        /// 将非泛型ReadResult转换为泛型ReadResult<T>
+        /// </summary>
+        public ReadResult<T> ToReadResult<T>()
+        {
+            // 如果已经是目标类型，直接返回
+            if (this is ReadResult<T> typedResult)
+            {
+                return typedResult;
+            }
+            throw new InvalidOperationException($"无法将 {GetType().Name} 转换为 ReadResult<{typeof(T).Name}>");
         }
     }
 }

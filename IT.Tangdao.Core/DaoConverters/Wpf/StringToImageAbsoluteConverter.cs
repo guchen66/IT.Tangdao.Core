@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
-namespace IT.Tangdao.Core.DaoConverters
+namespace IT.Tangdao.Core.DaoConverters.Wpf
 {
-    public class StringToImageAbsoluteConverter : IValueConverter
+    public class StringToImageAbsoluteConverter : NoBindingValueConverterBase
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string path = (string)value;
             if (!string.IsNullOrEmpty(path))
@@ -22,11 +22,6 @@ namespace IT.Tangdao.Core.DaoConverters
             {
                 return null;
             }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return null;
         }
     }
 }

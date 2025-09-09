@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace IT.Tangdao.Core
+namespace IT.Tangdao.Core.DaoTasks
 {
     public static class TangdaoTaskScheduler
     {
