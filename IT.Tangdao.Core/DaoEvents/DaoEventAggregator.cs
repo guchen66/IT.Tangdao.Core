@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IT.Tangdao.Core.DaoEvents.Delegates;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;

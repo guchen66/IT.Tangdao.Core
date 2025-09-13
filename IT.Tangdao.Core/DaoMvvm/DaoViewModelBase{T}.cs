@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoParameters.EventArg;
+﻿using IT.Tangdao.Core.Parameters.EventArg;
 using System;
 using System.Collections;
 using System.Collections.Generic;

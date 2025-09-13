@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoCommon;
+﻿using IT.Tangdao.Core.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

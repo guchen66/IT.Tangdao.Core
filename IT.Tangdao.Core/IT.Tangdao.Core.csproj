@@ -6,15 +6,24 @@
 	<UseWPF>true</UseWPF>
 	<Title>一个简易开发的工具类库包</Title>
 	<Authors>liuxin</Authors>
-	<Version>3.0.1</Version>
+	<Version>3.0.3</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>2.0.2</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/guchen66/IT.Tangdao.Core</RepositoryUrl>
+    <PackAsTool>False</PackAsTool>
+    <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
   </PropertyGroup>
 
  <ItemGroup>
    <None Include="..\LICENSE.md">
+     <Pack>True</Pack>
+     <PackagePath>\</PackagePath>
+   </None>
+   <None Include="..\ReadMe.md">
      <Pack>True</Pack>
      <PackagePath>\</PackagePath>
    </None>

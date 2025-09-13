@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoComponents;
+﻿using IT.Tangdao.Core.Components;
 using IT.Tangdao.Core.Providers;
 using System;
 using System.Collections.Generic;

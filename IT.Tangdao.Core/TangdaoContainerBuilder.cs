@@ -1,6 +1,6 @@
-﻿using IT.Tangdao.Core.DaoAdmin.IServices;
-using IT.Tangdao.Core.DaoAdmin.Services;
-using IT.Tangdao.Core.DaoCommon;
+﻿using IT.Tangdao.Core.Abstractions.IServices;
+using IT.Tangdao.Core.Abstractions.Services;
+using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.DaoEvents;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoEnums;
+﻿using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections.Generic;

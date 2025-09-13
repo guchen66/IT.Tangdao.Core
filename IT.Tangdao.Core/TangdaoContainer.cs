@@ -3,21 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using IT.Tangdao.Core.DaoCommon;
+using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.DaoMvvm;
 using IT.Tangdao.Core.Extensions;
-using IT.Tangdao.Core.DaoComponents;
-using IT.Tangdao.Core.DaoDtos.Globals;
 using IT.Tangdao.Core.DaoException;
-using IT.Tangdao.Core.Providers;
-using System.ComponentModel;
-using IT.Tangdao.Core.DaoEvents;
-using Newtonsoft.Json.Linq;
-using System.Linq.Expressions;
-using System.Windows;
 
 namespace IT.Tangdao.Core
 {
@@ -42,7 +31,7 @@ namespace IT.Tangdao.Core
                 ParameterInfos = parameters
             };
 
-            ChannelEvent.SetContext<TService>(context);
+            TangdaoContext.SetContext<TService>(context);
             return this;
         }
 
@@ -64,7 +53,7 @@ namespace IT.Tangdao.Core
             // 存储接口和实现类的映射
             context.InterfaceToImplementationMapping[serviceType] = implementationType;
 
-            ChannelEvent.SetContext<TService>(context);
+            TangdaoContext.SetContext<TService>(context);
             return this;
         }
 

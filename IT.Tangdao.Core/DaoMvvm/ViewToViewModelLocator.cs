@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoAttributes;
+﻿using IT.Tangdao.Core.Attributes;
 using IT.Tangdao.Core.DaoException;
 using System;
 using System.Collections.Generic;

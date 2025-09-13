@@ -1,7 +1,7 @@
-﻿using IT.Tangdao.Core.DaoAttributes;
-using IT.Tangdao.Core.DaoCommon;
+﻿using IT.Tangdao.Core.Attributes;
+using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.DaoEvents;
-using IT.Tangdao.Core.DaoSelectors;
+using IT.Tangdao.Core.Selectors;
 using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace IT.Tangdao.Core
 
         public ITangdaoProvider Provider;
 
-        public TangdaoContext Context;
+        //  public TangdaoContext Context;
 
         public Assembly Assembly;
 
@@ -41,7 +41,7 @@ namespace IT.Tangdao.Core
             Register(Container);
             // 自动关联 View 和 ViewModel
             AutoWireViewAndViewModel();
-            OnConfigure(Context);
+            //  OnConfigure(Context);
 
             OnInitialized();
         }
@@ -72,7 +72,7 @@ namespace IT.Tangdao.Core
             {
                 InitWindow(window);
             }
-            ChannelEvent.GetTangdaoContext(Provider);
+            // ChannelEvent.GetTangdaoContext(Provider);
         }
 
         private void InitWindow(Window window)
@@ -82,7 +82,7 @@ namespace IT.Tangdao.Core
 
         protected abstract Window CreateWindow();
 
-        protected abstract void OnConfigure(TangdaoContext Context);
+        //  protected abstract void OnConfigure(TangdaoContext Context);
 
         protected virtual Assembly GetAssembly(Assembly assembly)
         {

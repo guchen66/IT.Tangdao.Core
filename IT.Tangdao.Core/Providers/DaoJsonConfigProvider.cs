@@ -1,5 +1,5 @@
-﻿using IT.Tangdao.Core.DaoAdmin;
-using IT.Tangdao.Core.DaoAdmin.Results;
+﻿using IT.Tangdao.Core.Abstractions;
+using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Helpers;
 using Newtonsoft.Json.Linq;
 using System;

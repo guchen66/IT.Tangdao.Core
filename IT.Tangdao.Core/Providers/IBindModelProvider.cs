@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoAdmin.IServices;
+﻿using IT.Tangdao.Core.Abstractions.IServices;
 using IT.Tangdao.Core.DaoMvvm;
 using IT.Tangdao.Core.Helpers;
 using System;

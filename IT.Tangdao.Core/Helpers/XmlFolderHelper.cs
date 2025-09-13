@@ -14,7 +14,10 @@ namespace IT.Tangdao.Core.Helpers
     using System.Xml;
     using System.Xml.Serialization;
 
-    public class XmlFolderHelper
+    /// <summary>
+    /// Xml序列化反序列化帮助类
+    /// </summary>
+    public static class XmlFolderHelper
     {
         /// <summary>
         /// 将对象转成XML，并以指定编码保存为字符串
@@ -101,7 +104,12 @@ namespace IT.Tangdao.Core.Helpers
             }
         }
 
-        // 更简洁的反序列化方法，不需要处理命名空间
+        /// <summary>
+        /// 更简洁的反序列化方法，不需要处理命名空间
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xml"></param>
+        /// <returns></returns>
         public static T DeserializeSimple<T>(string xml)
         {
             var xmlSerializer = new XmlSerializer(typeof(T));

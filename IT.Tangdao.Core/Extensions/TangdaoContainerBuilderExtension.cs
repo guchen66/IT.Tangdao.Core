@@ -1,11 +1,7 @@
-﻿using IT.Tangdao.Core.DaoCommon;
-using IT.Tangdao.Core.DaoDtos.Options;
-using IT.Tangdao.Core.DaoEnums;
+﻿using IT.Tangdao.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Extensions
 {

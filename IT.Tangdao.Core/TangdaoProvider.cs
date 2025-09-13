@@ -1,12 +1,4 @@
-﻿using IT.Tangdao.Core.DaoCommon;
-using IT.Tangdao.Core.DaoDtos.Globals;
-using IT.Tangdao.Core.DaoEvents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace IT.Tangdao.Core
 {

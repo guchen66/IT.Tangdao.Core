@@ -1,5 +1,5 @@
-﻿using IT.Tangdao.Core.DaoCommon;
-using IT.Tangdao.Core.DaoEnums;
+﻿using IT.Tangdao.Core.Common;
+using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.DaoEvents;
 using Newtonsoft.Json.Linq;
 using System;
@@ -25,7 +25,7 @@ namespace IT.Tangdao.Core.Extensions
             }
 
             //否则，解析时，跟据数据通道传递数据上下文
-            RegisterContext context = ChannelEvent.GetContext<TService>();
+            RegisterContext context = TangdaoContext.GetContext<TService>();
 
             if (context == null)
             {
@@ -94,7 +94,7 @@ namespace IT.Tangdao.Core.Extensions
                 // 如果参数类型是接口，则从映射中查找对应的实现类
                 if (parameterType.IsInterface)
                 {
-                    var context = ChannelEvent.GetContext(parameterType);
+                    var context = TangdaoContext.GetContext(parameterType);
                     object[] parameterValues = new object[context.ParameterInfos.Length];
                     if (context == null || !context.InterfaceToImplementationMapping.TryGetValue(parameterType, out var implementationType))
                     {

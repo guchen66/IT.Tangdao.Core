@@ -1,5 +1,4 @@
-﻿using IT.Tangdao.Core.DaoAdmin.Results;
-using IT.Tangdao.Core.DaoConverters;
+﻿using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Utilys;
 using System;
 using System.Collections.Generic;
@@ -32,7 +31,7 @@ namespace IT.Tangdao.Core.Extensions
             return DictToObject.Convert<T>(dict);
         }
 
-        public static List<string> FirstOrDefault(this ReadResult result, string keyValue = null)
+        public static List<string> ToList(this ReadResult result, string keyValue = null)
         {
             var dict = result.ToDictionary();
 

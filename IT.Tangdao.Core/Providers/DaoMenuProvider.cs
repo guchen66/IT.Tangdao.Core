@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoParameters.Infrastructure;
+﻿using IT.Tangdao.Core.Parameters.Infrastructure;
 using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace IT.Tangdao.Core.Providers
 {
     public class DaoMenuProvider
     {
-        private record Mode(string Path, Action<ITangdaoMenuItem> OnChange);
+        private sealed record Mode(string Path, Action<ITangdaoMenuItem> OnChange);
         private readonly Dictionary<string, Mode> _watchList = new();
 
         public virtual ITangdaoMenuItem Root { get; set; } = new TangdaoMenuItem()

@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IT.Tangdao.Core.DaoAdmin;
+using IT.Tangdao.Core.Abstractions;
 using System.Net.Http.Json;
 using System.Windows.Input;
 

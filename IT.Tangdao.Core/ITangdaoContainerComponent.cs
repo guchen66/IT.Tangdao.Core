@@ -1,5 +1,5 @@
-﻿using IT.Tangdao.Core.DaoCommon;
-using IT.Tangdao.Core.DaoComponents;
+﻿using IT.Tangdao.Core.Common;
+using IT.Tangdao.Core.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;

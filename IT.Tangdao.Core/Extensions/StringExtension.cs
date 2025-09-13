@@ -8,67 +8,60 @@ using System.Text.RegularExpressions;
 
 namespace IT.Tangdao.Core.Extensions
 {
+    /// <summary>
+    /// string类型常用的扩展方法
+    /// </summary>
     public static class StringExtension
     {
-        public static int ToInt(this string str)
-        {
-            int result = 0;
-            if (string.IsNullOrWhiteSpace(str))
-            {
-                return result;
-            }
-            try
-            {
-                return int.Parse(str);
-            }
-            catch (FormatException e) when (e.Message == "")
-            {
-                // 可以选择返回一个特殊值，比如 -1，或者抛出一个新的异常
-                return -1;
-            }
-        }
+        /// <summary>
+        /// string转int类型
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static int ToInt(this string str) =>
+           string.IsNullOrWhiteSpace(str) ? -1 : int.Parse(str);
 
         //请注意，[NotNullWhen(true)] 属性通常用于指示当方法返回 true 时，输出参数不为 null。在这个场景中，它并不适用
+        /// <summary>
+        /// 将字符串转为32位int类型
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public static bool TryToInt(this string str, out int result)
         {
-            if (string.IsNullOrWhiteSpace(str))
-            {
-                result = 0; // 或者你可以选择返回 -1 或其他默认值
-                return false;
-            }
-
-            // 尝试转换字符串到整数
             return int.TryParse(str, out result);
         }
 
+        /// <summary>
+        /// 将字符串转换为 <see cref="double"/>；
+        /// 空串或格式错误返回 <see cref="double.NaN"/>。
+        /// </summary>
         public static double ToDouble(this string str)
         {
-            double result = 0;
-            if (string.IsNullOrWhiteSpace(str))
-            {
-                return result;
-            }
-            try
-            {
-                return double.Parse(str, CultureInfo.InvariantCulture);
-            }
-            catch (FormatException)
-            {
-                // 可以选择返回一个特殊值，比如 double.NaN 或者 double.MinValue
-                return double.NaN;
-            }
+            return double.TryParse(str, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var val) ? val : double.NaN;
         }
 
+        /// <summary>
+        /// string转double类型，失败不抛异常
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public static bool TryToDouble(this string str, out double result)
         {
-            if (string.IsNullOrWhiteSpace(str))
-            {
-                result = 0; // 或者你可以选择返回 double.NaN 或其他默认值
-                return false;
-            }
-
-            // 尝试转换字符串到双精度浮点数
             return double.TryParse(str, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
+        }
+
+        /// <summary>
+        /// string转bool类型，失败不抛异常
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryToBool(this string str, out bool result)
+        {
+            return bool.TryParse(str, out result);
         }
 
         /// <summary>
@@ -76,8 +69,8 @@ namespace IT.Tangdao.Core.Extensions
         /// </summary>
         public static bool ContainsIgnoreCase(this string source, string value)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (source == null) ArgumentNullException.ThrowIfNull(source);
+            if (value == null) ArgumentNullException.ThrowIfNull(value);
 
             return source.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
         }
