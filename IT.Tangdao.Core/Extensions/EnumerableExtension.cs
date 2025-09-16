@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Parameters.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Extensions
 {
+    /// <summary>
+    /// 对Linq和列表的扩展方法
+    /// </summary>
     public static class EnumerableExtension
     {
         /// <summary>
@@ -39,6 +43,67 @@ namespace IT.Tangdao.Core.Extensions
                 callback?.Invoke(item);
                 yield return item;
             }
+        }
+
+        /// <summary>
+        /// 为 IEnumerable<T> 添加索引
+        /// </summary>
+        /// <typeparam name="T">集合元素类型</typeparam>
+        /// <param name="source">源集合</param>
+        /// <returns>包含元素及其索引的 IEnumerable</returns>
+        public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> source)
+        {
+            return source.Select((item, index) => (item, index));
+        }
+
+        public static IEnumerable<(T item, int index)> FilterByPredicateWithIndex<T>(this IEnumerable<T> source, Func<(T item, int index), bool> predicate)
+        {
+            return source.Select((item, index) => (item, index)).Where(predicate);
+        }
+
+        public static IEnumerable<TResult> TransformWithIndex<T, TResult>(this IEnumerable<T> source, Func<(T item, int index), TResult> selector)
+        {
+            return source.Select((item, index) => selector((item, index)));
+        }
+
+        /// <summary>
+        /// 确保字符串集合不包含重复项（大小写敏感）
+        /// </summary>
+        public static IEnumerable<string> OnlyAdd(this IEnumerable<string> source, string newItem)
+        {
+            if (source == null)
+                ArgumentNullException.ThrowIfNull(nameof(source));
+
+            // 转换为HashSet提高查询效率
+            var existingItems = new HashSet<string>(source, StringComparer.Ordinal);
+
+            if (!existingItems.Contains(newItem))
+            {
+                return source.Concat(new[] { newItem });
+            }
+
+            return source; // 已存在则返回原集合
+        }
+
+        /// <summary>
+        /// 确保实现IAddParent接口的对象集合不包含重复ID
+        /// </summary>
+        public static IEnumerable<T> OnlyAdd<T>(this IEnumerable<T> source, T newItem) where T : IAddParent
+        {
+            if (source == null)
+                ArgumentNullException.ThrowIfNull(source);
+            if (newItem == null)
+                ArgumentNullException.ThrowIfNull(nameof(newItem));
+
+            // 检查是否已存在相同ID的项
+            bool exists = source.Any(item => item.Id == newItem.Id);
+
+            if (!exists)
+            {
+                return source.Concat(new[] { newItem });
+            }
+
+            return source;
         }
     }
 }

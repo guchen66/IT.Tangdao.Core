@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -65,6 +66,100 @@ namespace IT.Tangdao.Core.Extensions
         }
 
         /// <summary>
+        /// 把仅含一个逗号的字符串按逗号切成左右两部分，返回元组。
+        /// 若逗号数量 ≠ 1，抛 FormatException。
+        /// </summary>
+        public static (string left, string right) TryToTupleFromSingleComma(this string source)
+        {
+            if (source is null) ArgumentNullException.ThrowIfNull(source);
+
+            ReadOnlySpan<char> span = source.AsSpan();
+            int idx = span.IndexOf(',');
+            if (idx == -1 || span.Slice(idx + 1).IndexOf(',') != -1)
+                throw new FormatException("字符串必须且只能包含一个逗号。");
+
+            return (
+                left: span.Slice(0, idx).ToString(),
+                right: span.Slice(idx + 1).ToString()
+            );
+        }
+
+        /// <summary>
+        /// 对字符串添加大括号
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string TryInsertBraces(this string str) => $"{{{str}}}";
+
+        /// <summary>
+        /// 尝试对字符串添加中括号
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string TryInsertBrackets(this string str) => $"[{str}]";
+
+        /// <summary>
+        /// 对字符串添加小括号
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string TryInsertParentheses(this string str) => $"({str})";
+
+        /// <summary>
+        /// 对字符串添加尖括号
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string TryInserTangleBrackets(this string str) => $"<{str}>";
+
+        /// <summary> 用任意字符在两侧各包 n 个 </summary>
+        public static string TryWrap(this string str, char c, int n = 1) => str.PadLeft(str.Length + n, c).PadRight(str.Length + n * 2, c);
+
+        /// <summary>
+        /// 如果字符串头尾同时出现一对大括号，则去掉它们；否则返回原串。
+        /// </summary>
+        public static string TryRemoveBraces(this string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+            return str.StartsWith('{') && str.EndsWith('}') && str.Length >= 2
+                ? str[1..^1]
+                : str;
+        }
+
+        /// <summary>
+        /// 如果字符串头尾同时出现一对中括号，则去掉它们；否则返回原串。
+        /// </summary>
+        public static string TryRemoveBrackets(this string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+            return str.StartsWith('[') && str.EndsWith(']') && str.Length >= 2
+                ? str[1..^1]
+                : str;
+        }
+
+        /// <summary>
+        /// 如果字符串头尾同时出现一对小括号，则去掉它们；否则返回原串。
+        /// </summary>
+        public static string TryRemoveParentheses(this string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+            return str.StartsWith('(') && str.EndsWith(')') && str.Length >= 2
+                ? str[1..^1]
+                : str;
+        }
+
+        /// <summary>
+        /// 如果字符串头尾同时出现一对尖括号，则去掉它们；否则返回原串。
+        /// </summary>
+        public static string TryRemoveAngleBrackets(this string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+            return str.StartsWith('<') && str.EndsWith('>') && str.Length >= 2
+                ? str[1..^1]
+                : str;
+        }
+
+        /// <summary>
         /// 检查字符串是否包含指定的子字符串（不区分大小写）
         /// </summary>
         public static bool ContainsIgnoreCase(this string source, string value)
@@ -116,14 +211,10 @@ namespace IT.Tangdao.Core.Extensions
         /// <exception cref="InvalidOperationException"></exception>
         public static string UseStreamReadToEnd(this string path, Encoding encoding = null)
         {
-            if (encoding is null)
-            {
-                encoding = Encoding.UTF8;
-            }
+            encoding ??= Encoding.UTF8;
             if (!File.Exists(path))
             {
-                // 返回null或者空字符串，取决于您的需求
-                return null;
+                throw new FileNotFoundException("文件路径不存在");
             }
             string content = string.Empty;
 
@@ -134,32 +225,41 @@ namespace IT.Tangdao.Core.Extensions
             return content;
         }
 
+        /// <summary>
+        /// 打开文件并阅读
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
         public static Stream UseFileOpenRead(this string path, Encoding encoding = null)
         {
-            if (encoding is null)
-            {
-                encoding = Encoding.UTF8;
-            }
+            encoding ??= Encoding.UTF8;
             return File.OpenRead(path);
         }
 
+        /// <summary>
+        /// 向指定文本写入内容，注意path不能是文件夹
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="contents"></param>
+        /// <param name="encoding"></param>
         public static void UseFileWriteToTxt(this string path, string contents, Encoding encoding = null)
         {
-            if (encoding == null)
-            {
-                encoding = Encoding.UTF8;
-            }
+            encoding ??= Encoding.UTF8;
             // 确保目录存在
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             File.WriteAllText(path, contents, encoding);
         }
 
+        /// <summary>
+        /// 向指定文本写入byte内容，注意path不能是文件夹
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="contents"></param>
+        /// <param name="encoding"></param>
         public static void UseFileWriteByteToTxt(this string path, byte contents, Encoding encoding = null)
         {
-            if (encoding == null)
-            {
-                encoding = Encoding.UTF8;
-            }
+            encoding ??= Encoding.UTF8;
             using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
             {
                 fileStream.WriteByte(contents);
@@ -219,30 +319,6 @@ namespace IT.Tangdao.Core.Extensions
         }
 
 #endif
-        // 只有当 SUPPORTS_VALUETUPLE 编译符号被定义时才包含此代码
-
-        /// <summary>
-        /// 生成一个指定长度的随机字符串，RNGCryptoServiceProvider确保安全性
-        /// 使用场景，生成随机密码，会话标识
-        /// </summary>
-        /// <param name="length"></param>
-        /// <returns></returns>
-        public static string TryToRandomString(int length)
-        {
-            var b = new byte[4];
-            new RNGCryptoServiceProvider().GetBytes(b);
-            var r = new Random(BitConverter.ToInt32(b, 0));
-            var ret = string.Empty;
-            const string str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            for (var i = 0; i < length; i++)
-                ret += str.Substring(r.Next(0, str.Length - 1), 1);
-            return ret;
-        }
-
-        /// <summary>
-        /// 这个字段可以作为日志标识符使用
-        /// </summary>
-        public static string LogId => TryToRandomString(48);
 
         /// <summary>
         /// 在一个段落中，获取两个指定字符串之间的文本
@@ -258,7 +334,12 @@ namespace IT.Tangdao.Core.Extensions
             return rg.Match(text).Value;
         }
 
-        public static bool IsEmailAddress(this string @this)
+        /// <summary>
+        /// 判空，字符串不能为null，string.Empty,""," "
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsNotNullable(this string @this)
         {
             return !string.IsNullOrEmpty(@this) && !string.IsNullOrWhiteSpace(@this);
         }

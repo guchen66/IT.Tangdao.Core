@@ -16,6 +16,8 @@ using System.Configuration;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Selectors;
 using IT.Tangdao.Core.Abstractions.Results;
+using IT.Tangdao.Core.Extensions;
+using System.Windows.Markup;
 
 namespace IT.Tangdao.Core.Abstractions
 {
@@ -116,58 +118,31 @@ namespace IT.Tangdao.Core.Abstractions
             try
             {
                 var doc = XDocument.Parse(XMLData);
-                var root = doc.Root;
+
+                var root = doc.RootElement();
+
+                // 2. 结构检测
                 var xmlType = FileSelector.DetectXmlStructure(doc);
+                if (xmlType == DaoXmlType.Empty) return ReadResult.Failure("XML内容为空");
+                if (xmlType == DaoXmlType.None) return ReadResult.Failure("XML只有声明没有内容");
 
-                switch (xmlType)
+                // 3. 统一导航 + 取值
+                XElement? target = xmlType switch
                 {
-                    case DaoXmlType.Empty:
-                        return ReadResult.Failure("XML内容为空");
+                    DaoXmlType.Single => root.Element(node) ?? root.Elements().First().Element(node),
 
-                    case DaoXmlType.None:
-                        return ReadResult.Failure("XML只有声明没有内容");
+                    DaoXmlType.Multiple when ReadIndex < 0
+                        => root.Element(node),   // 扁平结构直接找
 
-                    case DaoXmlType.Single:
-                        // 单节点结构 - 直接查找目标节点
-                        var singleElement = root.Element(node) ?? root.Elements().First().Element(node);
-                        if (singleElement == null)
-                        {
-                            return ReadResult.Failure($"节点 '{node}' 不存在");
-                        }
-                        return ReadResult.Success(singleElement.Value);
+                    DaoXmlType.Multiple
+                        => root.Elements().ElementAtOrDefault(ReadIndex)?.Element(node),
 
-                    case DaoXmlType.Multiple:
-                        if (ReadIndex < 0)
-                        {
-                            // 尝试直接查找节点(适用于扁平结构)
-                            var directElement = root.Element(node);
-                            if (directElement != null)
-                            {
-                                return ReadResult.Success(directElement.Value);
-                            }
-                            return ReadResult.Failure("存在多个节点，请指定索引");
-                        }
-                        else
-                        {
-                            // 处理指定索引的情况
-                            var parentNode = root.Elements().ElementAtOrDefault(ReadIndex);
-                            if (parentNode == null)
-                            {
-                                return ReadResult.Failure($"索引 {ReadIndex} 超出范围");
-                            }
+                    _ => null
+                };
 
-                            var targetElement = parentNode.Element(node);
-                            if (targetElement == null)
-                            {
-                                return ReadResult.Success($"子节点 '{node}' 不存在");
-                            }
-
-                            return ReadResult.Success(targetElement.Value);
-                        }
-
-                    default:
-                        return ReadResult.Failure("未知的XML结构类型");
-                }
+                return target == null
+                    ? ReadResult.Failure(xmlType == DaoXmlType.Multiple && ReadIndex < 0 ? "存在多个节点，请指定索引" : $"节点 '{node}' 不存在")
+                    : ReadResult.Success(target.ValueOrDefault());
             }
             catch (Exception ex)
             {
@@ -178,18 +153,17 @@ namespace IT.Tangdao.Core.Abstractions
         /// <summary>
         /// 这里的path是uri地址，不是XML具体数据
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="uriPath"></param>
         /// <returns></returns>
-        public ReadResult SelectNodes(string path)
+        public ReadResult SelectNodes(string uriPath)
         {
-            XElement xElement = XElement.Load(path);
-            List<XElement> xElements = xElement.Descendants().ToList();
-
+            XElement xElement = uriPath.LoadFromFile().Root;
+            IEnumerable<XElement> xElements = xElement.Descendants();
             if (xElements == null)
             {
-                return ReadResult.Failure($"Element '{path}' not found.");
+                return ReadResult.Failure($"Element '{uriPath}' not found.");
             }
-            return ReadResult<List<XElement>>.Success(xElements);
+            return ReadResult<IEnumerable<XElement>>.Success(xElements);
         }
 
         public ReadResult<List<T>> SelectNodes<T>(string rootElement, Func<XElement, T> selector)
