@@ -171,6 +171,52 @@ namespace IT.Tangdao.Core.Extensions
         }
 
         /// <summary>
+        /// 链式创建BinaryWriter
+        /// </summary>
+        public static BinaryWriter ToBinaryWriter(this string filePath, FileMode fileMode = FileMode.Create)
+        {
+            var fileStream = new FileStream(filePath, fileMode);
+            return new BinaryWriter(fileStream);
+        }
+
+        /// <summary>
+        /// 链式创建BinaryReader
+        /// </summary>
+        public static BinaryReader ToBinaryReader(this string filePath, FileMode fileMode = FileMode.Open)
+        {
+            var fileStream = new FileStream(filePath, fileMode);
+            return new BinaryReader(fileStream);
+        }
+
+        /// <summary>
+        /// 使用BinaryWriter写入字符串并自动清理资源
+        /// </summary>
+        public static string UseBinaryWriteString(this string filePath, string content)
+        {
+            filePath.CreateFolder(); // 确保目录存在
+
+            using (var bw = filePath.ToBinaryWriter())
+            {
+                bw.Write(content);
+            }
+            return filePath; // 返回路径以便继续链式调用
+        }
+
+        /// <summary>
+        /// 使用BinaryReader读取字符串
+        /// </summary>
+        public static string UseBinaryReadString(this string filePath)
+        {
+            if (!File.Exists(filePath))
+                return null;
+
+            using (var br = filePath.ToBinaryReader())
+            {
+                return br.ReadString();
+            }
+        }
+
+        /// <summary>
         /// 通过路径直接创建文件夹
         /// </summary>
         /// <param name="path"></param>

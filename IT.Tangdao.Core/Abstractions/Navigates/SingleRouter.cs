@@ -12,6 +12,7 @@ using System.Windows.Threading;
 
 namespace IT.Tangdao.Core.Abstractions.Navigates
 {
+    /// <inheritdoc/>
     public class SingleRouter : ISingleRouter, INotifyPropertyChanged
     {
         private readonly ObservableCollection<ISingleNavigateView> _views;
@@ -20,12 +21,16 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
         private int _currentIndex;
         private readonly DispatcherTimer _autoCarouselTimer;
 
+        /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <inheritdoc/>
         public event EventHandler NavigationChanged;
 
+        /// <inheritdoc/>
         public event EventHandler<string> GroupChanged; // 新增：组切换事件
 
+        /// <inheritdoc/>
         public ISingleNavigateView CurrentView
         {
             get => _currentView;
@@ -40,9 +45,13 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
         }
 
+        /// <inheritdoc/>
         public bool CanPrevious => _currentIndex > 0;
+
+        /// <inheritdoc/>
         public bool CanNext => _currentIndex < _views.Count - 1;
 
+        /// <inheritdoc/>
         public bool IsAutoRotating
         {
             get => _autoCarouselTimer.IsEnabled;
@@ -63,6 +72,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
 
         private string _currentGroupKey;
 
+        /// <inheritdoc/>
         public string CurrentGroupKey
         {
             get => _currentGroupKey;
@@ -77,15 +87,17 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
         }
 
+        /// <inheritdoc/>
         public string AutoRotateStatusText => IsAutoRotating ? "自动轮播开启中" : "自动轮播已禁用";
 
         public IReadOnlyList<ISingleNavigateView> Views => _views;
 
+        /// <inheritdoc/>
         public SingleRouter(IEnumerable<ISingleNavigateView> views)
         {
             // 参数验证
             if (views == null)
-                throw new ArgumentNullException(nameof(views));
+                ArgumentNullException.ThrowIfNull(views);
 
             var viewList = views.ToList();
             if (viewList.Count == 0)
@@ -126,6 +138,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             _autoCarouselTimer.Tick += OnAutoCarouselTick;
         }
 
+        /// <inheritdoc/>
         public void Previous()
         {
             if (!CanPrevious) return;
@@ -134,6 +147,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             RefreshNavigationState();
         }
 
+        /// <inheritdoc/>
         public void Next()
         {
             if (!CanNext) return;
@@ -142,11 +156,13 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             RefreshNavigationState();
         }
 
+        /// <inheritdoc/>
         public void ToggleAutoCarousel()
         {
             IsAutoRotating = !IsAutoRotating;
         }
 
+        /// <inheritdoc/>
         public void NavigateTo(ISingleNavigateView view)
         {
             var index = _views.IndexOf(view);
@@ -156,6 +172,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
         }
 
+        /// <inheritdoc/>
         public void NavigateToIndex(int index)
         {
             if (index >= 0 && index < _views.Count)
@@ -166,13 +183,15 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
         }
 
+        /// <inheritdoc/>
         public void AddView(ISingleNavigateView view)
         {
             _views.Add(view);
-            _views.OrderBy(v => v.DisplayOrder);
+            _ = _views.OrderBy(v => v.DisplayOrder);
             RefreshNavigationState();
         }
 
+        /// <inheritdoc/>
         public void RemoveView(ISingleNavigateView view)
         {
             if (_views.Remove(view))
@@ -200,16 +219,19 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             OnPropertyChanged(nameof(CanNext));
         }
 
+        /// <inheritdoc/>
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        /// <inheritdoc/>
         protected void OnNavigationChanged()
         {
             NavigationChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             _autoCarouselTimer.Stop();

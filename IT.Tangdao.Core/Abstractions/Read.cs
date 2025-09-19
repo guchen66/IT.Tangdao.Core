@@ -18,6 +18,7 @@ using IT.Tangdao.Core.Selectors;
 using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Extensions;
 using System.Windows.Markup;
+using IT.Tangdao.Core.Utilys;
 
 namespace IT.Tangdao.Core.Abstractions
 {
@@ -278,11 +279,13 @@ namespace IT.Tangdao.Core.Abstractions
         /// 这两个引用没有传递值，是读取config的值，所以不需要使用ref，
         /// 使用了struct后，如果传递数据的扩展方法，需要加上ref
         /// </summary>
+        /// <param name="section"></param>
         public ReadResult SelectConfig(string section)
         {
             IDictionary idict = (IDictionary)ConfigurationManager.GetSection(section);
-            Dictionary<string, string> dict = idict.Cast<DictionaryEntry>().ToDictionary(de => de.Key.ToString(), de => de.Value.ToString());
-            return ReadResult<Dictionary<string, string>>.Success(dict);
+            TangdaoSortedDictionary<string, string> dict = idict.Cast<DictionaryEntry>().ToTangdaoSortedDictionary();
+
+            return ReadResult<TangdaoSortedDictionary<string, string>>.Success(dict);
         }
 
         public ReadResult SelectConfig<T>(string section) where T : class, new()

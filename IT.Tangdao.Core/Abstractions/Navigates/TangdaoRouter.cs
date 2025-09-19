@@ -12,6 +12,7 @@ using System.Windows;
 
 namespace IT.Tangdao.Core.Abstractions.Navigates
 {
+    /// <inheritdoc/>
     public class TangdaoRouter : ITangdaoRouter, INotifyPropertyChanged
     {
         private readonly Dictionary<string, Func<ITangdaoPage>> _routeMap = new Dictionary<string, Func<ITangdaoPage>>();
@@ -20,18 +21,26 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
         private readonly Stack<NavigationRecord> _forwardStack = new Stack<NavigationRecord>();
 
         private IRouteComponent _routeComponent;
+
+        /// <inheritdoc/>
         public ITangdaoPage CurrentPage { get; private set; }
+
         private object _currentView;
 
+        /// <inheritdoc/>
         public IRouteComponent RouteComponent
         {
             get => _routeComponent;
             set => _routeComponent = value;
         }
 
+        /// <inheritdoc/>
         public bool CanGoBack => _backStack.Count > 0;
+
+        /// <inheritdoc/>
         public bool CanGoForward => _forwardStack.Count > 0;
 
+        /// <inheritdoc/>
         public object CurrentView
         {
             get => _currentView;
@@ -42,15 +51,19 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
         }
 
+        /// <inheritdoc/>
         public event EventHandler<RouteChangedEventArgs> RouteChanged;
 
+        /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <inheritdoc/>
         public void RegisterRoute(string route, Func<ITangdaoPage> pageFactory)
         {
             _routeMap[route] = pageFactory;
         }
 
+        /// <inheritdoc/>
         public void RegisterPage<T>() where T : ITangdaoPage
         {
             var type = typeof(T);
@@ -67,6 +80,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             _reverseRouteMap[type] = route;
         }
 
+        /// <inheritdoc/>
         public void NavigateTo<T>(ITangdaoParameter parameters = null) where T : ITangdaoPage
         {
             var type = typeof(T);
@@ -76,6 +90,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             NavigateTo(route, parameters);
         }
 
+        /// <inheritdoc/>
         public void NavigateTo(string route, ITangdaoParameter parameters = null)
         {
             if (_routeMap.TryGetValue(route, out var pageFactory))
@@ -90,6 +105,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
         }
 
+        /// <inheritdoc/>
         private void NavigateToInternal(ITangdaoPage newPage, ITangdaoParameter parameters = null)
         {
             if (CurrentPage?.CanNavigateAway() == false)
@@ -118,6 +134,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             OnNavigationStateChanged();
         }
 
+        /// <inheritdoc/>
         public void GoBack()
         {
             if (_backStack.Count == 0) return;
@@ -133,6 +150,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             NavigateTo(record.Route, record.Parameters as ITangdaoParameter);
         }
 
+        /// <inheritdoc/>
         public void GoForward()
         {
             if (_forwardStack.Count == 0) return;
@@ -155,12 +173,13 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoForward)));
         }
 
+        /// <inheritdoc/>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private string GenerateRouteName(Type type)
+        private static string GenerateRouteName(Type type)
         {
             var route = type.Name;
             if (route.EndsWith("Page"))
@@ -172,16 +191,19 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             return route;
         }
 
-        private object ResolveViewForPage(ITangdaoPage page)
+        private static object ResolveViewForPage(ITangdaoPage page)
         {
             // 根据约定找到对应的 View
             var viewModelType = page.GetType();
+
             var viewTypeName = viewModelType.FullName
                 .Replace("ViewModel", "View")
                 .Replace("ViewModels", "Views");
 
-            var viewType = Type.GetType(viewTypeName);
+            // 先尝试在同一程序集中查找，如果使用 Type.GetType(viewTypeName)会报错，因为dll不存在你程序的命名空间，
+            // 此时为null，你可以设置数据模板
 
+            var viewType = viewModelType.Assembly.GetType(viewTypeName);
             if (viewType != null)
             {
                 var view = Activator.CreateInstance(viewType);
