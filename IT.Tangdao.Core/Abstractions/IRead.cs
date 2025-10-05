@@ -42,11 +42,6 @@ namespace IT.Tangdao.Core.Abstractions
         /// <summary>
         /// 读取Json对象
         /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="Result"></param>
-        /// <returns></returns>
-       // ReadResult SelectJsonObject<TResult>(TResult @Result);
-
         ReadResult SelectConfig(string section);
 
         ReadResult SelectCustomConfig(string configName, string section);

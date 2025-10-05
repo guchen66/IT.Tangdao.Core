@@ -1,4 +1,6 @@
-﻿using IT.Tangdao.Core.Providers;
+﻿using IT.Tangdao.Core.Components;
+using IT.Tangdao.Core.Ioc;
+using IT.Tangdao.Core.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Extensions
 {
-    public static class ComponentContainerExtension
+    internal static class ComponentContainerExtension
     {
         public static ITangdaoContainer RegisterComponent<TComponent>(this ITangdaoContainer container, object options = default)
             where TComponent : class, ITangdaoContainerComponent, new()

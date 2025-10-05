@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -152,6 +153,27 @@ namespace IT.Tangdao.Core.Helpers
         {
             string MainProgramPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
             return MainProgramPath;
+        }
+
+        /// <summary>
+        /// 获取此类的当前路径
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string GetThisFilePath([CallerFilePath] string filePath = null)
+        {
+            return filePath;
+        }
+
+        /// <summary>
+        /// 获取当前类所在源文件相对于程序入口的相对路径
+        /// </summary>
+        public static string GetThisFileRelativePath([CallerFilePath] string filePath = null)
+        {
+            string entryDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            string fullPath = Path.GetFullPath(filePath);
+            string relativePath = Path.GetRelativePath(entryDir, fullPath);
+            return relativePath;
         }
     }
 }

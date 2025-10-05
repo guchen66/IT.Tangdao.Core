@@ -1,4 +1,5 @@
 ﻿using IT.Tangdao.Core.DaoEvents;
+using IT.Tangdao.Core.DaoMvvm;
 using IT.Tangdao.Core.Ioc;
 using IT.Tangdao.Core.Parameters.EventArg;
 using System;
@@ -193,31 +194,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
 
         private static object ResolveViewForPage(ITangdaoPage page)
         {
-            // 根据约定找到对应的 View
-            var viewModelType = page.GetType();
-
-            var viewTypeName = viewModelType.FullName
-                .Replace("ViewModel", "View")
-                .Replace("ViewModels", "Views");
-
-            // 先尝试在同一程序集中查找，如果使用 Type.GetType(viewTypeName)会报错，因为dll不存在你程序的命名空间，
-            // 此时为null，你可以设置数据模板
-
-            var viewType = viewModelType.Assembly.GetType(viewTypeName);
-            if (viewType != null)
-            {
-                var view = Activator.CreateInstance(viewType);
-
-                // 设置 DataContext
-                if (view is FrameworkElement frameworkElement)
-                {
-                    frameworkElement.DataContext = page;
-                }
-
-                return view;
-            }
-
-            return page;
+            return ViewToViewModelLocator.Build(page);
         }
 
         private sealed class NavigationRecord

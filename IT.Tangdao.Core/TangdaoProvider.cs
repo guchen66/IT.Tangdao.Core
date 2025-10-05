@@ -1,17 +1,53 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Ioc;
+using System;
+using System.Collections.Concurrent;
 
 namespace IT.Tangdao.Core
 {
+    /// <summary>
+    /// 默认只读解析器，线程安全由策略与工厂保证。
+    /// </summary>
     public sealed class TangdaoProvider : ITangdaoProvider
     {
-        public object Resolve(Type type)
+        private readonly IServiceRegistry _registry;
+        private readonly IServiceFactory _factory;
+
+        internal TangdaoProvider(IServiceRegistry registry, IServiceFactory factory)
         {
-            return Activator.CreateInstance(type);
+            _registry = registry;
+            _factory = factory;
         }
 
-        public object Resolve(Type type, params object[] impleType)
+        public object GetService(Type serviceType)
         {
-            return Activator.CreateInstance(type, impleType);
+            if (serviceType == null) ArgumentNullException.ThrowIfNull(serviceType);
+
+            var entry = _registry.GetEntry(serviceType);
+            if (entry == null) return null;
+
+            // 把缓存字典作为额外参数传给策略，由策略决定是否使用
+            return entry.LifecycleStrategy.CreateInstance(
+                new ServiceCreationContext() { Entry = entry, Factory = _factory });
         }
+
+        public T GetService<T>() where T : class
+            => GetService(typeof(T)) as T;
+
+        public object GetKeyedService(Type serviceType, object key)
+        {
+            if (serviceType == null) ArgumentNullException.ThrowIfNull(serviceType);
+            if (key == null) ArgumentNullException.ThrowIfNull(key);
+
+            // 1. 只走新字典，不影响旧字典
+            var entry = (_registry as ServiceRegistry)?.GetKeyedEntry(serviceType, key);
+            if (entry == null) return null;
+
+            // 2. 生命周期策略与 GetService 共用同一套，无差别
+            return entry.LifecycleStrategy.CreateInstance(
+                new ServiceCreationContext { Entry = entry, Factory = _factory });
+        }
+
+        public T GetKeyedService<T>(object key) where T : class
+            => GetKeyedService(typeof(T), key) as T;
     }
 }

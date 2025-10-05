@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -168,6 +169,46 @@ namespace IT.Tangdao.Core.Extensions
             if (value == null) ArgumentNullException.ThrowIfNull(value);
 
             return source.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        /// <summary>
+        /// 不区分大小写比较两个字符串是否相等。
+        /// 与 string.Equals(a, b, StringComparison.OrdinalIgnoreCase) 行为一致。
+        /// </summary>
+        public static bool EqualsIgnoreCase(this string @this, string value)
+        {
+            return string.Equals(@this, value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// 检查字符串是否以指定值开头（不区分大小写）
+        /// </summary>
+        public static bool StartsWithIgnoreCase(this string source, string value)
+        {
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(value))
+                return false;
+
+            return source.StartsWith(value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// 检查字符串是否以指定值结尾（不区分大小写）
+        /// </summary>
+        public static bool EndsWithIgnoreCase(this string source, string value)
+        {
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(value))
+                return false;
+
+            return source.EndsWith(value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// 比较字符串（不区分大小写），返回排序结果
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static int CompareIgnoreCase(this string source, string value)
+        {
+            return string.Compare(source, value, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

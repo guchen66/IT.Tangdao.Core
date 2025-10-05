@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Windows;
 using System.Xaml;
+using System.Diagnostics;
 
 namespace IT.Tangdao.Core.Markup
 {
@@ -21,14 +22,14 @@ namespace IT.Tangdao.Core.Markup
             if (provideValueTarget?.TargetObject is DependencyObject targetObject)
             {
 #if DEBUG
-            // 添加调试信息
-            Debug.WriteLine($"DebugInfo - Tag: {Tag}, Target: {targetObject.GetType().Name}");
+                // 添加调试信息
+                Debug.WriteLine($"DebugInfo - Tag: {Tag}, Target: {targetObject.GetType().Name}");
 
-            // 可以在设计时显示额外信息
-            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(targetObject))
-            {
-                return $"[DEBUG: {Tag}]";
-            }
+                // 可以在设计时显示额外信息
+                if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(targetObject))
+                {
+                    return $"[DEBUG: {Tag}]";
+                }
 #endif
                 return "Production Value";
             }

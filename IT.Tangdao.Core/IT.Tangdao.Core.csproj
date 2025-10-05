@@ -6,7 +6,7 @@
 	<UseWPF>true</UseWPF>
 	<Title>一个简易开发的工具类库包</Title>
 	<Authors>liuxin</Authors>
-	<Version>3.0.4</Version>
+	<Version>3.0.6</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>2.0.2</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -18,6 +18,16 @@
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
   </PropertyGroup>
 
+ <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+   <NoWarn>1701;1702;1591;1570;1572;1573</NoWarn>
+ </PropertyGroup>
+
+ <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+   <NoWarn>1701;1702;1591;1570;1572;1573</NoWarn>
+ </PropertyGroup>
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
  <ItemGroup>
    <None Include="..\LICENSE.md">
      <Pack>True</Pack>

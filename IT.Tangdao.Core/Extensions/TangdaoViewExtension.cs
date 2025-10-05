@@ -24,10 +24,10 @@ namespace IT.Tangdao.Core.Extensions
             {
                 TWindow view = new TWindow();
                 view.Closed += View_Closed;
-                ITangdaoWindow tangdaoWin = view.DataContext as ITangdaoWindow;
+                //  TangdaoWindow tangdaoWin = view.DataContext as TangdaoWindow;
                 view.Loaded += (obj, e) =>
                 {
-                    tangdaoWin.Response(tangdaoParameter);
+                    // tangdaoWin.Response(tangdaoParameter);
                 };
 
                 view.Show();
@@ -52,10 +52,10 @@ namespace IT.Tangdao.Core.Extensions
             {
                 TWindow view = new TWindow();
                 view.Closed += View_Closed;
-                ITangdaoWindow tangdaoWin = view.DataContext as ITangdaoWindow;
+                //  ITangdaoWindow tangdaoWin = view.DataContext as ITangdaoWindow;
                 view.Loaded += (obj, e) =>
                 {
-                    tangdaoWin.Response(tangdaoParameter);
+                    //tangdaoWin.Response(tangdaoParameter);
                 };
                 view.Show();
 
@@ -90,7 +90,6 @@ namespace IT.Tangdao.Core.Extensions
             //是从主窗体打开子窗体，然后子窗体选择列表的一项，将单个数据发送给主窗体
             Thread thread = new Thread(() =>
             {
-
                 TWindow view = new TWindow();
                 view.Owner = activeWindow;
                 Binding binding = new Binding();
@@ -111,6 +110,7 @@ namespace IT.Tangdao.Core.Extensions
             //新线程启动，将Task实例返回，接收await操作符
             return tc.Task;
         }
+
         /// <summary>
         /// 使用时，可以使用Wait等待，仅此打开一个窗体，也可以使用await异步打开
         /// </summary>
@@ -148,8 +148,5 @@ namespace IT.Tangdao.Core.Extensions
         {
             System.Windows.Threading.Dispatcher.ExitAllFrames();
         }
-
-       
     }
-
 }

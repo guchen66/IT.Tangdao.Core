@@ -13,123 +13,30 @@ using System.Windows;
 
 namespace IT.Tangdao.Core.Extensions
 {
+    /// <summary>
+    /// 给 ITangdaoProvider 加常用便捷方法。
+    /// </summary>
     public static class TangdaoProviderExtension
     {
-        public static TService Resolve<TService>(this ITangdaoProvider provider)
+        public static T GetRequiredService<T>(this ITangdaoProvider provider) where T : class
         {
-            Type serviceType = typeof(TService);
-            //如果此类具有无参构造器，可以直接解析注册
-            if (serviceType.GetConstructor(Type.EmptyTypes) != null)
-            {
-                return (TService)provider.Resolve(serviceType);
-            }
-
-            //否则，解析时，跟据数据通道传递数据上下文
-            RegisterContext context = TangdaoContext.GetContext<TService>();
-
-            if (context == null)
-            {
-                throw new InvalidOperationException($"Unable to resolve type: {typeof(TService)}");
-            }
-
-            // 检查是否正在解析，避免循环依赖
-            if (context.IsResolving)
-            {
-                throw new InvalidOperationException($"Circular dependency detected while resolving type: {typeof(TService)}");
-            }
-
-            context.IsResolving = true;
-
-            //默认设置为瞬态
-            context.Lifecycle = Lifecycle.Transient;
-            try
-            {
-                // 如果请求的类型是接口，则查找对应的实现类
-                Type implementationType = typeof(TService);
-                if (typeof(TService).IsInterface)
-                {
-                    if (!context.InterfaceToImplementationMapping.TryGetValue(typeof(TService), out implementationType))
-                    {
-                        throw new InvalidOperationException($"No implementation registered for interface: {typeof(TService)}");
-                    }
-                }
-
-                // 解析构造函数参数
-                object[] parameterValues = new object[context.ParameterInfos.Length];
-                for (int i = 0; i < context.ParameterInfos.Length; i++)
-                {
-                    var parameter = context.ParameterInfos[i];
-                    Type parameterType = parameter.ParameterType;
-
-                    // 递归解析参数类型
-                    parameterValues[i] = ResolveParameter(provider, parameterType);
-                }
-
-                // 创建实例
-                return (TService)Activator.CreateInstance(implementationType, parameterValues);
-            }
-            finally
-            {
-                context.IsResolving = false; // 重置标记
-            }
+            return provider.GetService<T>() ?? throw new InvalidOperationException($"服务 '{typeof(T).Name}' 未注册。");
         }
 
-        private static object ResolveParameter(ITangdaoProvider provider, Type parameterType)
-        {
-            // 如果是基本类型或字符串，返回默认值
-            if (parameterType == typeof(int))
-            {
-                return 0;
-            }
-            else if (parameterType == typeof(string))
-            {
-                return "default";
-            }
-            else if (parameterType == typeof(bool))
-            {
-                return false;
-            }
-            else if (parameterType.IsClass || parameterType.IsInterface)
-            {
-                // 如果参数类型是接口，则从映射中查找对应的实现类
-                if (parameterType.IsInterface)
-                {
-                    var context = TangdaoContext.GetContext(parameterType);
-                    object[] parameterValues = new object[context.ParameterInfos.Length];
-                    if (context == null || !context.InterfaceToImplementationMapping.TryGetValue(parameterType, out var implementationType))
-                    {
-                        throw new InvalidOperationException($"No implementation registered for interface: {parameterType}");
-                    }
+        public static T GetRequiredService<T>(this ITangdaoProvider provider, Type serviceType)
+            => (T)(provider.GetService(serviceType) ?? throw new InvalidOperationException($"服务 '{serviceType.Name}' 未注册。"));
 
-                    // 递归解析实现类
-                    // return provider.Resolve(implementationType);
-                    // 解析构造函数参数
+        /// <summary>
+        /// 按 key 获取服务；找不到返回 null。
+        /// </summary>
+        public static T GetKeyedService<T>(this ITangdaoProvider provider, object key) where T : class
+            => (provider as TangdaoProvider)?.GetKeyedService<T>(key);
 
-                    for (int i = 0; i < context.ParameterInfos.Length; i++)
-                    {
-                        var parameter = context.ParameterInfos[i];
-                        parameterType = parameter.ParameterType;
-
-                        // 递归解析参数类型
-                        parameterValues[i] = ResolveParameter(provider, parameterType);
-                    }
-
-                    // 创建实例
-                    return Activator.CreateInstance(implementationType, parameterValues);
-                }
-
-                // 如果是类，则直接递归解析
-                return provider.Resolve(parameterType);
-            }
-            else if (parameterType.IsValueType)
-            {
-                // 创建值类型的默认实例
-                return Activator.CreateInstance(parameterType);
-            }
-            else
-            {
-                throw new InvalidOperationException($"Unsupported parameter type: {parameterType}");
-            }
-        }
+        /// <summary>
+        /// 按 key 获取服务；找不到抛异常。
+        /// </summary>
+        public static T GetRequiredKeyedService<T>(this ITangdaoProvider provider, object key) where T : class
+            => provider.GetKeyedService<T>(key)
+               ?? throw new InvalidOperationException($"服务 '{typeof(T).Name}' (key='{key}') 未注册。");
     }
 }

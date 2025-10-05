@@ -35,7 +35,7 @@ namespace IT.Tangdao.Core.Providers
 
         public BindModelProvider()
         {
-            _readService = ServerLocator.Current.Resolve<IReadService>();
+            _readService = TangdaoApplication.Provider.GetService<IReadService>();
             var xmlData = _readService.Read(ObjectPath);
             Default = XmlFolderHelper.Deserialize<T>(xmlData);
         }

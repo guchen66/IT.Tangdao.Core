@@ -1,27 +1,37 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Ioc;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core
 {
-    public interface ITangdaoContainer : ITangdaoContainerBuilder
+    /// <summary>
+    /// “只写”容器：仅暴露注册能力，不暴露解析。
+    /// 实现与解析侧完全隔离，符合接口隔离原则。
+    /// </summary>
+    public interface ITangdaoContainer
     {
-        ITangdaoProvider Builder();
+        /// <summary>
+        /// 注册一条服务映射；重复注册覆盖。
+        /// </summary>
+        void Register(IServiceEntry entry);
 
-        ITangdaoContainer Register(Type serviceType, Type implementationType);
+        /// <summary>
+        /// 拿到内部注册表（只读），供 Builder 或 Visitor 使用。
+        /// </summary>
+        IServiceRegistry Registry { get; }
 
-        ITangdaoContainer Register(Type implementationType);
+        /// <summary>
+        /// 从当前只写容器生成只读解析器。
+        /// </summary>
+        ITangdaoProvider BuildProvider();
 
-        ITangdaoContainer Register(Type serviceType, Func<object> creator);
+        /* 新增：仅供框架内部做延迟注册 */
 
-        ITangdaoContainer Register(Type type, Func<ITangdaoProvider, object> factoryMethod);
-
-        ITangdaoContainer Register(string name);
-
-        ITangdaoContainerBuilder Register<TService, TImplementation>() where TImplementation : TService;
-
-        ITangdaoContainerBuilder Register<TImplementation>();
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IList<Action<ITangdaoContainer>> LazyRegistrations { get; }
     }
 }

@@ -15,21 +15,4 @@ namespace IT.Tangdao.Core.Extensions
             return model.GetType().Assembly.GetTypes().Where(x => Attribute.IsDefined(x, typeof(ScanningAttribute)));
         }
     }
-
-    public class ViewToViewModelExtension
-    {
-        // 原方法保持不变，供类库内部使用
-        public static IEnumerable<Type> GetScanObject<TModel>(TModel model)
-        {
-            return model.GetType().Assembly.GetTypes()
-                .Where(x => Attribute.IsDefined(x, typeof(ViewToViewModelAttribute)));
-        }
-
-        // 新增方法，允许主程序传递程序集
-        public static IEnumerable<Type> GetScanObject(Assembly assembly)
-        {
-            return assembly.GetTypes()
-                .Where(x => Attribute.IsDefined(x, typeof(ViewToViewModelAttribute)));
-        }
-    }
 }

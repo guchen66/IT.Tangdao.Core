@@ -12,7 +12,7 @@ namespace IT.Tangdao.Core.Utilys
     /// </summary>
     public class TangdaoSortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        // 内部用 Framework 自带的 SortedDictionary，红黑树实现，插入即排序
+        // 内部用 Core 自带的 SortedDictionary，红黑树实现，插入即排序
         private readonly SortedDictionary<TKey, TValue> _core;
 
         /// <inheritdoc/>
