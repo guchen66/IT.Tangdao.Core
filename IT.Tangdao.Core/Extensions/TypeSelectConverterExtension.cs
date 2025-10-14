@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Extensions
 {
+    /// <summary>
+    /// 将一个类型转成列表
+    /// </summary>
     public static class TypeSelectConverterExtension
     {
         // 真正的单例容器

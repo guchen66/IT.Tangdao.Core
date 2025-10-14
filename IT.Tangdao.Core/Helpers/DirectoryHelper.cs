@@ -141,7 +141,7 @@ namespace IT.Tangdao.Core.Helpers
         /// <returns></returns>
         public static string GetSolutionName()
         {
-            string SolutionPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Name;
+            string SolutionPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Name;
             return SolutionPath;
         }
 
@@ -153,16 +153,6 @@ namespace IT.Tangdao.Core.Helpers
         {
             string MainProgramPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
             return MainProgramPath;
-        }
-
-        /// <summary>
-        /// 获取此类的当前路径
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static string GetThisFilePath([CallerFilePath] string filePath = null)
-        {
-            return filePath;
         }
 
         /// <summary>

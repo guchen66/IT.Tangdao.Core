@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Abstractions.Loggers
 {
-    internal class AppendLogger : ITangdaoLogger
+    internal sealed class AppendLogger : ITangdaoLogger
     {
         private readonly string _filePath;
 

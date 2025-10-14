@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Common.Reflection;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace IT.Tangdao.Core.Extensions
         }
 
         /// <summary>
-        /// 一个类子类是否是
+        /// 一个类子类是否是另一个类的子类
         /// </summary>
         /// <param name="type"></param>
         /// <param name="baseType"></param>
@@ -59,6 +60,29 @@ namespace IT.Tangdao.Core.Extensions
         public static bool IsHasSon(this Type type, Type baseType)
         {
             return type.IsSubclassOf(baseType);
+        }
+
+        /// <summary>
+        /// 获取所有父类+接口
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static TypeParents Parents(this Type type)
+        {
+            if (type == null) ArgumentNullException.ThrowIfNull(type);
+
+            // 1. 基类
+            var baseType = type.BaseType;                 // 可能 null（object）
+                                                          // 2. 所有祖先接口（含重复，若需要可 Distinct）
+            var allIfs = type.GetInterfaces().Distinct()             // 当前+祖先类接口
+                            .OrderBy(i => i.Name)         // 给个稳定序
+                            .ToList();
+
+            return new TypeParents
+            {
+                BaseClass = baseType,
+                Interfaces = allIfs
+            };
         }
 
         /// <summary>

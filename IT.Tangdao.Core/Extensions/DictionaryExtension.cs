@@ -18,12 +18,12 @@ namespace IT.Tangdao.Core.Extensions
         /// <returns></returns>
         public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> @this, TKey key) where TValue : new()
         {
-            if (!@this.ContainsKey(key))
+            if (!@this.TryGetValue(key, out var result))
             {
-                @this[key] = new TValue();
+                result = new TValue();
+                @this[key] = result;
             }
-
-            return @this[key];
+            return result;
         }
 
         /// <summary>
@@ -36,7 +36,8 @@ namespace IT.Tangdao.Core.Extensions
         /// <returns></returns>
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> @this, TKey key)
         {
-            return @this.ContainsKey(key) ? @this[key] : default;
+            @this.TryGetValue(key, out var result); // // 找不到时 value 就是 default(TValue)
+            return result;
         }
 
         /// <summary>
@@ -58,13 +59,11 @@ namespace IT.Tangdao.Core.Extensions
         }
 
         /// <summary>
-        /// 对字典的值重新进行排序
+        ///  对字典的值重新进行排序
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="dict"></param>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
         /// <returns></returns>
         public static Dictionary<TKey, TValue> TryOrderBy<TKey, TValue>(this Dictionary<TKey, TValue> dict)
         {

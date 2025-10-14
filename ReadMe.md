@@ -1,3 +1,5 @@
+
+
 #### 1、命令
 
 正常命令：TangdaoCommand   
@@ -802,5 +804,130 @@ public class ComboboxOptions
         </DataTemplate>
     </DataGridTemplateColumn.CellTemplate>
 </DataGridTemplateColumn>
+```
+
+#### 13、路径处理
+
+| 场景                                       | 用途                                 | 如何使用                                                     |
+| ------------------------------------------ | ------------------------------------ | ------------------------------------------------------------ |
+| **加载本地资源文件**（如JSON、图片、配置） | 避免硬编码路径，支持相对解决方案路径 | `TangdaoPath.Instance.Solution().Combine("Assets", "Icons", "logo.png").Build()` |
+| **日志文件输出路径**                       | 确保日志写入到临时目录或指定目录     | `TangdaoPath.Instance.Temp().Combine("logs", "app.log").Build()` |
+| **用户导出/保存文件**                      | 提供默认路径，避免平台差异           | `TangdaoPath.Instance.GetEnvironmentDirectory("EXPORT_DIR").Combine("report.xlsx")` |
+| **插件加载路径**                           | 动态加载插件DLL，避免路径错误        | `TangdaoPath.Instance.Solution().Combine("Plugins", "PluginA.dll").Build()` |
+| **配置文件路径**                           | 支持CI/CD中配置路径注入              | `TangdaoPath.Instance.GetThisFilePath().Parent().Combine("settings.json")` |
+| **单元测试中模拟路径**                     | 避免使用真实文件系统                 | 使用 `AbsolutePath` 和 `RelativePath` 构造虚拟路径，不依赖磁盘 |
+
+###### 1、WPF中加载图片资源
+
+```C#
+// ViewModel 或代码背后
+var imagePath = TangdaoPath.Instance
+    .Solution()
+    .Combine("Assets", "Images", "user_avatar.png")
+    .Build();
+
+if (imagePath.FileExists)
+{
+    AvatarImageSource = new BitmapImage(new Uri(imagePath.Value));
+}
+```
+
+###### 2、使用 `PathTemplate` 动态生成路径
+
+```C#
+var template = PathTemplate.Create("{Solution}/Exports/{UserId}/{Date}/report.xlsx");
+
+var path = template.Resolve(new
+{
+    Solution = TangdaoPath.Instance.GetSolutionDirectory().Value,
+    UserId = 12345,
+    Date = DateTime.Now.ToString("yyyy-MM-dd")
+});
+
+// 输出：C:\Projects\MySolution\Exports\12345\2025-10-10\report.xlsx
+```
+
+###### 3、缓存解决方案目录，避免重复查找
+
+```C#
+// 全局初始化一次
+var solutionDir = TangdaoPath.Instance.GetSolutionDirectory();
+
+// 后续使用
+var configPath = solutionDir.Combine("config", "appSettings.json");
+var dbPath = solutionDir.Combine("data", "local.db");
+```
+
+###### 4、清理临时文件
+
+```C#
+var tempDir = TangdaoPath.Instance.GetTempDirectory().Combine("MyApp");
+if (tempDir.DirectoryExists)
+{
+    Directory.Delete(tempDir.Value, true);
+}
+```
+
+###### 5、文件导出
+
+```C#
+ public void Export()
+ {
+     try
+     {
+         var template = PathTemplate.Create("{Solution}/Exports/{Date}/report.txt");
+         var exportPath = template.Resolve(new
+         {
+             Solution = TangdaoPath.Instance.GetSolutionDirectory().Value,
+             Date = DateTime.Now.ToString("yyyy-MM-dd")
+         });
+
+         Directory.CreateDirectory(exportPath.Parent().Value);
+         File.WriteAllText(exportPath.Value, $"Hello Stylet! Exported at {DateTime.Now}");
+     }
+     catch (Exception ex)
+     {
+     }
+ }
+```
+
+###### 6、创建备份
+
+```C#
+// 使用 Combine 构建路径
+AbsolutePath sourcePath = TangdaoPath.Instance
+    .GetThisFilePath()
+    .Parent()                           // 移除文件名
+    .Combine("..")                      // 上级目录
+    .Combine("Models")                  // Models 文件夹
+    .Combine("User.cs");                // 具体文件
+
+// 使用 Backup 创建备份
+ var backup = sourcePath.Backup(".bak");
+```
+
+#### 14、自定义排序
+
+带后期增加接口优化
+
+```C#
+List<Student> students = new List<Student>
+{
+    new Student { Id=4, Name = "张三1111", Education = "一本" },
+    new Student { Id=5, Name = "李四2222", Education = "大专" },
+    new Student { Id=2, Name = "王五3333", Education = "研究生" },
+    new Student { Id=1, Name = "张三4444", Education = "一本" },
+    new Student { Id=0, Name = "李四5555", Education = "大专" },
+    new Student { Id=6, Name = "王五6666", Education = "研究生" },
+};
+
+var priority = new Dictionary<string, int>
+{
+    ["大专"] = 1,
+    ["一本"] = 2,
+    ["研究生"] = 3
+};
+
+var comparer = TangdaoSortProvider.Priority<Student>(s => s.Education, priority);
 ```
 
