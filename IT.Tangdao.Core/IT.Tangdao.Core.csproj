@@ -6,7 +6,7 @@
 	<UseWPF>true</UseWPF>
 	<Title>一个简易开发的工具类库包</Title>
 	<Authors>liuxin</Authors>
-	<Version>3.0.7</Version>
+	<Version>3.0.8</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>2.0.2</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>

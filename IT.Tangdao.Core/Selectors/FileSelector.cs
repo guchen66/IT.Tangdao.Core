@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -164,6 +166,113 @@ namespace IT.Tangdao.Core.Selectors
                 DaoFileType.Config => ".config",
                 _ => null
             };
+        }
+
+        public static ChannelReader<string> EnumerateFilesRecursively(string root, int capacity = 100, CancellationToken token = default)
+        {
+            var output = Channel.CreateBounded<string>(capacity);             //创建一个有界通道
+
+            async Task WalkDir(string path)
+            {
+                IEnumerable<string> files = null, directories = null;           //List列表
+                try
+                {
+                    files = Directory.EnumerateFiles(path);                    //搜索匹配的目录，子目录，文件，子文件
+                    directories = Directory.EnumerateDirectories(path);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
+
+                if (files != null)
+                {
+                    foreach (var file in files)
+                    {
+                        await output.Writer.WriteAsync(file, token);                //将文件名写入channel
+                    }
+                }
+
+                if (directories != null)
+                    await Task.WhenAll(directories.Select(WalkDir));
+            }
+
+            Task.Run(async () =>
+            {
+                await WalkDir(root);
+                output.Writer.Complete();                                           //停止写入
+            }, token);
+
+            return output.Reader;                                                     //读取
+        }
+
+        public static ChannelReader<FileInfo> FilterByExtension(ChannelReader<string> input, IReadOnlySet<string> exts, CancellationToken token = default)
+        {
+            var output = Channel.CreateUnbounded<FileInfo>();               //无界通道
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await foreach (var file in input.ReadAllAsync(token).ConfigureAwait(false)) //筛选条件，读取，不需要将后续代码切到UI线程
+                    {
+                        var fileInfo = new FileInfo(file);
+                        if (exts.Contains(fileInfo.Extension))
+                            await output.Writer.WriteAsync(fileInfo, token).ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
+                finally
+                {
+                    output.Writer.Complete();
+                }
+            }, token);
+
+            return output;
+        }
+
+        public static async Task ReadDataFromFile(string filePath, ChannelWriter<string> writer, CancellationToken token = default)
+        {
+            try
+            {
+                using (var streamReader = new StreamReader(filePath))
+                {
+                    string line;
+                    while ((line = await streamReader.ReadLineAsync()) != null)
+                    {
+                        await writer.WriteAsync(line, token);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while reading data from file: {ex.Message}");
+            }
+            finally
+            {
+                writer.Complete();
+            }
+        }
+
+        public static async Task WriteDataToFile(string filePath, ChannelReader<string> reader, CancellationToken token = default)
+        {
+            try
+            {
+                using (var streamWriter = new StreamWriter(filePath))
+                {
+                    await foreach (var data in reader.ReadAllAsync(token).ConfigureAwait(false))
+                    {
+                        await streamWriter.WriteLineAsync(data);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while writing data to file: {ex.Message}");
+            }
         }
 
         /// <summary>

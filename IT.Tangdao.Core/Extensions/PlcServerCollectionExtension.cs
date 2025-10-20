@@ -2,6 +2,7 @@
 using IT.Tangdao.Core.Configurations;
 using System;
 using System.Collections.Generic;
+using IT.Tangdao.Core.DaoDevices.Plc;
 
 namespace IT.Tangdao.Core.Extensions
 {

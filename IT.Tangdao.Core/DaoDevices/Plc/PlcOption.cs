@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Configurations
+namespace IT.Tangdao.Core.DaoDevices.Plc
 {
     public class PlcOption
     {

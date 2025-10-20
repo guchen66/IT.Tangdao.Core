@@ -40,7 +40,7 @@ namespace IT.Tangdao.Core.Extensions
         /// 从ViewModel直接打开窗体
         /// 并且传递参数或者委托到一个平级的窗体
         /// </summary>
-        /// <typeparam name="TView"></typeparam>
+        /// <typeparam name="TWindow"></typeparam>
         /// <param name="viewModel"></param>
         /// <param name="tangdaoParameter"></param>
         /// <returns></returns>
