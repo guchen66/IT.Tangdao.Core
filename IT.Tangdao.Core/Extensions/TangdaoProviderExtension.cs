@@ -1,6 +1,6 @@
 ﻿using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.DaoEvents;
+using IT.Tangdao.Core.Events;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

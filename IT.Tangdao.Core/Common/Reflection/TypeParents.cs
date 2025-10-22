@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Common.Reflection
+namespace IT.Tangdao.Core.Reflection
 {
     public readonly struct TypeParents
     {

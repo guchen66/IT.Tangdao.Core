@@ -1,8 +1,8 @@
-﻿using IT.Tangdao.Core.DaoEvents;
-using IT.Tangdao.Core.DaoMvvm;
+﻿using IT.Tangdao.Core.Events;
+using IT.Tangdao.Core.Mvvm;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Ioc;
-using IT.Tangdao.Core.Parameters.EventArg;
+using IT.Tangdao.Core.EventArg;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -149,7 +149,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
 
             // 使用路由导航而不是直接创建实例
-            NavigateTo(record.Route, record.Parameters.AsOrFail<ITangdaoParameter>());
+            NavigateTo(record.Route, record.AsOrFail<ITangdaoParameter>());
         }
 
         /// <inheritdoc/>
@@ -165,7 +165,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigates
             }
 
             // 使用路由导航而不是直接创建实例
-            NavigateTo(record.Route, record.Parameters.AsOrFail<ITangdaoParameter>());
+            NavigateTo(record.Route, record.AsOrFail<ITangdaoParameter>());
         }
 
         // 添加导航状态变化通知

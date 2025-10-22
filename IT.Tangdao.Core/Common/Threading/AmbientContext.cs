@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Common.Threading
+namespace IT.Tangdao.Core.Threading
 {
     /// <summary>
     /// 兼容 .NET 6+ 的 AmbientContext：

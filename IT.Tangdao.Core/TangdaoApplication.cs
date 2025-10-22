@@ -1,5 +1,5 @@
 ﻿using IT.Tangdao.Core.Attributes;
-using IT.Tangdao.Core.DaoMvvm;
+using IT.Tangdao.Core.Mvvm;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Ioc;
 using System;

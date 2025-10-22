@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.Common.Reflection;
+﻿using IT.Tangdao.Core.Reflection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

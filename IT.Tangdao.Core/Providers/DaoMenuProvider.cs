@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.Parameters.Infrastructure;
+﻿using IT.Tangdao.Core.Infrastructure;
 using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections.Generic;

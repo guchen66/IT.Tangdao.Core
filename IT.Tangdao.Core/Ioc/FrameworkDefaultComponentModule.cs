@@ -1,7 +1,6 @@
-﻿using IT.Tangdao.Core.Abstractions.IServices;
-using IT.Tangdao.Core.Abstractions.Services;
+﻿using IT.Tangdao.Core.Abstractions;
 using IT.Tangdao.Core.Components;
-using IT.Tangdao.Core.DaoEvents;
+using IT.Tangdao.Core.Events;
 using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections.Generic;

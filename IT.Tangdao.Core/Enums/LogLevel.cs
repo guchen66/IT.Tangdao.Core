@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoEvents.Handlers;
+﻿using IT.Tangdao.Core.Events.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

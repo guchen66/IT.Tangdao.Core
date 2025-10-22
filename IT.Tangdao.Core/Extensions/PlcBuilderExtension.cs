@@ -1,7 +1,7 @@
 ﻿using IT.Tangdao.Core.Abstractions;
 using IT.Tangdao.Core.Configurations;
 using System;
-using IT.Tangdao.Core.DaoDevices.Plc;
+using IT.Tangdao.Core.Devices.Plc;
 
 namespace IT.Tangdao.Core.Extensions
 {

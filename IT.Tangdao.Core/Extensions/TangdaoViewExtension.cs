@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoMvvm;
+﻿using IT.Tangdao.Core.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;

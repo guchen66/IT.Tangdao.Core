@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions.IServices
+namespace IT.Tangdao.Core.Abstractions
 {
     public interface ITypeConvertService
     {
         T Converter<T>(string name) where T : class, new();
-
     }
 }

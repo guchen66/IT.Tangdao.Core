@@ -42,6 +42,11 @@ namespace IT.Tangdao.Core.Common
         /// </summary>
         private static readonly ConcurrentDictionary<Type, Lazy<object>> _instances = new ConcurrentDictionary<Type, Lazy<object>>();
 
+        /// <summary>
+        /// 存储“带键”实例（与类型无关，纯字符串 key）
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, object> _keyedInstances = new ConcurrentDictionary<string, object>();
+
         public static void SetTangdaoParameter(string name, ITangdaoParameter parameter)
         {
             _parameter[name] = parameter;
@@ -112,6 +117,23 @@ namespace IT.Tangdao.Core.Common
             return _instances.TryGetValue(typeof(TService), out var lazy)
                 ? (TService)lazy.Value   // 要么拿到实例，要么 null
                 : default;
+        }
+
+        /// <summary>
+        /// 设置带键实例（与类型无关，纯 key-value）
+        /// </summary>
+        public static void SetInstance(string key, object instance)
+        {
+            _keyedInstances[key] = instance;
+        }
+
+        /// <summary>
+        /// 按 key 获取实例；找不到返回 default(T)
+        /// </summary>
+        public static T GetInstance<T>(string key) where T : class
+        {
+            _keyedInstances.TryGetValue(key, out var hit);
+            return hit as T;
         }
 
         /// <summary>

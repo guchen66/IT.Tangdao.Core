@@ -15,11 +15,8 @@ namespace IT.Tangdao.Core.Selectors
 {
     internal sealed class FileSelector
     {
-        private static Lazy<IRead> _read = new Lazy<IRead>(() => new Read());
-
-        public static IRead Queryable()
+        private FileSelector()
         {
-            return _read.Value;
         }
 
         /// <summary>

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using IT.Tangdao.Core.Common;
-using IT.Tangdao.Core.DaoMvvm;
+using IT.Tangdao.Core.Mvvm;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.DaoException;
 using IT.Tangdao.Core.Selectors;
