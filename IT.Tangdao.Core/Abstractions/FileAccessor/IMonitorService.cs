@@ -3,7 +3,7 @@ using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.EventArg;
 using System;
 
-namespace IT.Tangdao.Core.Abstractions
+namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     public interface IMonitorService
     {

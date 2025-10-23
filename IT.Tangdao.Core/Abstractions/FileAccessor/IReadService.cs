@@ -1,15 +1,4 @@
-﻿using IT.Tangdao.Core.Abstractions.Results;
-using IT.Tangdao.Core.Abstractions;
-using IT.Tangdao.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using IT.Tangdao.Core.Abstractions.FileAccessor;
-
-namespace IT.Tangdao.Core.Abstractions
+﻿namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     /// <summary>
     /// 定义读取文本的服务

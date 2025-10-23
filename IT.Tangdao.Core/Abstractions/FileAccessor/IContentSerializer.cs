@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Selectors;
 
-namespace IT.Tangdao.Core.Abstractions
+namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     public interface IContentSerializer
     {

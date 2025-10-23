@@ -1,13 +1,8 @@
 ﻿using System.Collections.Generic;
 using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Selectors;
-using IT.Tangdao.Core.Extensions;
-using IT.Tangdao.Core.Helpers;
-using IT.Tangdao.Core.Abstractions.FileAccessor;
-using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions
+namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     /// <summary>
     /// 链式查询起点。支持自动或显式指定格式后对内容做节点/实体查询。

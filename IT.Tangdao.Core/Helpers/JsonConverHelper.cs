@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using IT.Tangdao.Core.Abstractions;
 using System.Net.Http.Json;
 using System.Windows.Input;
+using Newtonsoft.Json.Converters;
 
 namespace IT.Tangdao.Core.Helpers
 {
@@ -110,18 +111,17 @@ namespace IT.Tangdao.Core.Helpers
             }
         }
 
-        //public static ReadResult GetJsonObject(string objectKey)
-        //{
-        //    JObject jsonObject = JObject.Parse(jsonContent);
+        internal static void SaveJsonData<T>(T obj, string filePath)
+        {
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore,  // 这个会排除IP: null
+                Converters = new List<JsonConverter> { new StringEnumConverter() }  // 添加枚举转换器
+            };
 
-        //    JToken valueToken = jsonObject.SelectToken($"objectKey");
-
-        //    if (valueToken == null || valueToken.Type == JTokenType.Null)
-        //    {
-        //        // 键不存在或值为 null
-        //        return new ReadResult("转换失败，JToken为null", false);
-        //    }
-        //    return new ReadResult(valueToken.ToString(), true);
-        //}
+            string json = JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
+            File.WriteAllText(filePath, json);
+        }
     }
 }

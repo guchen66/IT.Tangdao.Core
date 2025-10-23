@@ -90,6 +90,33 @@ namespace IT.Tangdao.Core.Extensions
             return container;
         }
 
+        /// <summary>
+        /// 把**已有实例**注册成单例；后续解析都返回同一对象。
+        /// </summary>
+        public static ITangdaoContainer AddTangdaoSingleton<T>(this ITangdaoContainer container, T instance) where T : class
+        {
+            if (instance == null) ArgumentNullException.ThrowIfNull(instance);
+
+            // 用匿名工厂包装，永远返回同一实例
+            container.Register(new ServiceEntry(
+                typeof(T),
+                typeof(T),                  // 任意写，不会被用到
+                new SingletonInstanceStrategy(instance))); // 见下
+            return container;
+        }
+
+        /// <summary>
+        /// 专门为“实例单例”写的生命周期策略——永远返回同一对象。
+        /// </summary>
+        private sealed class SingletonInstanceStrategy : ILifecycleStrategy
+        {
+            private readonly object _instance;
+
+            public SingletonInstanceStrategy(object instance) => _instance = instance;
+
+            public object CreateInstance(ServiceCreationContext context) => _instance;
+        }
+
         #endregion 工厂注册
 
         #region 私有工厂实现

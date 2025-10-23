@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Abstractions;
+using IT.Tangdao.Core.Abstractions.FileAccessor;
 
 namespace IT.Tangdao.Core.Providers
 {

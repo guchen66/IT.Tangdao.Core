@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions
+namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     public interface IContentWritable
     {
@@ -23,8 +23,8 @@ namespace IT.Tangdao.Core.Abstractions
         /// <summary>
         /// 序列化对象并写入
         /// </summary>
-        //void WriteObject<T>(string path, T obj);
+        void WriteObject<T>(string path, T obj);
 
-        IContentWritable this[object writeObject] { get; }
+        //IContentWritable this[object writeObject] { get; }
     }
 }
