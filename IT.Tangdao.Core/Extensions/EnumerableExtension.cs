@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using IT.Tangdao.Core.Abstractions.Contracts;
 
 namespace IT.Tangdao.Core.Extensions
 {

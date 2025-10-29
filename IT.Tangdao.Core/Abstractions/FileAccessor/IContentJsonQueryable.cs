@@ -9,8 +9,8 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     public interface IContentJsonQueryable : IContentQueryable
     {
-        ReadResult SelectKeys();
+        ResponseResult SelectKeys();
 
-        ReadResult SelectValue(string key);
+        ResponseResult SelectValue(string key);
     }
 }

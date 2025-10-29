@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Infrastructure.Ambient
 {
-    public class CacheKey
+    public static class FileContentCacheKey
     {
-        public static string GetCacheKey(string path, DaoFileType type)
+        public static string Create(string path, DaoFileType type)
         {
             // 与 ContentQueryable 同一套根 key
             return string.Format("Content:{0}:{1}", path, type);

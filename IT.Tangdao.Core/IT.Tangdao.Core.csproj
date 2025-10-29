@@ -6,7 +6,7 @@
 	<UseWPF>true</UseWPF>
 	<Title>一个简易开发的工具类库包</Title>
 	<Authors>liuxin</Authors>
-	<Version>3.0.11</Version>
+	<Version>3.0.12</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>2.0.2</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -16,6 +16,9 @@
     <RepositoryUrl>https://github.com/guchen66/IT.Tangdao.Core</RepositoryUrl>
     <PackAsTool>False</PackAsTool>
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<Copyright>Copyright (c) liuxin 2023-$([System.DateTime]::Now.ToString(`yyyy`))</Copyright>
   </PropertyGroup>
 
  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

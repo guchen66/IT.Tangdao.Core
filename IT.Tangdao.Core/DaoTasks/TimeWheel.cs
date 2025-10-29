@@ -10,7 +10,7 @@ namespace IT.Tangdao.Core.DaoTasks
 {
     public class TimeWheel<T>
     {
-        private int secondSlot = 0;
+        private int secondSlot;
 
         private DateTime wheelTime
         { get { return new DateTime(1, 1, 1, 0, 0, secondSlot); } }

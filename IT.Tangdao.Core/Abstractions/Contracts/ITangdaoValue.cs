@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Infrastructure
+namespace IT.Tangdao.Core.Abstractions.Contracts
 {
     /// <summary>
     /// 减少拆箱，装箱接口

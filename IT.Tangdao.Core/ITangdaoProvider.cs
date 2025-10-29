@@ -23,5 +23,7 @@ namespace IT.Tangdao.Core
         /// 泛型便利方法，由扩展方法默认实现。
         /// </summary>
         T GetService<T>() where T : class;
+
+        IReadOnlyList<IServiceEntry> GetEntries();
     }
 }

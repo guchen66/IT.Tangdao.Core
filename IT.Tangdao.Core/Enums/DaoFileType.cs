@@ -30,6 +30,9 @@ namespace IT.Tangdao.Core.Enums
         Json,
 
         /// <summary>应用程序配置文件。</summary>
-        Config
+        Config,
+
+        /// <summary>Ini配置文件。</summary>
+        Ini
     }
 }

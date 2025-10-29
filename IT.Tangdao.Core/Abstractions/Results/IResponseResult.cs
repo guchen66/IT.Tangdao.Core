@@ -12,7 +12,7 @@ namespace IT.Tangdao.Core.Abstractions.Results
     /// <summary>
     /// 基础查询结果接口（适用于所有查询操作）
     /// </summary>
-    public interface IQueryableResult
+    public interface IResponseResult
     {
         /// <summary>
         /// 操作是否成功

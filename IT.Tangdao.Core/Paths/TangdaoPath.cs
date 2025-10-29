@@ -78,6 +78,13 @@ namespace IT.Tangdao.Core.Paths
 
         public TangdaoPathBuilder Temp() => new TangdaoPathBuilder(GetTempDirectory());
 
+        /// <summary>
+        /// 自定义路径
+        /// </summary>
+        /// <param name="rootDir"></param>
+        /// <returns></returns>
+        public TangdaoPathBuilder AsPath(string rootDir = null) => new TangdaoPathBuilder(string.IsNullOrWhiteSpace(rootDir) ? GetCurrentDirectory() : new AbsolutePath(rootDir));
+
         #endregion Fluent Builder
 
         #region 私有辅助

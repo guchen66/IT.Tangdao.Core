@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.Infrastructure;
+﻿using IT.Tangdao.Core.Abstractions.Configurations;
+using IT.Tangdao.Core.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;

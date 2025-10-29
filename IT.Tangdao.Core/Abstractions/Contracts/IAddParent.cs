@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Infrastructure
+namespace IT.Tangdao.Core.Abstractions.Contracts
 {
-    public class AddTaskItem : IAddTaskItem
+    public interface IAddParent
     {
-        public string NewItem { get; set; }
+        public int Id { get; set; }
     }
 }

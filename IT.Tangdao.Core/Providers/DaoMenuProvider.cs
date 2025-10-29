@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IT.Tangdao.Core.Abstractions.Configurations;
 
 namespace IT.Tangdao.Core.Providers
 {

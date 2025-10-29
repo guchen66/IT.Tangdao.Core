@@ -18,7 +18,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         /// <summary>
         /// 异步写入内容
         /// </summary>
-        Task<WriteResult> WriteAsync(string path, string content, DaoFileType daoFileType = DaoFileType.None);
+        Task<ResponseResult> WriteAsync(string path, string content, DaoFileType daoFileType = DaoFileType.None);
 
         /// <summary>
         /// 序列化对象并写入

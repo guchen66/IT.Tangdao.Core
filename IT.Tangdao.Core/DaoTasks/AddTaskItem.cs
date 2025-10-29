@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Infrastructure
+namespace IT.Tangdao.Core.DaoTasks
 {
-    public interface IAddParent
+    public class AddTaskItem : IAddTaskItem
     {
-        public int Id { get; set; }
+        public string NewItem { get; set; }
     }
 }

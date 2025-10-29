@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Abstractions.Results;
+using IT.Tangdao.Core.Helpers;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     public interface IContentConfigQueryable : IContentQueryable
     {
-        ReadResult SelectConfig(string section);
+        ResponseResult<TangdaoSortedDictionary<string, string>> SelectAppConfig(string section);
 
-        ReadResult SelectConfig<T>(string section) where T : class, new();
+        ResponseResult SelectAppConfig<T>(string section) where T : class, new();
 
-        ReadResult SelectConfigByJsonConvert<T>(string section) where T : class, new();
+        ResponseResult SelectConfigByJsonConvert<T>(string section) where T : class, new();
 
-        ReadResult SelectCustomConfig(string configName, string section);
+        ResponseResult<Dictionary<string, string>> SelectCustomConfig(string configName, string section);
     }
 }

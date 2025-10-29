@@ -46,7 +46,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         /// <summary>
         /// 异步写入内容
         /// </summary>
-        public async Task<WriteResult> WriteAsync(string path, string content, DaoFileType daoFileType = DaoFileType.None)
+        public async Task<ResponseResult> WriteAsync(string path, string content, DaoFileType daoFileType = DaoFileType.None)
         {
             if (daoFileType == DaoFileType.None)
             {
@@ -54,7 +54,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             }
             await new TimeSpan(1000);
             path.UseFileWriteToTxt(content);
-            return WriteResult<string>.Success(content);
+            return ResponseResult<string>.Success(content);
         }
 
         /// <summary>

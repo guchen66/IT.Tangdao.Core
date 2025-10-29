@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using IT.Tangdao.Core.Helpers;
 
 namespace IT.Tangdao.Core
 {
@@ -125,10 +126,10 @@ namespace IT.Tangdao.Core
             ViewToViewModelLocator.AutoBindViewModel(view, viewType, Provider);
         }
 
-        private List<ITangdaoModule> DiscoverModules()
+        private static List<ITangdaoModule> DiscoverModules()
         {
             var list = new List<ITangdaoModule>();
-            foreach (var asm in GetModuleAssemblies())
+            foreach (var asm in AssemblyHelper.GetModuleAssemblies())
             {
                 foreach (var attr in asm.GetCustomAttributes<TangdaoModuleAttribute>())
                 {
@@ -165,14 +166,6 @@ namespace IT.Tangdao.Core
                 });
             }
         }
-
-        /// <summary>
-        /// 返回要搜索的程序集列表；子类可重写过滤
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerable<Assembly> GetModuleAssemblies() =>
-            AppDomain.CurrentDomain.GetAssemblies()
-                     .Where(a => !a.IsDynamic && !a.FullName.StartsWith("System"));
 
         protected override void OnExit(ExitEventArgs e)
         {

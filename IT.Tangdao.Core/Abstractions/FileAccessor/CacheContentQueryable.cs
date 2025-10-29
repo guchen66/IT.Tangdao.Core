@@ -6,6 +6,7 @@ using IT.Tangdao.Core.Selectors;
 using System;
 using System.IO;
 using IT.Tangdao.Core.Infrastructure.Ambient;
+using IT.Tangdao.Core.Paths;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
@@ -23,12 +24,12 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         public CacheContentQueryable()
         { }
 
-        private ContentQueryable _inner = null;
+        private ContentQueryable _inner;
         /* ========== 缓存版 Read - 用 new 隐藏父接口签名 ========== */
 
-        public new IContentQueryable Read(string path, DaoFileType type)
+        public IContentQueryable Read(string path, DaoFileType type)
         {
-            var rootKey = CacheKey.GetCacheKey(path, type);
+            var rootKey = FileContentCacheKey.Create(path, type);
 
             var parameter = TangdaoContext.GetTangdaoParameter(rootKey);
 
@@ -65,6 +66,8 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public IContentConfigQueryable AsConfig() => _inner.AsConfig();
 
+        public IContentIniQueryable AsIni() => _inner.AsIni();
+
         public IContentQueryable Auto() => this;
 
         public IContentQueryable this[int idx] => new ContentQueryable()[idx];
@@ -80,5 +83,36 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public void ClearRegion(string region) =>
             throw new NotImplementedException();
+
+        public IContentQueryable Read(AbsolutePath path, DaoFileType type = DaoFileType.None)
+        {
+            var rootKey = FileContentCacheKey.Create(path.Value, type);
+
+            var parameter = TangdaoContext.GetTangdaoParameter(rootKey);
+
+            string Data = parameter.Get<string>(rootKey);
+            var detected = FileSelector.DetectFromContent(Data);
+            // ① TangdaoContext 拿实例级缓存
+            var hit = TangdaoContext.GetInstance<ContentQueryable>(rootKey);
+            if (hit != null)
+            {
+                _inner = hit;
+                return hit;
+            }
+
+            // ② 磁盘读 + 探测
+            var content = File.ReadAllText(path.Value);
+
+            // ③ 新实例（无参构造）
+            var fresh = new ContentQueryable
+            {
+                Content = content,
+                // DetectedType = detected
+            };
+
+            // ④ 放进 TangdaoContext 缓存桶
+            TangdaoContext.SetInstance(rootKey, fresh);
+            return fresh;
+        }
     }
 }
