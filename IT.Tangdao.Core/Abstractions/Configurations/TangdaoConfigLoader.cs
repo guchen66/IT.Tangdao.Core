@@ -10,7 +10,7 @@ using IT.Tangdao.Core.Abstractions.Loggers;
 
 namespace IT.Tangdao.Core.Abstractions.Configurations
 {
-    internal class TangdaoConfigLoader : ITangdaoConfigLoader
+    internal sealed class TangdaoConfigLoader : ITangdaoConfigLoader
     {
         private static readonly ITangdaoLogger Logger = TangdaoLogger.Get(typeof(TangdaoConfigLoader));
 

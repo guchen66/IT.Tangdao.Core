@@ -43,7 +43,7 @@ namespace IT.Tangdao.Core.Helpers
                 return input;
 
             // 2. 全局表里有
-            if (TypeParsers.Table.TryGetValue(targetType, out var parser))
+            if (TypeParser.Table.TryGetValue(targetType, out var parser))
                 return parser(input);
 
             // 3. 类型自带 TypeConverter

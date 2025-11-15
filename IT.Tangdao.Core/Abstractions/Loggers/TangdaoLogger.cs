@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.Infrastructure;
+﻿using IT.Tangdao.Core.Common;
+using IT.Tangdao.Core.Configurations;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

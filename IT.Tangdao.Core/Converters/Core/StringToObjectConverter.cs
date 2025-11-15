@@ -16,7 +16,7 @@ namespace IT.Tangdao.Core.Converters.Core
         public StringToObjectConverter(Func<string, T> parser = null)
         {
             _parser = parser
-                   ?? (TypeParsers.Table.TryGetValue(typeof(T), out var p)
+                   ?? (TypeParser.Table.TryGetValue(typeof(T), out var p)
                        ? (Func<string, T>)(s => (T)p(s))
                        : _ => throw new NotSupportedException($"未注册 {typeof(T)} 的解析器"));
         }

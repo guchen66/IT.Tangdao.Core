@@ -1,9 +1,11 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using IT.Tangdao.Core.Faker;
 
 namespace IT.Tangdao.Core.Helpers
 {
@@ -129,6 +131,33 @@ namespace IT.Tangdao.Core.Helpers
             return returnString ? value.ToString() : value;
         }
 
+        /// <summary>
+        /// 根据模板键返回随机值（.NET Framework 版）
+        /// </summary>
+        public static object GetRandomTemplateValue(string template)
+        {
+            switch (template)
+            {
+                case MockTemplate.ChineseName:
+                    return GetRandomChineseName();
+
+                case MockTemplate.Mobile:
+                    return GenerateChineseMobileNumber();
+
+                case MockTemplate.City:
+                    return GetRandomChineseCity();
+
+                case MockTemplate.Date:
+                    return GenerateRandomDateTime();
+
+                case MockTemplate.Email:
+                    return StringHelper.GenerateRandomEmail();
+
+                default:
+                    return GenerateRandomString(6);
+            }
+        }
+
         public static T GetRandomEnumValue<T>() where T : Enum
         {
             var values = Enum.GetValues(typeof(T));
@@ -144,5 +173,13 @@ namespace IT.Tangdao.Core.Helpers
         public static bool GetRandomBoolean() => _random.Next(2) == 1;
 
         public static int GetNextAutoIncrementId() => _intIdCounter++;
+
+        public static string CurrentRandomChineseName => GetCurrentRandomChineseName();
+        public static string RandomChineseName => GetRandomChineseName();
+
+        public static string GetCurrentRandomChineseName()
+        {
+            return CultureHelper.GetCultureSpecificNames()[_random.Next(CommonNames.Length)];
+        }
     }
 }

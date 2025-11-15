@@ -14,7 +14,7 @@ namespace IT.Tangdao.Core.Bootstrap
 {
     internal sealed class FrameworkDefaultComponent : ITangdaoContainerComponent
     {
-        public void Load(ITangdaoContainer container, DaoComponentContext context)
+        public void Load(ITangdaoContainer container, TangdaoComponentContext context)
         {
             // 框架级默认服务
             container.AddTangdaoSingleton<IReadService, ReadService>();

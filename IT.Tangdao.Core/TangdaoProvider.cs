@@ -12,15 +12,12 @@ namespace IT.Tangdao.Core
     {
         private readonly IServiceRegistry _registry;
         private readonly IServiceFactory _factory;
-        private readonly IReadOnlyList<IServiceEntry> _snapshot; // 快照
-
-        public IReadOnlyList<IServiceEntry> GetEntries() => _snapshot;
 
         internal TangdaoProvider(IServiceRegistry registry, IServiceFactory factory)
         {
             _registry = registry;
             _factory = factory;
-            _snapshot = registry.GetAllEntries(); // 建造阶段一次性拍快照，后续线程安全遍
+            //_snapshot = registry.GetAllEntries(); // 建造阶段一次性拍快照，后续线程安全遍
         }
 
         public object GetService(Type serviceType)

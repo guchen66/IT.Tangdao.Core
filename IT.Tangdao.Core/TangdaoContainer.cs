@@ -7,7 +7,7 @@ using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Mvvm;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.DaoException;
-using IT.Tangdao.Core.Selectors;
+using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Ioc;
 using System.ComponentModel;
 

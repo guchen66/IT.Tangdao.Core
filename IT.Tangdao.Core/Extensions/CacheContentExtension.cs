@@ -4,15 +4,14 @@ using IT.Tangdao.Core.Abstractions;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Helpers;
-using IT.Tangdao.Core.Selectors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IT.Tangdao.Core.Infrastructure.Ambient;
 using Newtonsoft.Json;
 using IT.Tangdao.Core.Paths;
+using IT.Tangdao.Core.Ambient;
 
 namespace IT.Tangdao.Core.Extensions
 {
@@ -40,7 +39,7 @@ namespace IT.Tangdao.Core.Extensions
                 var parameter = TangdaoContext.GetTangdaoParameter(rootKey);
                 string content = parameter.Get<string>(rootKey);
 
-                var detected = FileSelector.DetectFromContent(content);
+                var detected = FileHelper.DetectFromContent(content);
 
                 switch (detected)
                 {

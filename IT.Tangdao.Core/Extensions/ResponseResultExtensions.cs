@@ -1,6 +1,5 @@
 ﻿using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Helpers;
-using IT.Tangdao.Core.Infrastructure.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IT.Tangdao.Core.Configurations;
 
 namespace IT.Tangdao.Core.Extensions
 {

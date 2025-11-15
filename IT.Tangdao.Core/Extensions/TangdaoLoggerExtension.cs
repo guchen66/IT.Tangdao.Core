@@ -1,6 +1,6 @@
 ﻿using IT.Tangdao.Core.Abstractions;
 using IT.Tangdao.Core.Abstractions.Loggers;
-using IT.Tangdao.Core.Infrastructure;
+using IT.Tangdao.Core.Configurations;
 using System;
 using System.Collections.Generic;
 using System.IO;

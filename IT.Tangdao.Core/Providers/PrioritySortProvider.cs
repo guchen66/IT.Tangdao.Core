@@ -20,8 +20,7 @@ namespace IT.Tangdao.Core.Providers
         /// <param name="keySelector"></param>
         /// <param name="priority"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public PrioritySortProvider(Func<T, string> keySelector,
-                                    IDictionary<string, int> priority)
+        public PrioritySortProvider(Func<T, string> keySelector, IDictionary<string, int> priority)
         {
             _keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
             _priority = priority ?? throw new ArgumentNullException(nameof(priority));

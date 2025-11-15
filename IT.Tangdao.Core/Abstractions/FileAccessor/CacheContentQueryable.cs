@@ -2,11 +2,11 @@
 using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Selectors;
+using IT.Tangdao.Core.Helpers;
 using System;
 using System.IO;
-using IT.Tangdao.Core.Infrastructure.Ambient;
 using IT.Tangdao.Core.Paths;
+using IT.Tangdao.Core.Ambient;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
@@ -34,7 +34,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             var parameter = TangdaoContext.GetTangdaoParameter(rootKey);
 
             string Data = parameter.Get<string>(rootKey);
-            var detected = FileSelector.DetectFromContent(Data);
+            var detected = FileHelper.DetectFromContent(Data);
             // ① TangdaoContext 拿实例级缓存
             var hit = TangdaoContext.GetInstance<ContentQueryable>(rootKey);
             if (hit != null)
@@ -91,7 +91,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             var parameter = TangdaoContext.GetTangdaoParameter(rootKey);
 
             string Data = parameter.Get<string>(rootKey);
-            var detected = FileSelector.DetectFromContent(Data);
+            var detected = FileHelper.DetectFromContent(Data);
             // ① TangdaoContext 拿实例级缓存
             var hit = TangdaoContext.GetInstance<ContentQueryable>(rootKey);
             if (hit != null)

@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.Mvvm;
+﻿using IT.Tangdao.Core.Abstractions;
+using IT.Tangdao.Core.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -115,6 +115,7 @@ namespace IT.Tangdao.Core.Extensions
 
         /// <summary>
         /// 确保实现IAddParent接口的对象集合不包含重复ID
+        /// 按 Id 去重，不会抛出异常，重复就原样返回
         /// </summary>
         public static IEnumerable<T> OnlyAdd<T>(this IEnumerable<T> source, T newItem) where T : IAddParent
         {

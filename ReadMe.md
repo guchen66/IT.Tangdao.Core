@@ -19,9 +19,8 @@ MinidaoCommand.CreateFromTask(async () => { });
 
 ###### 1-2、集成快捷命令
 
-```
+```C#
 //当ViewModel继承DaoViewModelBase的时候，可以快速创建命令，省去new TangdaoCommand();
-HomeViewModel : DaoViewModelBase
 
 public ICommand SaveCommand => this.Cmd(Execute);
 ```
@@ -132,7 +131,32 @@ TangdaoApplication.Provider.GetService(viewModel);
  }
 ```
 
+###### 4-3、AutoViewAttribute
 
+当对于ViewModel使用特性的时候，自动关联View和ViewModel
+
+```C#
+ [AutoView]
+ public class DefaultViewModel : DaoViewModelBase{}
+```
+
+使用方式需要ContentControl
+
+```c#
+ <ContentControl Content="{Binding DefaultViewModel}" />
+```
+
+也就是本框架默认使用ViewModel-First
+
+如果使用View-First
+
+写了
+
+```C#
+<local: DefaultView/>
+```
+
+默认绑定不会生效
 
 #### 5、常用文件的读写
 
@@ -352,7 +376,7 @@ socket_port=7181
 // 正确调用（多节点必须指定索引）
 var ip1 = _readService.Default.AsXml().SelectNode("IP").Value;
 
-var ip2 = _readService.Default.AsXml().SelectNodes(); 
+var ipAll = _readService.Default.AsXml().SelectNodes(); 
 
 ```
 
@@ -424,7 +448,9 @@ LoginViewModel:接收
 
 
 
-对PLC的读取进行了扩展未完成
+对PLC的读取进行了扩展
+
+注意：已迁移到IT.Tangdao.Core.Device.dll或IT.Tangdao.Framework.Device.dll
 
 ```c#
   container.RegisterPlcServer(plc => 
@@ -442,7 +468,7 @@ LoginViewModel:接收
 
 
 
-
+链式创建对象
 
 ```C#
 var maybe = TangdaoOptional<string>.Some("Hello")
@@ -496,6 +522,19 @@ TangdaoContext.GetTangdaoParameter<T>();
 
 ###### 7-3、Socket通信
 
+```C#
+ string connUri = "tcp://127.0.0.1:502";
+ var uri = new TangdaoUri(connUri);
+
+ Context = TangdaoChannelBuilder.Build(NetMode.Client, connUri);
+ container.AddTangdaoSingleton<ITangdaoChannel>();
+ container.AddTangdaoSingleton<ITangdaoRequest>();
+ container.AddTangdaoSingleton<ITangdaoResponse>();
+
+```
+
+
+
 #### 8、日志DaoLogger
 
 日志默认是写在桌面上的
@@ -537,8 +576,8 @@ public class MainWindowViewModel : BindableBase
 
      private void Loaded()
      {
-         var generator = new DaoFakeDataGeneratorProvider<Student>();
-         List<Student> randomStudents = generator.GenerateRandomData(10);
+         var generator = new TangdaoDataFaker<Student>();
+         List<Student> randomStudents = generator.Build(10);
          Students = new ObservableCollection<Student>(randomStudents);
      }
  }
@@ -576,7 +615,7 @@ XAML Code：
  <ContentControl
      HorizontalContentAlignment="Stretch"
      VerticalContentAlignment="Stretch"
-     s:View.Model="{Binding CurrentView}" />
+     Content="{Binding CurrentView}" />
 
  <!--  智能控制栏  -->
  <Border
@@ -587,7 +626,7 @@ XAML Code：
          <!--  导航按钮  -->
          <Button
              Width="100"
-             Command="{s:Action Previous}"
+             Command="{Binding PreviousCommand}"
              Content="◄ 上一页"
              IsEnabled="{Binding CanPrevious}" />
 
@@ -603,7 +642,7 @@ XAML Code：
          <!--  导航按钮  -->
          <Button
              Width="100"
-             Command="{s:Action Next}"
+             Command="{Binding NextCommand}"
              Content="下一页 ►"
              IsEnabled="{Binding CanNext}" />
      </StackPanel>
@@ -820,11 +859,10 @@ class Program
 在程序启动时注册事件
 
 ```C#
-  protected override void OnLaunch()
+  protected override void Configure()
   {
-      base.OnLaunch();
       // 启动监控服务
-      var monitorService = Container.Get<IMonitorService>();
+      var monitorService = Provider.GetService<IMonitorService>();
       monitorService.FileChanged += OnFileChanged;
       monitorService.StartMonitoring();
   }
@@ -838,26 +876,24 @@ class Program
 注册代码
 
 ```C#
- // 注册配置
- Bind<FileMonitorConfig>().ToFactory(container =>
+ container.AddTangdaoSingleton(new FileMonitorConfig() 
  {
-     return new FileMonitorConfig
-     {
-         MonitorRootPath = @"E:\IgniteDatas\",
-         IncludeSubdirectories = true,
-         MonitorFileTypes = new List<DaoFileType>
+     MonitorRootPath = ConfigurationManager.AppSettings["MontionPath"],
+     IncludeSubdirectories = true,
+     MonitorFileTypes = new List<DaoFileType>
          {
              DaoFileType.Xml,
-            // DaoFileType.Config,
-           //  DaoFileType.Json
          },
-         DebounceMilliseconds = 800,
-         FileReadRetryCount = 3
+     DebounceMilliseconds = 800,
+     FileReadRetryCount = 3
+ });
+ container.AddTangdaoSingletonFactory<IMonitorService>(provider =>
+ {
+     return new FileMonitorService
+     {
+         
      };
- }).InSingletonScope();
-
- // 注册监控服务
- Bind<IMonitorService>().To<FileMonitorService>().InSingletonScope();
+ });
 ```
 
 #### 13、任务调度器
@@ -963,7 +999,7 @@ public class ComboboxOptions
                    Width="70"
                    Margin="0,0,15,0"
                    Background="LightGreen"
-                   Command="{markup:AncestorBinding Path=DataContext.UpdateUserCommand,AncestorType=UserControl}"
+                   Command="{markup:AncestorBinding Path=DataContext.UpdateUserCommand}"
                    CommandParameter="{Binding Id}"
                    Content="修改"
                    FontSize="14"
@@ -1134,3 +1170,16 @@ var priority = new Dictionary<string, int>
 var comparer = TangdaoSortProvider.Priority<Student>(s => s.Education, priority);
 ```
 
+#### 17、特性
+
+AutoRegisterAttribute:自动注册特性
+
+AutoWireViewAttribute：对ViewModel标注特性，自动关联View和ViewModel
+
+```C#
+ [AutoRegister(Mode = RegisterMode.Singleton, Order = 6)]
+ [AutoWireView]
+ public class TaskViewModel : DaoViewModelBase{}
+```
+
+注册的时候，可以指定注册的模式和顺序，数字越小，最先注册

@@ -13,4 +13,4 @@ using IT.Tangdao.Core.Bootstrap;
 
 // 模块自注册（关键一行）
 [assembly: TangdaoModule(typeof(FrameworkDefaultComponentModule))]
-[assembly: TangdaoModule(typeof(ViewModelFirstComponentModule))]
+[assembly: TangdaoModule(typeof(AutoRegisterComponentModule))]

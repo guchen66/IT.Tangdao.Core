@@ -2,7 +2,7 @@
 using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Selectors;
+using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections;
@@ -12,13 +12,12 @@ using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
 using System.IO;
-using IT.Tangdao.Core.Helpers;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Abstractions.Loggers;
 using IT.Tangdao.Core.Paths;
 using System.Xml;
-using IT.Tangdao.Core.Infrastructure.Configurations;
+using IT.Tangdao.Core.Configurations;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
@@ -82,7 +81,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         {
             _content = File.ReadAllText(path);
             _path = path;
-            _detected = t == DaoFileType.None ? FileSelector.DetectFromContent(_content) : t;
+            _detected = t == DaoFileType.None ? FileHelper.DetectFromContent(_content) : t;
             // ① 根 key：路径 + 格式
             var rootKey = string.Format("Content:{0}:{1}", path, _detected);
             TangdaoParameter tangdaoParameter = new TangdaoParameter();
@@ -94,7 +93,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         public async Task<IContentQueryable> ReadAsync(string path, DaoFileType daoFileType = DaoFileType.None)
         {
             _content = await ReadTxtAsync(path);
-            _detected = daoFileType == DaoFileType.None ? FileSelector.DetectFromContent(_content) : daoFileType;
+            _detected = daoFileType == DaoFileType.None ? FileHelper.DetectFromContent(_content) : daoFileType;
             var rootKey = string.Format("Content:{0}:{1}", path, _detected);
             TangdaoParameter tangdaoParameter = new TangdaoParameter();
             tangdaoParameter.Add(rootKey, _content);
@@ -170,7 +169,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             {
                 var doc = XDocument.Parse(_content);
                 var root = doc.RootElement();
-                var xmlType = FileSelector.DetectXmlStructure(doc);
+                var xmlType = FileHelper.DetectXmlStructure(doc);
 
                 switch (xmlType)
                 {
@@ -287,7 +286,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
                 foreach (var node in doc.Root.Elements())
                 {
                     var instance = new T();
-                    FileSelector.MapXElementToObject(node, instance); // 自动映射
+                    FileHelper.MapXElementToObject(node, instance); // 自动映射
                     result.Add(instance);
                 }
 
@@ -466,7 +465,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         public IContentQueryable Read(AbsolutePath path, DaoFileType t = DaoFileType.None)
         {
             _content = File.ReadAllText(path.Value);
-            _detected = t == DaoFileType.None ? FileSelector.DetectFromContent(_content) : t;
+            _detected = t == DaoFileType.None ? FileHelper.DetectFromContent(_content) : t;
 
             // ① 根 key：路径 + 格式
             var rootKey = $"Content:{path.Value}:{_detected}";

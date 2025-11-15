@@ -8,6 +8,6 @@ namespace IT.Tangdao.Core.Abstractions.Contracts
 {
     public interface IAddParent
     {
-        public int Id { get; set; }
+        int Id { get; }
     }
 }

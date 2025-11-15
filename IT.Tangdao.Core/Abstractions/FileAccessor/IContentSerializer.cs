@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Selectors;
+using IT.Tangdao.Core.Helpers;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
@@ -30,7 +30,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         {
             var doc = XDocument.Parse(content);
             T instance = new T();
-            FileSelector.MapXElementToObject(doc.Root, instance);
+            FileHelper.MapXElementToObject(doc.Root, instance);
             return instance;
         }
 

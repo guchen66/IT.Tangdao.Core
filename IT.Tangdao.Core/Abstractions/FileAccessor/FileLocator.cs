@@ -6,7 +6,7 @@ using System.Text;
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Abstractions.Results;
 using System.Threading.Tasks;
-using IT.Tangdao.Core.Selectors;
+using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Extensions;
 using System.Xml.Linq;
@@ -54,7 +54,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             if (string.IsNullOrWhiteSpace(path))
                 return ResponseResult<string>.Failure("路径不能为空。");
 
-            if (FileSelector.GetPathKind(path) != PathKind.Directory)
+            if (FileHelper.GetPathKind(path) != PathKind.Directory)
                 return ResponseResult<string>.Failure("指定路径必须是有效目录。");
 
             // 1. 先拿过滤后的文件列表（私有方法，见下）

@@ -10,6 +10,9 @@ using System.Windows.Controls;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Abstractions.Navigates;
 using System.Reflection;
+using IT.Tangdao.Core.Abstractions.Loggers;
+using System.Threading;
+using IT.Tangdao.Core.Abstractions.Contracts;
 
 namespace IT.Tangdao.Core.Mvvm
 {
@@ -17,12 +20,14 @@ namespace IT.Tangdao.Core.Mvvm
     /// 视图定位器
     /// 用来全局定位MVVM模式
     /// </summary>
-    public static class ViewToViewModelLocator
+    internal static class ViewToViewModelLocator
     {
         /// <summary>
         /// 针对普通 VM，零约束
         /// </summary>
         public static object Build(object vm) => BuildInstance(vm);
+
+        private static readonly ITangdaoLogger Logger = TangdaoLogger.Get(typeof(ViewToViewModelLocator));
 
         /// <summary>
         /// 针对实现了 ITangdaoPage 的 VM，编译期就能确定类型，零装箱
@@ -61,6 +66,7 @@ namespace IT.Tangdao.Core.Mvvm
         {
             // 查找对应的 ViewModel 类型
             var viewModelType = FindViewModelType(viewType);
+
             if (viewModelType != null)
             {
                 // 从容器解析 ViewModel 并设置 DataContext
@@ -70,9 +76,23 @@ namespace IT.Tangdao.Core.Mvvm
                     if (view is FrameworkElement frameworkElement)
                     {
                         frameworkElement.DataContext = viewModel;
+                        if (viewModel is IViewReady life)
+                        {
+                            // 显式委托变量，用于解绑
+                            RoutedEventHandler handler = null;
+                            handler = (s, e) =>
+                            {
+                                frameworkElement.Loaded -= handler;   // 立刻解绑
+                                life.OnViewLoaded();
+                            };
+                            frameworkElement.Loaded += handler;
+                            if (frameworkElement.IsLoaded)
+                                handler(frameworkElement, new RoutedEventArgs());
+                        }
                     }
                 }
             }
+            RegisterAutoViews();
         }
 
         /// <summary>
@@ -82,7 +102,7 @@ namespace IT.Tangdao.Core.Mvvm
         {
             if (viewType == null) return null;
 
-            var viewModelName = viewType.Name.Replace("View", "") + "ViewModel";
+            var viewModelName = viewType.Name.Replace("View", "ViewModel");
 
             // 方法1：同命名空间
             var viewModelType = viewType.Assembly.GetType($"{viewType.Namespace}.{viewModelName}");
@@ -94,36 +114,52 @@ namespace IT.Tangdao.Core.Mvvm
 
             if (viewModelType != null)
             {
-                Console.WriteLine($"通过全局搜索找到: {viewModelType.FullName}");
                 return viewModelType;
             }
 
-            Console.WriteLine($"未找到 ViewModel: {viewModelName}");
             return null;
         }
 
-        /// <summary>
-        /// 绑定所有的视图的DataContext
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="provider"></param>
-        /// <returns></returns>
-        public static Control BindDataContext(object data, ITangdaoProvider provider)
+        private static readonly Assembly _entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
+
+        private static int _registered; // 0 未注册，1 已注册
+
+        public static void RegisterAutoViews()
         {
-            if (data is null)
-                return null;
-
-            var name = data.GetType().FullName.Replace("ViewModel", "View");
-            var type = Type.GetType(name);
-
-            if (type != null)
+            if (_entryAssembly == null)
             {
-                var control = (Control)provider.GetService(type);
-                control.DataContext = data;
-                return control;
+                return;
             }
+            if (Interlocked.Exchange(ref _registered, 1) == 1) return; // 原子幂等
 
-            return new Control();
+            var vms = _entryAssembly.GetTypes()
+                .Where(t => !t.IsAbstract &&
+                            Attribute.IsDefined(t, typeof(AutoWireViewAttribute)));
+
+            foreach (var vmType in vms)
+            {
+                var key = new DataTemplateKey(vmType);
+                if (Application.Current.Resources.Contains(key)) continue;
+                var viewTypeName = vmType.FullName.Replace("ViewModel", "View").Replace("ViewModels", "Views");
+                var viewType = vmType.Assembly.GetType(viewTypeName);
+
+                var factory = new FrameworkElementFactory(viewType);
+                factory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler(OnViewLoaded));
+                var dataTemplate = new DataTemplate { DataType = vmType, VisualTree = factory };
+                Application.Current.Resources[key] = dataTemplate;
+            }
+        }
+
+        private static void OnViewLoaded(object sender, RoutedEventArgs e)
+        {
+            // sender 就是「模板实例」本身
+            var view = (FrameworkElement)sender;
+            // 解除订阅，只执行一次
+            view.Loaded -= OnViewLoaded;
+
+            var vm = view.DataContext;          // 已由 ContentPresenter 自动灌入
+            if (vm is IViewReady life)
+                life.OnViewLoaded();
         }
     }
 }

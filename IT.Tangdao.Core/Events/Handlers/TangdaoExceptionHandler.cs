@@ -1,5 +1,4 @@
 ﻿using IT.Tangdao.Core.Abstractions;
-using IT.Tangdao.Core.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Windows;
 using IT.Tangdao.Core.Abstractions.Loggers;
+using IT.Tangdao.Core.Configurations;
 
 namespace IT.Tangdao.Core.Events.Handlers
 {
