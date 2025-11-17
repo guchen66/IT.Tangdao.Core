@@ -65,27 +65,27 @@ namespace IT.Tangdao.Core.Threading
 
         /*-------- 默认槽 --------*/
 
-        public static T? GetCurrent<T>() where T : class => _defaultSlot.Value as T;
+        public static T? GetObject<T>() where T : class => _defaultSlot.Value as T;
 
-        public static void SetCurrent<T>(T? value) where T : class => _defaultSlot.Value = value;
+        public static void SetObject<T>(T? value) where T : class => _defaultSlot.Value = value;
 
-        public static void ClearCurrent<T>() where T : class => _defaultSlot.Value = null;
+        public static void ClearObject<T>() where T : class => _defaultSlot.Value = null;
 
         /*-------- 具名槽 --------*/
 
-        public static T? GetCurrent<T>(string name) where T : class
+        public static T? GetObject<T>(string name) where T : class
         {
             var dict = GetOrCreateNamedDict(typeof(T));
             return dict.TryGetValue(name, out var v) ? v as T : null;
         }
 
-        public static void SetCurrent<T>(string name, T? value) where T : class
+        public static void SetObject<T>(string name, T? value) where T : class
         {
             var dict = GetOrCreateNamedDict(typeof(T));
             dict[name] = value;
         }
 
-        public static void ClearCurrent<T>(string name) where T : class
+        public static void ClearObject<T>(string name) where T : class
         {
             var dict = GetOrCreateNamedDict(typeof(T));
             dict.Remove(name);

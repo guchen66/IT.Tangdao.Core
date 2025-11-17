@@ -20,7 +20,7 @@ namespace IT.Tangdao.Core.Mvvm
         // 验证规则字典
         private readonly Dictionary<string, Func<T, string>> _validationRules = new Dictionary<string, Func<T, string>>();
 
-        public bool HasErrors => _errors.Any();
+        public bool HasErrors => _errors.Count > 0;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 

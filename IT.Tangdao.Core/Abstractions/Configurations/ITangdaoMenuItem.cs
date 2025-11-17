@@ -22,7 +22,7 @@ namespace IT.Tangdao.Core.Abstractions.Configurations
         string MenuName { get; set; }
 
         /// <summary>
-        /// 配置值
+        /// 配置值。
         /// </summary>
         string? Value { get; set; }
 

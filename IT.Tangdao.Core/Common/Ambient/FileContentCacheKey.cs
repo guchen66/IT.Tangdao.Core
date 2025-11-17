@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Ambient
 {
-    public static class FileContentCacheKey
+    public sealed class FileContentCacheKey
     {
         public static string Create(string path, DaoFileType type)
         {

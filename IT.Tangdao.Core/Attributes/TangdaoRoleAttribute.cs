@@ -10,11 +10,11 @@ namespace IT.Tangdao.Core.Attributes
     /// Remark特性
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class RoleRemarkAttribute : Attribute
+    public class TangdaoRoleAttribute : Attribute
     {
         public int Remark { get; private set; }
 
-        public RoleRemarkAttribute(int remark)
+        public TangdaoRoleAttribute(int remark)
         {
             this.Remark = remark;
         }

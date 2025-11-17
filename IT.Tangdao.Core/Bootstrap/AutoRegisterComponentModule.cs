@@ -12,7 +12,7 @@ using System.Windows;
 
 namespace IT.Tangdao.Core.Bootstrap
 {
-    internal class AutoRegisterComponentModule : ITangdaoModule
+    internal sealed class AutoRegisterComponentModule : ITangdaoModule
     {
         private static readonly ITangdaoLogger Logger = TangdaoLogger.Get(typeof(AutoRegisterComponentModule));
 

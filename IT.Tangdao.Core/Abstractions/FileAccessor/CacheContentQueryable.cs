@@ -21,9 +21,6 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             set => _content = value;
         }
 
-        public CacheContentQueryable()
-        { }
-
         private ContentQueryable _inner;
         /* ========== 缓存版 Read - 用 new 隐藏父接口签名 ========== */
 

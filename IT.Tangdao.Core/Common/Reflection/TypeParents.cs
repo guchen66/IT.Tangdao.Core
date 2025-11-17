@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Reflection
 {
+    /// <summary>
+    /// 父类构建模板
+    /// </summary>
     public readonly struct TypeParents
     {
-        public Type? BaseClass { get; init; }      // 基类（null=object）
+        public Type? BaseClass { get; init; }
         public IReadOnlyList<Type> Interfaces { get; init; }
 
         // 语法糖：解构

@@ -11,17 +11,17 @@ namespace IT.Tangdao.Core.Extensions
     /// </summary>
     public static class NumericExtension
     {
-        public static int Square(this int value) => (int)SquareCore(value);
+        public static int Square(this int value) => (int)InternalSquare(value);
 
-        public static double Square(this double value) => SquareCore(value);
+        public static double Square(this double value) => InternalSquare(value);
 
-        public static int MathToAbs(this int value) => (int)MathToAbsCore(value);
+        public static int MathToAbs(this int value) => (int)InternalMathToAbs(value);
 
-        public static double MathToAbs(this double value) => MathToAbsCore(value);
+        public static double MathToAbs(this double value) => InternalMathToAbs(value);
 
-        private static double SquareCore(double value) => value * value;
+        private static double InternalSquare(double value) => value * value;
 
-        private static double MathToAbsCore(double value)
+        private static double InternalMathToAbs(double value)
         {
             return Math.Abs(value);
         }

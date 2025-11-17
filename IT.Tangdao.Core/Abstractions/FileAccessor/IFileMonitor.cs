@@ -5,7 +5,7 @@ using System;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
-    public interface IMonitorService
+    public interface IFileMonitor : IDisposable
     {
         event EventHandler<DaoFileChangedEventArgs> FileChanged;
 
@@ -27,6 +27,6 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         /// <summary>
         /// 获取当前监控状态
         /// </summary>
-        DaoMonitorStatus GetStatus();
+        MonitorStatus GetStatus();
     }
 }

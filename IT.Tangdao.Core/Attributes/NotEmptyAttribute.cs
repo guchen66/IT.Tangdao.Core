@@ -18,11 +18,5 @@ namespace IT.Tangdao.Core.Attributes
         {
             _message = message;
         }
-
-        public bool ValidData(object obj)
-        {
-            return !string.IsNullOrEmpty(obj?.ToString());
-        }
-
     }
 }

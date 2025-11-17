@@ -15,7 +15,7 @@ namespace IT.Tangdao.Core.Abstractions.Configurations
         private static readonly ITangdaoLogger Logger = TangdaoLogger.Get(typeof(TangdaoConfigLoader));
 
         // 嵌入资源路径 = 默认命名空间 + 文件夹 + 文件名
-        private const string ResourcePath = "IT.Tangdao.Framework.Settings.tangdao.json";
+        private const string ResourcePath = "IT.Tangdao.Core.Settings.tangdao.json";
 
         public TangdaoConfig Load()
         {
