@@ -42,11 +42,11 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
     public static class ReadServiceProvider
     {
-        private static readonly AsyncLocal<IReadService> _current = new AsyncLocal<IReadService>();
+        private static readonly AsyncLocal<IContentReader> _current = new AsyncLocal<IContentReader>();
 
-        public static IReadService Default { get; } = new ReadService();
+        public static IContentReader Default { get; } = new ContentReader();
 
-        public static IReadService Current
+        public static IContentReader Current
         {
             get => _current.Value ?? Default;
             set => _current.Value = value ?? throw new ArgumentNullException(nameof(value));

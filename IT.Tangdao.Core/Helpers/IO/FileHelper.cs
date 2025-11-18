@@ -9,38 +9,15 @@ using System.Threading.Channels;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using IT.Tangdao.Core.Extensions;
 
 namespace IT.Tangdao.Core.Helpers
 {
     /// <summary>
     /// 判断文件的后缀
     /// </summary>
-    public class FileHelper
+    public static class FileHelper
     {
-        public bool Root { get; set; }
-
-        public static string GetFileType(string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath))
-                throw new ArgumentException("文件路径不能为空", nameof(filePath));
-
-            // 获取文件扩展名（包括点）
-            string extension = Path.GetExtension(filePath);
-
-            // 根据扩展名判断文件类型
-            switch (extension.ToLower())
-            {
-                case ".xaml":
-                    return "XAML";
-
-                case ".cs":
-                    return "CS";
-
-                default:
-                    return "Unknown";
-            }
-        }
-
         /// <summary>
         /// 获取当前路径文件类型
         /// </summary>
@@ -56,6 +33,49 @@ namespace IT.Tangdao.Core.Helpers
                 ? PathKind.Directory
                 : PathKind.File;
         }
+
+        /// <summary>
+        /// 判断该路径是否是根目录
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool IsRoot(string path)
+        {
+            string root = Path.GetPathRoot(path);
+            return path.EqualsIgnoreCase(root);
+        }
+
+        #region 文件的读取
+
+        public static string ReadAllText(string path)
+        {
+            if (!File.Exists(path)) throw new FileNotFoundException("指定文件未找到。", path);
+            return File.ReadAllText(path);
+        }
+
+        public static string[] ReadAllLines(string path)
+        {
+            if (!File.Exists(path)) throw new FileNotFoundException("指定文件未找到。", path);
+            return File.ReadAllLines(path);
+        }
+
+        public static string ReadTextWithStream(string path)
+        {
+            if (!File.Exists(path)) throw new FileNotFoundException("指定文件未找到。", path);
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            using var sr = new StreamReader(fs, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+            return sr.ReadToEnd();
+        }
+
+        public static async Task<string> ReadTextWithStreamAsync(string path)
+        {
+            if (!File.Exists(path)) throw new FileNotFoundException("指定文件未找到。", path);
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
+            using var sr = new StreamReader(fs, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+            return await sr.ReadToEndAsync();
+        }
+
+        #endregion 文件的读取
 
         /// <summary>
         /// 解析当前类型属于指定枚举
@@ -88,6 +108,11 @@ namespace IT.Tangdao.Core.Helpers
             }
         }
 
+        /// <summary>
+        /// 解析当前XML数据的结构
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         public static XmlStruct DetectXmlStructure(XDocument doc)
         {
             if (doc == null) return XmlStruct.Empty;
@@ -292,20 +317,6 @@ namespace IT.Tangdao.Core.Helpers
             {
                 Console.WriteLine($"An error occurred while writing data to file: {ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// 文件导入
-        /// </summary>
-        public static void Import()
-        {
-        }
-
-        /// <summary>
-        /// 文件导出
-        /// </summary>
-        public static void Export()
-        {
         }
     }
 }

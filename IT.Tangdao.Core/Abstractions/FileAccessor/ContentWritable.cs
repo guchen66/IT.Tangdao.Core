@@ -77,11 +77,11 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
                 switch (extension)
                 {
                     case ".xml":
-                        XmlFolderHelper.SerializeXMLToFile<T>(obj, path);
+                        TangdaoXmlSerializer.SerializeXMLToFile<T>(obj, path);
                         break;
 
                     case ".json":
-                        JsonConverHelper.SaveJsonData(obj, path);
+                        TangdaoJsonFileHelper.SaveJsonData(obj, path);
                         break;
 
                     default:

@@ -274,7 +274,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             }
         }
 
-        private string ComputeContentHash(string content)
+        private static string ComputeContentHash(string content)
         {
             if (string.IsNullOrEmpty(content)) return string.Empty;
 
@@ -285,7 +285,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             }
         }
 
-        private string CompareContentChanges(string oldContent, string newContent, DaoFileType fileType)
+        private static string CompareContentChanges(string oldContent, string newContent, DaoFileType fileType)
         {
             if (string.IsNullOrEmpty(oldContent) || string.IsNullOrEmpty(newContent))
                 return "无法比较，内容为空";
@@ -314,7 +314,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             }
         }
 
-        private string CompareXmlChanges(string oldXml, string newXml)
+        private static string CompareXmlChanges(string oldXml, string newXml)
         {
             var oldLines = oldXml.Split('\n');
             var newLines = newXml.Split('\n');
@@ -331,7 +331,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             return changes.Count > 0 ? string.Join("; ", changes.Take(3)) + (changes.Count > 3 ? "..." : "") : "格式变化";
         }
 
-        private string CompareJsonChanges(string oldJson, string newJson)
+        private static string CompareJsonChanges(string oldJson, string newJson)
         {
             // 简单的JSON比较逻辑
             if (oldJson.Length != newJson.Length)
@@ -340,7 +340,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             return "JSON内容变化";
         }
 
-        private string CompareTextChanges(string oldText, string newText)
+        private static string CompareTextChanges(string oldText, string newText)
         {
             if (oldText.Length != newText.Length)
                 return "文本长度变化";

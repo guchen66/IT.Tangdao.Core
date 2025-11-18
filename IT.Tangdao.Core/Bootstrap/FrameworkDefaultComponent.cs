@@ -17,8 +17,8 @@ namespace IT.Tangdao.Core.Bootstrap
         public void Load(ITangdaoContainer container, TangdaoComponentContext context)
         {
             // 框架级默认服务
-            container.AddTangdaoSingleton<IReadService, ReadService>();
-            container.AddTangdaoSingleton<IWriteService, WriteService>();
+            container.AddTangdaoSingleton<IContentReader, ContentReader>();
+            container.AddTangdaoSingleton<IContentWriter, ContentWriter>();
             // container.AddTangdaoSingleton<IAlarmService, AlarmService>();
             // container.AddTangdaoSingleton<IMonitorService, FileMonitorService>();
             container.AddTangdaoSingleton<IFileLocator, FileLocator>();

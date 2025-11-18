@@ -1,7 +1,7 @@
 ﻿namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     /// <inheritdoc/>
-    public class ReadService : IReadService
+    public class ContentReader : IContentReader
     {
         public IContentQueryable Default => new ContentQueryable();
 

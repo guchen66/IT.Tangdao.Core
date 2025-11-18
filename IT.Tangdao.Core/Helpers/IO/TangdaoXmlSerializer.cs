@@ -17,7 +17,7 @@ namespace IT.Tangdao.Core.Helpers
     /// <summary>
     /// Xml序列化反序列化帮助类
     /// </summary>
-    public static class XmlFolderHelper
+    public static class TangdaoXmlSerializer
     {
         /// <summary>
         /// 将对象转成XML，并以指定编码保存为字符串

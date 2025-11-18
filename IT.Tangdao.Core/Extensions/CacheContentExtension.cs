@@ -44,7 +44,7 @@ namespace IT.Tangdao.Core.Extensions
                 switch (detected)
                 {
                     case DaoFileType.Xml:
-                        return XmlFolderHelper.Deserialize<T>(content);
+                        return TangdaoXmlSerializer.Deserialize<T>(content);
 
                     case DaoFileType.Json:
                         return JsonConvert.DeserializeObject<T>(content);
