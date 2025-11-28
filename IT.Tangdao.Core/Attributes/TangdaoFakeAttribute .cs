@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Gaming.Input;
 
 namespace IT.Tangdao.Core.Attributes
 {
@@ -32,11 +33,20 @@ namespace IT.Tangdao.Core.Attributes
 
         #region 值类型使用
 
-        public int Min { get; set; }
+        /// <summary>
+        /// 最小值，默认0
+        /// </summary>
+        public int Min { get; set; } = 0;
 
-        public int Max { get; set; }
+        /// <summary>
+        /// 最大值，默认1000
+        /// </summary>
+        public int Max { get; set; } = 1000;
 
-        public int Point { get; set; }
+        /// <summary>
+        /// 小数位数，默认4
+        /// </summary>
+        public int Point { get; set; } = 4;
 
         #endregion 值类型使用
 

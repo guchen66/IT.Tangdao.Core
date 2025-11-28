@@ -7,17 +7,13 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows;
-using System.Xaml;
 
 namespace IT.Tangdao.Core.Markup
 {
-    /// <summary>
-    /// 针对复杂的绑定，直接返回VM
-    /// </summary>
-    public class AncestorBindingExtension : MarkupExtension
+    public class RelativeBindingExtension : MarkupExtension
     {
         /// <summary>
-        /// 最终要绑定的路径，默认拿 VM 本身
+        /// 相对路径网上查找绑定的路径，默认拿 VM 本身
         /// </summary>
         public PropertyPath Path { get; set; }
 
@@ -26,24 +22,21 @@ namespace IT.Tangdao.Core.Markup
         /// <summary>
         /// 是否优先查找特定类型的父级
         /// </summary>
-        public Type AncestorType { get; set; } = typeof(UserControl);
+        public string AncestorTypeName { get; set; } = "UserControl";
 
         public override object ProvideValue(IServiceProvider sp)
         {
-            var rootProvider = sp.GetService(typeof(IRootObjectProvider)) as IRootObjectProvider;
-            if (rootProvider != null)
-            {
-                var rootObject = rootProvider.RootObject;
-                AncestorType = rootObject.GetType();
-            }
+            var typeResolver = sp.GetService(typeof(IXamlTypeResolver)) as IXamlTypeResolver;
+            var ancestorType = typeResolver?.Resolve(AncestorTypeName) ?? typeof(UserControl);
+
             return new Binding
             {
+                Path = Path,
                 RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor)
                 {
-                    AncestorType = AncestorType,
+                    AncestorType = ancestorType,
                     AncestorLevel = AncestorLevel
-                },
-                Path = Path
+                }
             }.ProvideValue(sp);
         }
     }
