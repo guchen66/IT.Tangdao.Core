@@ -1,6 +1,8 @@
 ﻿using IT.Tangdao.Core.Common;
+using IT.Tangdao.Core.Faker;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +49,16 @@ namespace IT.Tangdao.Core.Attributes
         /// 小数位数，默认4
         /// </summary>
         public int Point { get; set; } = 4;
+
+        /// <summary>
+        /// 是否为主键自增属性
+        /// </summary>
+        /// <remarks>
+        /// 当设置为true时，该属性会自动生成连续递增的Id值
+        /// 结合IsIdProperty方法自动识别Id属性
+        /// </remarks>
+        [Description("是否为主键自增属性")]
+        public bool PrimarykeyAutoIncrement { get; set; } = false;
 
         #endregion 值类型使用
 

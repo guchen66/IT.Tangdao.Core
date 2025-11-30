@@ -14,12 +14,9 @@ namespace IT.Tangdao.Core.Bootstrap
 {
     internal sealed class AutoRegisterComponentModule : ITangdaoModule
     {
-        private static readonly ITangdaoLogger Logger = TangdaoLogger.Get(typeof(AutoRegisterComponentModule));
-
         public void RegisterServices(ITangdaoContainer container)
         {
             TangdaoAutoRegistry.Register(container);
-            Logger.WriteLocal("所有View注册成功");
         }
 
         public void OnInitialized(ITangdaoProvider provider)
