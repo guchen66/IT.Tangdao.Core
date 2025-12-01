@@ -2,6 +2,7 @@
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Helpers;
+using IT.Tangdao.Core.Pooling;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Helpers
@@ -17,7 +19,7 @@ namespace IT.Tangdao.Core.Helpers
     /// 数据自动生成器
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TangdaoDataFaker<T> where T : new()
+    public class TangdaoDataFaker<T> where T : class, new()
     {
         //缓存属性生成setter
         private static readonly ConcurrentDictionary<string, Action<T, object>> _cachePropertySetters =
@@ -47,11 +49,9 @@ namespace IT.Tangdao.Core.Helpers
                 { typeof(bool), () => FakeDataHelper.GetRandomBoolean() }
             });
 
-        /// <summary>
-        /// 通过动态委托自动生成数据
-        /// </summary>
-        /// <param name="count"></param>
-        /// <returns></returns>
+        // 对象池，用于复用生成的对象，减少GC压力
+        private static readonly ThreadLocal<TangdaoPool<T>> _objectPool = new ThreadLocal<TangdaoPool<T>>(() => new TangdaoPool<T>());
+
         /// <summary>
         /// 通过动态委托自动生成数据
         /// </summary>
@@ -117,7 +117,8 @@ namespace IT.Tangdao.Core.Helpers
 
         private static T CreateRandomInstance()
         {
-            var instance = new T();  // 1. 创建新实例
+            // 1、从对象池中租借一个对象，避免频繁创建新对象
+            var instance = _objectPool.Value.Rent();
             var properties = _cachedProperties.Value;// 2. 获取所有公共实例属性
 
             foreach (var property in properties)  // 3. 遍历每个属性
