@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using IT.Tangdao.Core.Faker;
 using System.Threading;
 using IT.Tangdao.Core.Extensions;
+using IT.Tangdao.Core.Abstractions.Loggers;
 
 namespace IT.Tangdao.Core.Helpers
 {
@@ -193,8 +194,8 @@ namespace IT.Tangdao.Core.Helpers
         public static object GetRandomEnumValue(Type enumType, bool returnString = false)
         {
             var values = Enum.GetValues(enumType);
-            var value = values.GetValue(_random.Value.Next(values.Length));
 
+            var value = values.GetValue(_random.Value.Next(values.Length));
             // 根据需求返回枚举值或字符串
             return returnString ? value.ToString() : value;
         }

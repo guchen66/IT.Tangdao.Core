@@ -2,11 +2,13 @@
 using IT.Tangdao.Core.Abstractions.Loggers;
 using IT.Tangdao.Core.Configurations;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Extensions
@@ -21,9 +23,11 @@ namespace IT.Tangdao.Core.Extensions
         /// category 为空时直接落在根目录，否则作为子文件夹。
         /// 程序启动LogPathConfig.SetRoot可自定义Log目录
         /// </summary>
+        private static readonly ConcurrentDictionary<string, object> _fileLocks = new ConcurrentDictionary<string, object>();
+
         public static void WriteLocal(this ITangdaoLogger logger, string message, string category = null, [CallerMemberName] string caller = null,
-                              [CallerFilePath] string file = null,
-                              [CallerLineNumber] int line = 0)
+            [CallerFilePath] string file = null,
+            [CallerLineNumber] int line = 0)
         {
             if (logger == null) return;
 
@@ -36,14 +40,20 @@ namespace IT.Tangdao.Core.Extensions
                 var fileName = $"{DateTime.Now:yyyyMMdd}.log";
                 var filePath = Path.Combine(dir, fileName);
 
-                // 这里用到了 logger，于是扩展方法“名副其实”
-                var logLine = $"{DateTime.Now:F}  [{caller}]  ({Path.GetFileName(file)}:{line})  " +
-                   $"{logger.GetType().FullName}  {message}{Environment.NewLine}";
-                File.AppendAllText(filePath, logLine);
+                var logLine = $"ThreadId:{Environment.CurrentManagedThreadId} {DateTime.Now:HH:mm:ss.fff}  [{caller}]  ({Path.GetFileName(file)}:{line})  " +
+                             $"{logger.GetType().FullName}  {message}{Environment.NewLine}";
+
+                // 获取或创建针对该文件路径的锁
+                var fileLock = _fileLocks.GetOrAdd(filePath, path => new object());
+
+                lock (fileLock)
+                {
+                    File.AppendAllText(filePath, logLine);
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"WriteLocal failed: {ex}");
+                Console.WriteLine($"WriteLocal failed: {ex}");
             }
         }
     }
