@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace IT.Tangdao.Core.Extensions
         /// </summary>
         public static Task<bool> WaitOneAsync(this WaitHandle handle, int millisecondsTimeout = Timeout.Infinite, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (handle == null) throw new ArgumentNullException(nameof(handle));
+            if (handle == null) TangdaoGuards.ThrowIfNull(nameof(handle));
 
             var tcs = new TaskCompletionSource<bool>();
             RegisteredWaitHandle registeredWait = null;

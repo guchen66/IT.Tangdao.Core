@@ -21,12 +21,9 @@ namespace IT.Tangdao.Core.Ioc
                             ILifecycleStrategy lifecycleStrategy)
         {
             // 防御式校验，早失败、易排错
-            if (serviceType == null)
-                throw new ArgumentNullException(nameof(serviceType));
-            if (implementationType == null)
-                throw new ArgumentNullException(nameof(implementationType));
-            if (lifecycleStrategy == null)
-                throw new ArgumentNullException(nameof(lifecycleStrategy));
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(implementationType);
+            ArgumentNullException.ThrowIfNull(lifecycleStrategy);
             if (!serviceType.IsAssignableFrom(implementationType))
                 throw new ArgumentException($"类型 '{implementationType}' 未实现/继承 '{serviceType}'.");
 

@@ -32,12 +32,12 @@ namespace IT.Tangdao.Core.Helpers
 
                 // 跳过空行和注释
                 if (string.IsNullOrEmpty(trimmedLine) ||
-                    trimmedLine.StartsWith(";") ||
-                    trimmedLine.StartsWith("#"))
+                    trimmedLine.StartsWith(';') ||
+                    trimmedLine.StartsWith('#'))
                     continue;
 
                 // 处理节标题 [SectionName]
-                if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
+                if (trimmedLine.StartsWith('[') && trimmedLine.EndsWith(']'))
                 {
                     currentSection = new IniConfig
                     {
@@ -93,14 +93,14 @@ namespace IT.Tangdao.Core.Helpers
 
                 // 跳过空行和注释
                 if (string.IsNullOrEmpty(trimmedLine) ||
-                    trimmedLine.StartsWith(";") ||
-                    trimmedLine.StartsWith("#"))
+                    trimmedLine.StartsWith(';') ||
+                    trimmedLine.StartsWith('#'))
                     continue;
 
                 totalLines++;
 
                 // 检测节标题 [SectionName]
-                if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
+                if (trimmedLine.StartsWith('[') && trimmedLine.EndsWith(']'))
                 {
                     sectionCount++;
                 }
@@ -133,7 +133,7 @@ namespace IT.Tangdao.Core.Helpers
 
             // 基本的键值对验证
             return !string.IsNullOrEmpty(keyPart) &&
-                   !keyPart.Contains(" ") &&
+                   !keyPart.Contains(' ') &&
                    valuePart.Length > 0;
         }
     }

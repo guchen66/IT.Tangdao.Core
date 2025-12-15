@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions
+namespace IT.Tangdao.Core.Converters.Core
 {
-    public interface ITypeConvertService
+    public interface ITangdaoConvert
     {
         T Converter<T>(string name) where T : class, new();
     }
