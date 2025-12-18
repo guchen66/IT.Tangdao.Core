@@ -24,7 +24,7 @@ namespace IT.Tangdao.Core.Helpers
         /// <returns></returns>
         public static string[] GetRootJsonFileNames()
         {
-            string rootDirectory = DirectoryHelper.SelectRootDirectory();
+            string rootDirectory = DirectoryHelper.GetDomainBaseDirectory();
 
             string[] jsonFilePaths = Directory.GetFiles(rootDirectory, "*.json");
 
@@ -37,7 +37,7 @@ namespace IT.Tangdao.Core.Helpers
         /// <returns></returns>
         public static async Task<string[]> GetRootJsonFileNamesAsync()
         {
-            string rootDirectory = DirectoryHelper.SelectRootDirectory();
+            string rootDirectory = DirectoryHelper.GetDomainBaseDirectory();
 
             string[] jsonFilePaths = await Task.Run(() => Directory.GetFiles(rootDirectory, "*.json"));
 
