@@ -17,9 +17,7 @@ namespace IT.Tangdao.Core.Events
         private static readonly TangdaoWeakEvent _instance = new TangdaoWeakEvent();
         public static TangdaoWeakEvent Instance => _instance;
 
-        [Obsolete("仅供框架内部使用，请订阅 OnXxxReceived", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public event EventHandler<MessageEventArgs> MessageReceived;
+        private event EventHandler<MessageEventArgs> MessageReceived;
 
         [Obsolete("仅供框架内部使用，请订阅 OnXxxReceived", true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -31,7 +29,7 @@ namespace IT.Tangdao.Core.Events
 
         public event EventHandler<MessageEventArgs> OnMessageReceived
         {
-            add => WeakEventManager<TangdaoWeakEvent, MessageEventArgs>.AddHandler(this, nameof(MessageReceived), value);
+            add => WeakEventManager<TangdaoWeakEvent, MessageEventArgs>.AddHandler(this, "MessageReceived", value);
             remove => WeakEventManager<TangdaoWeakEvent, MessageEventArgs>.RemoveHandler(this, nameof(MessageReceived), value);
         }
 

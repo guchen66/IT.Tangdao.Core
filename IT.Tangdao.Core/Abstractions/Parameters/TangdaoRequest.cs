@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Framework.Abstractions.Parameters
+namespace IT.Tangdao.Core.Abstractions.Parameters
 {
     public sealed class ReadRegRequest : TangdaoParameter, ITangdaoRequest
     {

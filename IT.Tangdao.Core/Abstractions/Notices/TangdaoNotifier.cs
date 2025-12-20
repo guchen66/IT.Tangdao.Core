@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using IT.Tangdao.Core.EventArg;
+
+namespace IT.Tangdao.Core.Abstractions.Notices
+{
+    /// <summary>
+    /// 通知接收器实现，用于接收通用通知
+    /// </summary>
+    public class TangdaoNotifier : TangdaoNotifier<object>, ITangdaoNotifier
+    {
+    }
+}

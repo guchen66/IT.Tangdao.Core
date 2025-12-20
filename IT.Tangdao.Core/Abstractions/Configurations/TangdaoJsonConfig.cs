@@ -13,7 +13,7 @@ namespace IT.Tangdao.Core.Abstractions.Configurations
         public ITangdaoOrder Order => new TangdaoOrder(1);   // 也可以直接用属性，双重保险
     }
 
-    // 放 IT.Tangdao.Framework.Abstractions.Configuration 或当前 Implementation 均可
+    // 放 IT.Tangdao.Core.Abstractions.Configuration 或当前 Implementation 均可
     public sealed class TangdaoConfig
     {
         public string UserName { get; set; }
