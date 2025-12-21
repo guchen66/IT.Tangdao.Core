@@ -10,5 +10,6 @@ namespace IT.Tangdao.Core.Ioc
     {
         public IServiceEntry Entry { get; set; }
         public IServiceFactory Factory { get; set; }
+        public object Key { get; set; }  // 新增
     }
 }

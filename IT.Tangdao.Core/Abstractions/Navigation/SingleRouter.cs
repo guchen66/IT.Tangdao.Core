@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace IT.Tangdao.Core.Abstractions.Navigates
+namespace IT.Tangdao.Core.Abstractions.Navigation
 {
     /// <inheritdoc/>
     public class SingleRouter : ISingleRouter, INotifyPropertyChanged

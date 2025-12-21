@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.Extensions;
+﻿using IT.Tangdao.Core.Common;
+using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace IT.Tangdao.Core.Abstractions.Notices
         /// </summary>
         /// <param name="noticeRegistry">通知注册表，包含观察者类型信息</param>
         /// <returns>创建的通知观察者实例</returns>
-        INoticeObserver CreateObserver(NoticeRegistry noticeRegistry);
+        INoticeObserver CreateObserver(RegistrationTypeEntry noticeRegistry);
 
         /// <summary>
         /// 清除观察者实例缓存

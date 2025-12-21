@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace IT.Tangdao.Core.Abstractions.Navigates
+namespace IT.Tangdao.Core.Abstractions.Navigation
 {
     /// <inheritdoc/>
     public class TangdaoRouter : ITangdaoRouter, INotifyPropertyChanged

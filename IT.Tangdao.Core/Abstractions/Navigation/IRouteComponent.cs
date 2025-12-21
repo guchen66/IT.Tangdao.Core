@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions.Navigates
+namespace IT.Tangdao.Core.Abstractions.Navigation
 {
     /// <summary>
     /// 注册总界面
