@@ -27,7 +27,7 @@ namespace IT.Tangdao.Core.Enums
         Single,
 
         /// <summary>
-        /// 单个根节点但有多个子节点
+        /// 存在多个子节点
         /// </summary>
         Multiple
     }

@@ -20,6 +20,8 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
 
         event EventHandler NavigationChanged;
 
+        event EventHandler<string> GroupChanged;
+
         void Previous();
 
         void Next();

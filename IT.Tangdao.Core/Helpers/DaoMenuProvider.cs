@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Abstractions.Configurations;
 
-namespace IT.Tangdao.Core.Providers
+namespace IT.Tangdao.Core.Helpers
 {
     public class DaoMenuProvider
     {
@@ -19,7 +19,7 @@ namespace IT.Tangdao.Core.Providers
             Childs = new List<ITangdaoMenuItem>()
         };
 
-        public event EventHandler? Changed;
+        public event EventHandler Changed;
 
         // 添加监控项
         public void Watch(string path, Action<ITangdaoMenuItem> onChange)

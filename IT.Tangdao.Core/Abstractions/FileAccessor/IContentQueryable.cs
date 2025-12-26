@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Enums;
+using System.Threading.Tasks;
 using IT.Tangdao.Core.Paths;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
@@ -11,24 +12,29 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
     /// </summary>
     public interface IContentQueryable
     {
-        public string Content { get; }
+        /// <summary>
+        /// 读取的内容
+        /// </summary>
+        string Content { get; }
 
-        IContentXmlQueryable AsXml();
+        /// <summary>
+        /// 读取的路径
+        /// </summary>
+        string ReadPath { get; }
 
-        IContentJsonQueryable AsJson();
+        /// <summary>
+        /// 文件后缀
+        /// </summary>
+        DaoFileType DetectedType { get; }
 
-        IContentConfigQueryable AsConfig();
+        IXmlQueryable AsXml();
 
-        IContentIniQueryable AsIni();
+        IJsonQueryable AsJson();
 
-        IContentQueryable Read(string path, DaoFileType t = DaoFileType.None);
+        IConfigQueryable AsConfig();
 
-        IContentQueryable Read(AbsolutePath path, DaoFileType t = DaoFileType.None);
+        IIniQueryable AsIni();
 
-        IContentQueryable Auto();          // 自动探测
-
-        IContentQueryable this[int index] { get; }
-
-        IContentQueryable this[string readObject] { get; }
+        IContentQueryable Auto(); // 自动探测
     }
 }

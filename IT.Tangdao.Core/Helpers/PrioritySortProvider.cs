@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Providers
+namespace IT.Tangdao.Core.Helpers
 {
     /// <summary>
     /// 基于 TangdaoSortedDictionary 的通用优先级排序器

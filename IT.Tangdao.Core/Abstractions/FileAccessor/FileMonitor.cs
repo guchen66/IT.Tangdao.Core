@@ -1,5 +1,4 @@
-﻿using IT.Tangdao.Core.Common;
-using IT.Tangdao.Core.Configurations;
+﻿using IT.Tangdao.Core.Configurations;
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.EventArg;
 using IT.Tangdao.Core.Helpers;
@@ -16,14 +15,33 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     public class FileMonitor : IFileMonitor, IDisposable
     {
+        /// <summary>
+        /// 线程安全的字典，存储目录路径和对应的文件监控器
+        /// </summary>
         private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers;
+
+        /// <summary>
+        /// 存储文件状态（内容、哈希、修改时间）
+        /// </summary>
         private readonly ConcurrentDictionary<string, FileState> _fileStates;
+
+        /// <summary>
+        /// 存储每个文件最后处理事件的时间（用于防抖）
+        /// </summary>
         private readonly ConcurrentDictionary<string, DateTime> _lastEventTimes;
+
+        /// <summary>
+        /// 当XML文件发生变化时触发的事件
+        /// </summary>
+        public event EventHandler<DaoFileChangedEventArgs> FileChanged;
+
+        /// <summary>
+        /// 文件监控配置
+        /// </summary>
         private FileMonitorConfig _config;
+
         private bool _isDisposed;
         private MonitorStatus _status = MonitorStatus.Stopped;
-
-        public event EventHandler<DaoFileChangedEventArgs> FileChanged;
 
         public FileMonitor()
         {
@@ -40,14 +58,22 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
+        /// <summary>
+        /// 开始监控
+        /// </summary>
         public void StartMonitoring()
         {
             StartMonitoring(_config);
         }
 
+        /// <summary>
+        /// 查找指定配置下的所文件的目录，并开始监控
+        /// </summary>
+        /// <param name="config"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void StartMonitoring(FileMonitorConfig config)
         {
-            if (config == null) ArgumentNullException.ThrowIfNull(nameof(config));
+            if (config == null) throw new ArgumentNullException(nameof(config));
 
             _config = config;
             _status = MonitorStatus.Monitoring;
@@ -73,7 +99,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
                 Console.WriteLine($"未找到{fileType}文件");
                 return;
             }
-
+            // 获取所有包含配置枚举文件的唯一目录
             var uniqueDirectories = files
                 .Select(filePath => Path.GetDirectoryName(filePath))
                 .Where(dir => !string.IsNullOrEmpty(dir))
@@ -121,6 +147,11 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             }
         }
 
+        /// <summary>
+        /// 监控文件的创建、修改、删除、重命名事件
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <param name="fileType"></param>
         private void StartMonitoringDirectory(string directoryPath, DaoFileType fileType)
         {
             if (_watchers.ContainsKey(directoryPath)) return;
@@ -186,6 +217,13 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             _status = MonitorStatus.Error;
         }
 
+        /// <summary>
+        /// 处理文件变化的核心逻辑，比较文件内容哈希值，只有真正的内容变化才触发事件
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="fileType"></param>
+        /// <param name="changeType"></param>
+        /// <param name="changeDescription"></param>
         private void ProcessFileChange(string filePath, DaoFileType fileType, WatcherChangeTypes changeType, string changeDescription)
         {
             try
@@ -280,7 +318,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
             using (var sha256 = SHA256.Create())
             {
-                var hash = SHA256.HashData(Encoding.UTF8.GetBytes(content));
+                var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(content));
                 return Convert.ToBase64String(hash);
             }
         }

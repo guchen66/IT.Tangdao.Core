@@ -1,11 +1,10 @@
-﻿using IT.Tangdao.Core.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Providers
+namespace IT.Tangdao.Core.Helpers
 {
     public class TangdaoSortProvider
     {

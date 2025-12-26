@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Helpers;
@@ -37,19 +32,6 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         public string Serialize<T>(T obj)
         {
             throw new NotImplementedException();
-        }
-    }
-
-    public static class ReadServiceProvider
-    {
-        private static readonly AsyncLocal<IContentReader> _current = new AsyncLocal<IContentReader>();
-
-        public static IContentReader Default { get; } = new ContentReader();
-
-        public static IContentReader Current
-        {
-            get => _current.Value ?? Default;
-            set => _current.Value = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using IT.Tangdao.Core.Components;
+﻿using IT.Tangdao.Core.Bootstrap;
+using IT.Tangdao.Core.Components;
 using IT.Tangdao.Core.Ioc;
-using IT.Tangdao.Core.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

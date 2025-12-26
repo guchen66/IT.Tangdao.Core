@@ -1,10 +1,7 @@
-﻿using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Paths;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using IT.Tangdao.Core.Enums;
+using IT.Tangdao.Core.Paths;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {

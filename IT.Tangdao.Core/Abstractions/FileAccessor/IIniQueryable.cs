@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Abstractions.Results;
+using IT.Tangdao.Core.Configurations;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
-    public interface IContentJsonQueryable : IContentQueryable
+    public interface IIniQueryable
     {
-        ResponseResult SelectKeys();
-
-        ResponseResult SelectValue(string key);
+        ResponseResult<IniConfig> SelectIni(string section);
     }
 }

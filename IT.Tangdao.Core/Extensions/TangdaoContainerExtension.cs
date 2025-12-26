@@ -1,12 +1,4 @@
-﻿using IT.Tangdao.Core.Components;
-using IT.Tangdao.Core.Providers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IT.Tangdao.Core;
-using System.Windows;
+﻿using System;
 using IT.Tangdao.Core.Ioc;
 
 namespace IT.Tangdao.Core.Extensions

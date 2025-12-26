@@ -25,16 +25,11 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
         bool CanGoForward { get; }
 
         /// <summary>
-        /// 导航配套组件，需要总界面实现
-        /// </summary>
-        IRouteComponent RouteComponent { get; set; }
-
-        /// <summary>
         /// 导航到指定页面类型
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="parameters"></param>
-        void NavigateTo<T>(ITangdaoParameter parameters = null) where T : ITangdaoPage;
+        void NavigateTo<T>(ITangdaoParameter parameters = null) where T : class, ITangdaoPage;
 
         /// <summary>
         /// 导航到指定路由
@@ -66,14 +61,14 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
         /// <summary>
         /// 注册路由
         /// </summary>
-        /// <param name="route"></param>
-        /// <param name="pageFactory"></param>
-        void RegisterRoute(string route, Func<ITangdaoPage> pageFactory);
+        /// <typeparam name="T">页面类型</typeparam>
+        void RegisterPage<T>() where T : class, ITangdaoPage;
 
         /// <summary>
-        /// 注册路由
+        /// 注册路由，并指定路由名称
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        void RegisterPage<T>() where T : ITangdaoPage;
+        /// <typeparam name="T">页面类型</typeparam>
+        /// <param name="routeName">路由名称</param>
+        void RegisterPage<T>(string routeName) where T : class, ITangdaoPage;
     }
 }
