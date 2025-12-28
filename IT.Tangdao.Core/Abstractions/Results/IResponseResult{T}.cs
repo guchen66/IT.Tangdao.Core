@@ -9,7 +9,7 @@ namespace IT.Tangdao.Core.Abstractions.Results
     /// 泛型操作结果接口
     /// </summary>
     /// <typeparam name="T">数据类型</typeparam>
-    public interface IResponseResult<T> : IResponseResult
+    public interface IResponseResult<out T> : IResponseResult
     {
         T Data { get; }
     }
