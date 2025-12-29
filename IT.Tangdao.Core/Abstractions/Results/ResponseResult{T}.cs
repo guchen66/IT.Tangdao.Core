@@ -13,6 +13,7 @@ namespace IT.Tangdao.Core.Abstractions.Results
     public class ResponseResult<T> : ResponseResult, IResponseResult<T>
     {
         public T Data { get; set; }
+
         T IResponseResult<T>.Data => Data;  // 显式实现，接口调用只能读
 
         // 索引器支持

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Configurations;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -19,9 +20,6 @@ namespace IT.Tangdao.Core.Helpers
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern uint GetPrivateProfileString(string lpSection, string lpKey, string lpDefault, char[] lpReturnedString, uint nSize, string lpFileName);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern uint GetPrivateProfileString(string lpSection, string lpKey, IntPtr lpDefault, IntPtr lpReturnedString, uint nSize, IntPtr lpFileName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern uint GetPrivateProfileSectionNames(
@@ -64,25 +62,15 @@ namespace IT.Tangdao.Core.Helpers
         /// </summary>
         public string ReadString(string section, string key, string defaultValue = "")
         {
-            const int BufLen = 1024;
-            unsafe
-            {
-                char* buf = stackalloc char[BufLen];
+            const int BufLen = 1024;                 // 1K 缓冲，够用
+            char[] buffer = new char[BufLen];        // 零分配只在托管堆一次
 
-                fixed (char* pDef = defaultValue ?? string.Empty)
-                fixed (char* pFile = _filePath)
-                {
-                    uint len = GetPrivateProfileString(
-                        section,
-                        key,
-                        (IntPtr)pDef,
-                        (IntPtr)buf,
-                        BufLen,
-                        (IntPtr)pFile);
+            uint len;
+            lock (_lock)
+                len = GetPrivateProfileString(section, key, defaultValue ?? string.Empty, buffer, (uint)buffer.Length, _filePath);
 
-                    return new string(buf, 0, (int)len);
-                }
-            }
+            // len 不包含末尾 '\0'
+            return new string(buffer, 0, (int)len);
         }
 
         /// <summary>
@@ -170,5 +158,36 @@ namespace IT.Tangdao.Core.Helpers
         }
 
         #endregion 批量枚举
+
+        /// <summary>
+        /// 检测内容是否为 INI 文件格式
+        /// </summary>
+        public static bool IsIniFormat(string content) => IniParser.IsIniFormat(content);
+
+        /// <summary>
+        /// 解析 INI 文件内容
+        /// </summary>
+        public static IniConfigCollection Parse(string iniContent) => IniParser.Parse(iniContent);
+
+        /// <summary>
+        /// 从文件路径解析 INI 文件
+        /// </summary>
+        public static IniConfigCollection ParseFile(string filePath) => IniParser.ParseFile(filePath);
+
+        // 可以添加其他 INI 相关的工具方法
+        public static string GetValue(IniConfigCollection configs, string section, string key, string defaultValue = "")
+        {
+            var sectionConfig = configs[section];
+            return sectionConfig?[key] ?? defaultValue;
+        }
+
+        public static T GetValue<T>(IniConfigCollection configs, string section, string key, T defaultValue = default)
+        {
+            var value = GetValue(configs, section, key);
+            if (string.IsNullOrEmpty(value))
+                return defaultValue;
+
+            return TypeParser.TryParse<T>(value, out var result) ? result : defaultValue;
+        }
     }
 }
