@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IT.Tangdao.Core.Abstractions.Contracts;
 using IT.Tangdao.Core.Abstractions.Notices;
 using IT.Tangdao.Core.Common;
 
@@ -21,7 +22,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
         /// </summary>
         /// <param name="route">路由名称</param>
         /// <returns>创建的页面实例，如果解析失败则返回null</returns>
-        ITangdaoPage ResolvePage(RegistrationTypeEntry  route);
+        ITangdaoPage ResolvePage(IRegistrationTypeEntry route);
 
         /// <summary>
         /// 根据页面类型解析并创建页面实例

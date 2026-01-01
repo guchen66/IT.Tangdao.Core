@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
-    internal interface IBatchContentQueryable
+    public interface IConfigSerializer
     {
     }
 }

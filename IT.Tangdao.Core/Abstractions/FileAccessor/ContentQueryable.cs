@@ -23,24 +23,19 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
     internal sealed class ContentQueryable : IContentQueryable, IXmlQueryable, IJsonQueryable, IConfigQueryable, IIniQueryable
     {
+        #region--属性--
         private static readonly ITangdaoLogger Logger = TangdaoLogger.Get(typeof(ContentQueryable));
-        private string _content = string.Empty;
-
-        public string Content
-        {
-            get => _content;
-            set => _content = value;
-        }
+        public string Content { get; set; }
 
         public string ReadPath { get; set; }
 
         public DaoFileType DetectedType { get; set; }
 
-        /* ========== IContentQueryable 通用方法 **只写一次** ========== */
+        #endregion
+
+        #region --格式切换--
 
         public IContentQueryable Auto() => this;   // 逻辑已在内置字段，直接返回自己
-
-        /* ========== 格式切换 ========== */
 
         public IXmlQueryable AsXml()
         {
@@ -79,6 +74,8 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             throw new FormatException("转换失败，读取的内容不是有效的Ini格式");
         }
 
+        #endregion
+
         #region--XML读取--
 
         /// <summary>
@@ -88,14 +85,14 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         /// <returns></returns>
         public ResponseResult SelectNode(string node)
         {
-            if (_content == null)
+            if (Content == null)
             {
-                return ResponseResult.Failure("文件未解析成功", new XmlException($"文件未解析成功 {_content}"));
+                return ResponseResult.Failure("文件未解析成功", new XmlException($"文件未解析成功 {Content}"));
             }
 
             try
             {
-                var doc = XDocument.Parse(_content);
+                var doc = XDocument.Parse(Content);
                 var root = doc.RootElement();
                 var xmlType = FileHelper.DetectXmlStructure(doc);
 
@@ -178,10 +175,10 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         {
             try
             {
-                if (_content == null)
+                if (Content == null)
                     return ResponseResult<IEnumerable<T>>.Failure("读取失败");
 
-                var doc = XDocument.Parse(_content);
+                var doc = XDocument.Parse(Content);
                 var result = new List<T>();
 
                 foreach (var node in doc.Root.Elements())
@@ -205,7 +202,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public ResponseResult<IEnumerable<dynamic>> SelectKeys()
         {
-            if (_content == null)
+            if (Content == null)
             {
                 return ResponseResult<IEnumerable<dynamic>>.Failure($"读取失败");
             }
@@ -214,7 +211,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             try
             {
                 // 使用JToken.Parse()来解析不同类型的JSON
-                JToken jsonToken = JToken.Parse(_content);
+                JToken jsonToken = JToken.Parse(Content);
 
                 // 递归方法，用于获取所有键
                 void GetKeys(JToken token)
@@ -268,7 +265,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public ResponseResult<IEnumerable<dynamic>> SelectValues()
         {
-            if (_content == null)
+            if (Content == null)
             {
                 return ResponseResult<IEnumerable<dynamic>>.Failure($"读取失败");
             }
@@ -277,7 +274,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             try
             {
                 // 使用JToken.Parse()来解析不同类型的JSON
-                JToken jsonToken = JToken.Parse(_content);
+                JToken jsonToken = JToken.Parse(Content);
 
                 // 递归方法，用于获取所有值
                 void GetValues(JToken token)
@@ -347,7 +344,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         /// <returns></returns>
         public ResponseResult SelectValue(string key)
         {
-            if (_content == null)
+            if (Content == null)
             {
                 return ResponseResult.Failure($"读取失败");
             }
@@ -355,7 +352,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             try
             {
                 // 使用JToken.Parse()来解析不同类型的JSON
-                JToken jsonToken = JToken.Parse(_content);
+                JToken jsonToken = JToken.Parse(Content);
                 JToken valueToken = null;
 
                 // 根据JSON类型进行不同的查找
@@ -399,7 +396,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public ResponseResult<IEnumerable<T>> SelectObjects<T>() where T : new()
         {
-            if (_content == null)
+            if (Content == null)
             {
                 return ResponseResult<IEnumerable<T>>.Failure($"读取失败");
             }
@@ -407,19 +404,19 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             try
             {
                 // 使用JToken.Parse()来解析不同类型的JSON
-                JToken jsonToken = JToken.Parse(_content);
+                JToken jsonToken = JToken.Parse(Content);
                 List<T> resultList = new List<T>();
 
                 if (jsonToken is JObject jsonObject)
                 {
                     // 处理单个对象的情况
-                    T instance = JsonConvert.DeserializeObject<T>(_content);
+                    T instance = JsonConvert.DeserializeObject<T>(Content);
                     resultList.Add(instance);
                 }
                 else if (jsonToken is JArray jsonArray)
                 {
                     // 处理数组的情况
-                    resultList = JsonConvert.DeserializeObject<List<T>>(_content);
+                    resultList = JsonConvert.DeserializeObject<List<T>>(Content);
                 }
                 else
                 {
@@ -464,24 +461,11 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             return ResponseResult<Dictionary<string, T>>.Success(dict);
         }
 
-        public ResponseResult SelectConfigByJsonConvert<T>(string section) where T : class, new()
-        {
-            T Target = new T();
-            IDictionary idict = (IDictionary)ConfigurationManager.GetSection(section);
-            var dict = idict.Cast<DictionaryEntry>()
-                   .ToDictionary(
-                       de => de.Key.ToString(),
-                       de => JsonConvert.DeserializeObject<T>(de.Value.ToString())
-                   );
-
-            return ResponseResult<Dictionary<string, T>>.Success(dict);
-        }
-
         /// <summary>
         /// 读取自定义的config文件
         /// </summary>
-        /// <param name="menuList"></param>
-        public ResponseResult<Dictionary<string, string>> SelectSection(string section)
+        /// <param name="section"></param>
+        public ResponseResult<IDictionary<string, string>> SelectSection(string section)
         {
             if (ReadPath == null)
             {
@@ -500,13 +484,13 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             if (customSection == null)
             {
                 dicts.Add("null", null);
-                return ResponseResult<Dictionary<string, string>>.Failure(null);
+                return ResponseResult<IDictionary<string, string>>.Failure(null);
             }
             foreach (MenuElement menu in customSection.Menus)
             {
                 dicts.TryAdd(menu.Title, menu.Value);
             }
-            return ResponseResult<Dictionary<string, string>>.Success(dicts);
+            return ResponseResult<IDictionary<string, string>>.Success(dicts);
         }
 
         #endregion
@@ -515,7 +499,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public ResponseResult<IniConfig> SelectIni(string section)
         {
-            var configs = IniParser.Parse(_content);
+            var configs = IniParser.Parse(Content);
             if (configs != null)
             {
                 if (section == null)

@@ -46,7 +46,6 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             TangdaoParameter tangdaoParameter = new TangdaoParameter();
             tangdaoParameter.Add(rootKey, content);    //缓存内容
             TangdaoContext.SetTangdaoParameter(rootKey, tangdaoParameter);
-            // 注意：ContentQueryable 实例并返回,内部会处理路径和类型检测
             return new ContentQueryable { Content = content, ReadPath = path, DetectedType = detectedType };
         }
 
@@ -62,7 +61,6 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
             tangdaoParameter.Add(rootKey, content);    //缓存内容
             TangdaoContext.SetTangdaoParameter(rootKey, tangdaoParameter);
 
-            // 创建 ContentQueryable 实例并返回
             // 注意：ContentQueryable 内部会处理路径和类型检测
             return new ContentQueryable { Content = content, ReadPath = path.Value, DetectedType = detectedType };
         }
@@ -77,7 +75,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
                 daoFileType = DaoFileType.Txt;
             }
             path.UseFileWriteToTxt(content);
-            return new ContentWritable();
+            return new ContentWritable() { Content = content, DetectedType = daoFileType, WritePath = path };
         }
 
         public IContentWritable Write(AbsolutePath path, string content, DaoFileType daoFileType = DaoFileType.None)
@@ -87,59 +85,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
                 daoFileType = DaoFileType.Txt;
             }
             path.Value.UseFileWriteToTxt(content);
-            return new ContentWritable();
-        }
-
-        /// <summary>
-        /// 异步写入内容
-        /// </summary>
-        public async Task<ResponseResult> WriteAsync(string path, string content, DaoFileType daoFileType = DaoFileType.None)
-        {
-            if (daoFileType == DaoFileType.None)
-            {
-                daoFileType = DaoFileType.Txt;
-            }
-            await new TimeSpan(1000);
-            path.UseFileWriteToTxt(content);
-            return ResponseResult<string>.Success(content);
-        }
-
-        /// <summary>
-        /// 序列化对象并写入
-        /// </summary>
-        public void WriteObject<T>(string path, T obj)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentException("路径不能为空", nameof(path));
-
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj), "要序列化的对象不能为null");
-
-            try
-            {
-                // 根据文件扩展名决定序列化格式
-                var extension = Path.GetExtension(path)?.ToLowerInvariant();
-                // string content;
-
-                switch (extension)
-                {
-                    case ".xml":
-                        TangdaoXmlSerializer.SerializeXMLToFile<T>(obj, path);
-                        break;
-
-                    case ".json":
-                        TangdaoJsonFileHelper.SaveJsonData(obj, path);
-                        break;
-
-                    default:
-                        // content = JsonConvert.SerializeObject(obj, _jsonSettings);
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new IOException($"序列化并写入对象失败: {path}", ex);
-            }
+            return new ContentWritable() { Content = content, DetectedType = daoFileType, WritePath = path.Value };
         }
     }
 }

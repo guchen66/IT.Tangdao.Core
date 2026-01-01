@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Abstractions.Notices;
 using IT.Tangdao.Core.Common;
+using IT.Tangdao.Core.Abstractions.Contracts;
 
 namespace IT.Tangdao.Core.Abstractions.Navigation
 {
@@ -15,7 +16,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
     /// </summary>
     public class TangdaoRouterResolver : ITangdaoRouterResolver
     {
-        private readonly Func<RegistrationTypeEntry, ITangdaoPage> _customResolver;
+        private readonly Func<IRegistrationTypeEntry, ITangdaoPage> _customResolver;
 
         /// <summary>
         /// 初始化默认路由解析器实例
@@ -27,7 +28,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
         /// 使用自定义解析函数初始化路由解析器实例
         /// </summary>
         /// <param name="customResolver">自定义解析函数</param>
-        public TangdaoRouterResolver(Func<RegistrationTypeEntry, ITangdaoPage> customResolver = null)
+        public TangdaoRouterResolver(Func<IRegistrationTypeEntry, ITangdaoPage> customResolver = null)
         {
             _customResolver = customResolver;
         }
@@ -37,7 +38,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
         /// </summary>
         /// <param name="route">路由名称</param>
         /// <returns>创建的页面实例，如果解析失败则返回null</returns>
-        public ITangdaoPage ResolvePage(RegistrationTypeEntry route)
+        public ITangdaoPage ResolvePage(IRegistrationTypeEntry route)
         {
             // 如果提供了自定义解析函数，优先使用
             if (_customResolver != null)
@@ -48,7 +49,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
             // 默认实现：尝试使用内置IOC容器解析
             try
             {
-                return (ITangdaoPage)TangdaoApplication.Provider.GetKeyedService<ITangdaoPage>(route.Key);
+                return TangdaoApplication.Provider.GetKeyedService<ITangdaoPage>(route.Key);
             }
             catch (Exception)
             {
@@ -66,7 +67,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
         {
             try
             {
-                return (ITangdaoPage)TangdaoApplication.Provider.GetService<TPage>();
+                return TangdaoApplication.Provider.GetService<TPage>();
             }
             catch (Exception)
             {

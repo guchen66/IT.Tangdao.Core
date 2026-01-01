@@ -10,7 +10,7 @@ using IT.Tangdao.Core.Ambient;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
-    /// <summary>
+    // <summary>
     /// 缓存查询构建器实现
     /// </summary>
     public class CacheQueryBuilder : ICacheQueryBuilder
@@ -78,6 +78,11 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         }
 
         public IContentWritable Write(AbsolutePath path, string content, DaoFileType daoFileType = DaoFileType.None)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IContentWritable Write<T>(string path, T writeObject, DaoFileType daoFileType = DaoFileType.None)
         {
             throw new NotImplementedException();
         }

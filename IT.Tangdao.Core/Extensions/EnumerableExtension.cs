@@ -1,5 +1,4 @@
 ﻿using IT.Tangdao.Core.Infrastructure;
-using IT.Tangdao.Core.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -10,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Abstractions.Contracts;
+using IT.Tangdao.Core.Helpers;
 
 namespace IT.Tangdao.Core.Extensions
 {
