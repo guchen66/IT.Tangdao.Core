@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Common
+namespace IT.Tangdao.Core.Helpers
 {
     /// <summary>
     /// 临时文件的创建与移除

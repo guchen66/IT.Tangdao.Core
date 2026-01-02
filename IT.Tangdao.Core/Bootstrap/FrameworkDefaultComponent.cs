@@ -30,7 +30,7 @@ namespace IT.Tangdao.Core.Bootstrap
             container.AddTangdaoSingleton<ITangdaoNotifier, TangdaoNotifier>();
 
             //注册委托传输服务
-            container.AddTangdaoSingleton<IHandlerTable, HandlerTable>();
+            container.AddTangdaoSingleton<IActionTable, ActionTable>();
 
             //注册事件聚合器
             container.AddTangdaoSingleton<IDaoEventAggregator, DaoEventAggregator>();
