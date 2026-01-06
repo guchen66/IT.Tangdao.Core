@@ -337,7 +337,7 @@ namespace IT.Tangdao.Core.Helpers
         public void UpdateValues(List<TValue> allDatas)
         {
             if (allDatas == null)
-                throw new ArgumentNullException(nameof(allDatas));
+                ArgumentNullException.ThrowIfNull(nameof(allDatas));
 
             if (allDatas.Count != this.Count)
                 throw new ArgumentException("数据数量与key数量不匹配", nameof(allDatas));
@@ -376,7 +376,7 @@ namespace IT.Tangdao.Core.Helpers
         public IEnumerable<KeyValuePair<TKey, TValue>> GetRange(TangdaoKeyRange range)
         {
             if (range == null)
-                throw new ArgumentNullException(nameof(range));
+                ArgumentNullException.ThrowIfNull(nameof(range));
 
             return GetRange(range.Start, range.End, range.IncludeStart, range.IncludeEnd);
         }
@@ -403,7 +403,7 @@ namespace IT.Tangdao.Core.Helpers
         public void Merge(IDictionary<TKey, TValue> other, bool overwriteExisting = true)
         {
             if (other == null)
-                throw new ArgumentNullException(nameof(other));
+                ArgumentNullException.ThrowIfNull(nameof(other));
 
             foreach (var kvp in other)
             {
@@ -475,7 +475,7 @@ namespace IT.Tangdao.Core.Helpers
         public int RemoveWhere(Func<KeyValuePair<TKey, TValue>, bool> predicate)
         {
             if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
+                ArgumentNullException.ThrowIfNull(nameof(predicate));
 
             var keysToRemove = _core.Where(predicate).Select(kvp => kvp.Key).ToList();
             int count = keysToRemove.Count;
