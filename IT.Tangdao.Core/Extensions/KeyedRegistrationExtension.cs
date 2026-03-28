@@ -30,12 +30,11 @@ namespace IT.Tangdao.Core.Extensions
 
         #region 底层统一入口
 
-        private static ITangdaoContainer AddKeyed<TService, TImpl>(ITangdaoContainer container,
-                                                                   object key,
-                                                                   ILifecycleStrategy strategy)
+        private static ITangdaoContainer AddKeyed<TService, TImpl>(ITangdaoContainer container, object key, ILifecycleStrategy strategy)
         {
             var entry = new KeyedServiceEntry(typeof(TService), typeof(TImpl), strategy, key);
-            container.Register(entry);
+            //  keyed 注册走新字典，不干扰普通注册
+            (container.Registry as ServiceRegistry)?.AddKeyed(entry, key);
             return container;
         }
 

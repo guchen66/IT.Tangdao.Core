@@ -4,9 +4,9 @@
    
 	<TargetFramework>net6.0-windows</TargetFramework>
 	<UseWPF>true</UseWPF>
-	<Title>一个简易开发的工具类库包</Title>
+	<Title>WPF快速开发工具包</Title>
 	<Authors>liuxin</Authors>
-	<Version>3.2.1</Version>
+	<Version>3.2.3</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>3.1.1</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -31,6 +31,7 @@
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<PackageProjectUrl>https://github.com/guchen66/IT.Tangdao.Core</PackageProjectUrl>
+		<PackageReleaseNotes>优化IOC参数注册GetKeyedService</PackageReleaseNotes>
 	</PropertyGroup>
  <ItemGroup>
    <None Include="..\LICENSE.md">
