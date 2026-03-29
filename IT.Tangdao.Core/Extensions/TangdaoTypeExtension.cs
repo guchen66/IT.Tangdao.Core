@@ -67,7 +67,7 @@ namespace IT.Tangdao.Core.Extensions
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static TypeParents Parents(this Type type)
+        public static TypeMetadata Parents(this Type type)
         {
             if (type == null) ArgumentNullException.ThrowIfNull(type);
 
@@ -78,11 +78,7 @@ namespace IT.Tangdao.Core.Extensions
                             .OrderBy(i => i.Name)         // 给个稳定序
                             .ToList();
 
-            return new TypeParents
-            {
-                BaseClass = baseType,
-                Interfaces = allIfs
-            };
+            return new TypeMetadata(baseType, allIfs);
         }
 
         /// <summary>

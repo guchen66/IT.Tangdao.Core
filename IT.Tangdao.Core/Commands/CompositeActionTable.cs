@@ -17,7 +17,7 @@ namespace IT.Tangdao.Core.Commands
     /// 类似于Prism框架的CompositeCommand类，但针对IActionTable接口设计
     /// 采用密封类设计，防止继承
     /// </remarks>
-    public sealed class CompositeActionTable : IActionTable
+    public sealed class CompositeActionTable : IActionTable, IActionTableHandler
     {
         /// <summary>
         /// 用于存储多个IActionTable实例的队列
@@ -35,9 +35,24 @@ namespace IT.Tangdao.Core.Commands
         private readonly SynchronizationContext _synchronizationContext;
 
         /// <summary>
-        /// 当命令注册或移除时触发的事件
+        /// 注册委托时发生的事件
         /// </summary>
-        public event EventHandler<ActionTableEventArgs> ActionChanged;
+        public event EventHandler<ActionTableEventArgs> Registered;
+
+        /// <summary>
+        /// 移除委托时发生的事件
+        /// </summary>
+        public event EventHandler<ActionTableEventArgs> Unregistered;
+
+        /// <summary>
+        /// 委托执行时发生的事件
+        /// </summary>
+        public event EventHandler<ActionTableEventArgs> Executing;
+
+        /// <summary>
+        /// 委托执行后发生的事件
+        /// </summary>
+        public event EventHandler<ActionTableEventArgs> Executed;
 
         /// <summary>
         /// 无参构造函数，默认激活复合操作
@@ -58,24 +73,86 @@ namespace IT.Tangdao.Core.Commands
         }
 
         /// <summary>
-        /// 触发ActionChanged事件
+        /// 触发注册委托事件
         /// </summary>
-        /// <param name="eventType">事件类型</param>
-        /// <param name="key">命令的唯一标识符</param>
-        /// <param name="priority">命令优先级</param>
-        private void OnActionChanged(ActionTableEventType eventType, string key, TaskPriority priority)
+        /// <param name="key">委托的唯一标识符</param>
+        /// <param name="priority">委托优先级</param>
+        private void OnRegistered(string key, TaskPriority priority)
         {
             // 如果设置了同步上下文，则在该上下文中触发事件
             if (_synchronizationContext != null)
             {
                 _synchronizationContext.Post(state =>
                 {
-                    ActionChanged?.Invoke(this, new ActionTableEventArgs(eventType, key, priority));
+                    Registered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Registered, key, priority));
                 }, null);
             }
             else
             {
-                ActionChanged?.Invoke(this, new ActionTableEventArgs(eventType, key, priority));
+                Registered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Registered, key, priority));
+            }
+        }
+
+        /// <summary>
+        /// 触发移除委托事件
+        /// </summary>
+        /// <param name="key">委托的唯一标识符</param>
+        /// <param name="priority">委托优先级</param>
+        private void OnUnregistered(string key, TaskPriority priority)
+        {
+            // 如果设置了同步上下文，则在该上下文中触发事件
+            if (_synchronizationContext != null)
+            {
+                _synchronizationContext.Post(state =>
+                {
+                    Unregistered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Unregistered, key, priority));
+                }, null);
+            }
+            else
+            {
+                Unregistered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Unregistered, key, priority));
+            }
+        }
+
+        /// <summary>
+        /// 触发执行委托事件
+        /// </summary>
+        /// <param name="key">委托的唯一标识符</param>
+        /// <param name="priority">委托优先级</param>
+        private void OnExecuting(string key, TaskPriority priority)
+        {
+            // 如果设置了同步上下文，则在该上下文中触发事件
+            if (_synchronizationContext != null)
+            {
+                _synchronizationContext.Post(state =>
+                {
+                    Executing?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executing, key, priority));
+                }, null);
+            }
+            else
+            {
+                Executing?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executing, key, priority));
+            }
+        }
+
+        /// <summary>
+        /// 触发执行后事件
+        /// </summary>
+        /// <param name="key">委托的唯一标识符</param>
+        /// <param name="priority">委托优先级</param>
+        private void OnExecuted(string key, TaskPriority priority)
+        {
+            // 如果设置了同步上下文，则在该上下文中触发事件
+            if (_synchronizationContext != null)
+            {
+                _synchronizationContext.Post(state =>
+                {
+                    Executed?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executed, key, priority));
+                }, null);
+            }
+            else
+            {
+                Executed?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executed, key, priority));
             }
         }
 
@@ -90,8 +167,16 @@ namespace IT.Tangdao.Core.Commands
             {
                 throw new ArgumentNullException(nameof(actionTable));
             }
-            // 订阅子表的ActionChanged事件
-            actionTable.ActionChanged += (sender, e) => OnActionChanged(e.EventType, e.Key, e.Priority);
+
+            // 如果子表实现了IActionTableHandler，订阅其事件
+            if (actionTable is IActionTableHandler handler)
+            {
+                handler.Registered += (sender, e) => OnRegistered(e.Key, e.Priority);
+                handler.Unregistered += (sender, e) => OnUnregistered(e.Key, e.Priority);
+                handler.Executing += (sender, e) => OnExecuting(e.Key, e.Priority);
+                handler.Executed += (sender, e) => OnExecuted(e.Key, e.Priority);
+            }
+
             _actionTables.Enqueue(actionTable);
         }
 
@@ -288,13 +373,13 @@ namespace IT.Tangdao.Core.Commands
                     var priority = targetTable.GetActionInfo().TryGetValue(key, out var info) ? info.Priority : TaskPriority.Normal;
 
                     // 触发执行前事件
-                    OnActionChanged(ActionTableEventType.Executing, key, priority);
+                    OnExecuting(key, priority);
 
                     // 执行命令
                     targetTable.Execute(key);
 
                     // 触发执行后事件
-                    OnActionChanged(ActionTableEventType.Executed, key, priority);
+                    OnExecuted(key, priority);
                 }
             }
         }
@@ -320,13 +405,13 @@ namespace IT.Tangdao.Core.Commands
                     var priority = targetTable.GetActionInfo().TryGetValue(key, out var info) ? info.Priority : TaskPriority.Normal;
 
                     // 触发执行前事件
-                    OnActionChanged(ActionTableEventType.Executing, key, priority);
+                    OnExecuting(key, priority);
 
                     // 执行命令
                     targetTable.Execute(key, result);
 
                     // 触发执行后事件
-                    OnActionChanged(ActionTableEventType.Executed, key, priority);
+                    OnExecuted(key, priority);
                 }
             }
         }
