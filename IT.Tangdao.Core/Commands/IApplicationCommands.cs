@@ -15,6 +15,8 @@ namespace IT.Tangdao.Core.Commands
     /// <typeparam name="T"></typeparam>
     public interface IApplicationCommands<T>
     {
-        MinidaoCommand<T> MinidaoCommand { get; set; }
+        TangdaoCommand<T> Command { get; set; }
+
+        TangdaoAsyncCommand<T> AsyncCommand { get; set; }
     }
 }

@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace IT.Tangdao.Core.Events
 {
-    public delegate Task DaoAsyncEventHandler<in T>(T @event) where T : DaoEventBase;
+    public delegate Task DaoAsyncEventHandler<in T>(T @event) where T : EventBase;
 }

@@ -1,4 +1,4 @@
-﻿using IT.Tangdao.Core.DaoException;
+﻿using IT.Tangdao.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;

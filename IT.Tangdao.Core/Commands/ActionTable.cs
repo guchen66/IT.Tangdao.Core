@@ -1,6 +1,6 @@
 ﻿using IT.Tangdao.Core.Abstractions.Contracts;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.EventArg;
+using IT.Tangdao.Core.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

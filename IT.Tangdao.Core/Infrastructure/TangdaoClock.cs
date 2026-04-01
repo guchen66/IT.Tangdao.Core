@@ -8,7 +8,7 @@ using System.Windows.Threading;
 
 namespace IT.Tangdao.Core.Infrastructure
 {
-    public class TangdaoClock : DaoViewModelBase
+    public class TangdaoClock : ViewModelBase
     {
         private DateTime _currentDate;
 

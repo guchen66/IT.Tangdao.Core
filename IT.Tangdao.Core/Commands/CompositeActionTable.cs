@@ -5,7 +5,7 @@ using System.Threading;
 using IT.Tangdao.Core.Abstractions.Contracts;
 using IT.Tangdao.Core.Commands;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.EventArg;
+using IT.Tangdao.Core.Events;
 
 namespace IT.Tangdao.Core.Commands
 {
