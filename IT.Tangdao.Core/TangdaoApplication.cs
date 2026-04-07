@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using IT.Tangdao.Core.Helpers;
+using IT.Tangdao.Core.DaoTasks;
 
 namespace IT.Tangdao.Core
 {
@@ -29,7 +30,7 @@ namespace IT.Tangdao.Core
     /// </summary>
     public abstract class TangdaoApplication : Application
     {
-        public static ITangdaoProvider Provider { get; private set; }
+        protected static ITangdaoProvider Provider { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -44,11 +45,13 @@ namespace IT.Tangdao.Core
             var moduleCatalog = DiscoverModules();
             RegisterModules(moduleCatalog, builder);
             builder.ValidateDependencies();
+
             Provider = builder.Build().BuildProvider();
+            ServiceLocator.Default.Initialize(Provider);
             builder.RaiseBuilt(Provider);  //回调插件的Initialized
             // ② 留给子类做额外配置
             Configure();
-
+            AsyncTaskHandler(Provider.GetService<ITaskQueueManager>()).ConfigureAwait(false);
             // ③ 创建主窗口
             var window = CreateWindow();
             // ② 摆烂时走约定
@@ -69,7 +72,17 @@ namespace IT.Tangdao.Core
         protected abstract void RegisterServices(ITangdaoContainer container);
 
         protected virtual void Configure()
-        { }
+        {
+        }
+
+        /// <summary>
+        /// 异步任务处理器
+        /// </summary>
+        /// <returns></returns>
+        protected virtual async Task AsyncTaskHandler(ITaskQueueManager taskQueueManager)
+        {
+            await taskQueueManager.Empty();
+        }
 
         /// <summary>
         /// 子类**可重写**。

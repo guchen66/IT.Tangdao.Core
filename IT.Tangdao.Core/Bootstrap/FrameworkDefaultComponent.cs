@@ -4,6 +4,7 @@ using IT.Tangdao.Core.Abstractions.Navigation;
 using IT.Tangdao.Core.Abstractions.Notices;
 using IT.Tangdao.Core.Commands;
 using IT.Tangdao.Core.Components;
+using IT.Tangdao.Core.DaoTasks;
 using IT.Tangdao.Core.Events;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Ioc;
@@ -35,8 +36,10 @@ namespace IT.Tangdao.Core.Bootstrap
             //注册事件聚合器
             container.AddTangdaoSingleton<IEventAggregator, EventAggregator>();
 
-            //注册导航服务
+            //注册异步任务流
+            container.AddTangdaoSingleton<ITaskQueueManager, TaskQueueManager>();
 
+            //注册导航服务
             container.AddTangdaoTransientFactory<ITangdaoRouterResolver>(provider =>
             {
                 return new TangdaoRouterResolver(entry => provider.GetService(entry.RegisterType) as ITangdaoPage);

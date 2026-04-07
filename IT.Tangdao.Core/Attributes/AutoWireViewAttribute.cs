@@ -10,7 +10,7 @@ namespace IT.Tangdao.Core.Attributes
     /// 对ViewModel设置特性，自动关联View
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    internal class AutoWireViewAttribute : Attribute
+    public class AutoWireViewAttribute : Attribute
     {
     }
 }

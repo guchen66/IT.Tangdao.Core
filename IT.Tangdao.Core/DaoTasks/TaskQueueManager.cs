@@ -9,7 +9,7 @@ using IT.Tangdao.Core.Enums;
 
 namespace IT.Tangdao.Core.DaoTasks
 {
-    public class TaskQueueManager : ITaskQueueManager, IDisposable
+    public class TaskQueueManager : ITaskQueueManager
     {
         private readonly ManualResetEventSlim _manual = new ManualResetEventSlim();
         private CancellationTokenSource _cts;
@@ -280,6 +280,15 @@ namespace IT.Tangdao.Core.DaoTasks
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 空的任务
+        /// </summary>
+        /// <returns></returns>
+        public Task Empty()
+        {
+            return Task.CompletedTask;
         }
 
         public void Dispose()

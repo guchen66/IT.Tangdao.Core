@@ -1,5 +1,6 @@
 ﻿using IT.Tangdao.Core.Configurations;
 using IT.Tangdao.Core.Enums;
+using IT.Tangdao.Core.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -58,19 +59,30 @@ namespace IT.Tangdao.Core.Abstractions.Loggers
         }
 
         /// <summary>
-        /// 处理单个日志项
+        /// 处理单个日志
         /// </summary>
-        /// <param name="logItem">日志项</param>
+        /// <param name="logItem"></param>
+        /// <returns></returns>
         private async Task ProcessLogItemAsync(LogItem logItem)
         {
-            string logLine = FormatLogLine(logItem);
+            // 格式化日志行
+            string logLine = $"{logItem.Time:yyyy-MM-dd HH:mm:ss.fff} " +
+                           $"[{logItem.ThreadId}] " +
+                           $"{logItem.Level.ToString().ToUpper()} {logItem.Type.FullName}{Environment.NewLine}" +
+                           $"{logItem.Message}{Environment.NewLine}";
+            if (logItem.Exception != null)
+                logLine += $"{logItem.Exception.Message}{Environment.NewLine}{logItem.Exception.StackTrace}{Environment.NewLine}";
 
             // 根据输出方式输出日志
             if (logItem.OutputType.HasFlag(LogOutputType.File))
             {
-                var file = Path.Combine(LogEnsureConfig.Root, "Tangdao.log");
-                var writer = GetWriter(file);
-                await writer.WriteAsync(logLine);
+                var root = LogHelper.GetLogRoot();
+                var extension = LogHelper.GetLogExtension();
+                var fileName = $"Tangdao{extension}";
+                var filePath = Path.Combine(root, fileName);
+
+                // 使用LogHelper保存日志
+                LogHelper.SaveLogToFile(logItem, filePath);
             }
 
             if (logItem.OutputType.HasFlag(LogOutputType.Console))
@@ -86,23 +98,6 @@ namespace IT.Tangdao.Core.Abstractions.Loggers
             {
                 System.Diagnostics.Debug.Write(logLine);
             }
-        }
-
-        /// <summary>
-        /// 格式化日志行
-        /// </summary>
-        /// <param name="logItem">日志项</param>
-        /// <returns>格式化后的日志行</returns>
-        private static string FormatLogLine(LogItem logItem)
-        {
-            string message = $"{logItem.Message}{Environment.NewLine}";
-            if (logItem.Exception != null)
-                message += $"{logItem.Exception.Message}{Environment.NewLine}{logItem.Exception.StackTrace}{Environment.NewLine}";
-
-            return $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} " +
-                   $"[{Environment.CurrentManagedThreadId}] " +
-                   $"{logItem.Level.ToString().ToUpper()} {logItem.Type.FullName}{Environment.NewLine}" +
-                   $"{message}{Environment.NewLine}";
         }
 
         /// <summary>
@@ -187,18 +182,6 @@ namespace IT.Tangdao.Core.Abstractions.Loggers
                 }
                 _fileWriters.Clear();
             }
-        }
-
-        /// <summary>
-        /// 日志项
-        /// </summary>
-        public class LogItem
-        {
-            public LoggerLevel Level { get; set; }
-            public string Message { get; set; }
-            public Exception Exception { get; set; }
-            public Type Type { get; set; }
-            public LogOutputType OutputType { get; set; }
         }
     }
 }

@@ -7,6 +7,7 @@ using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Abstractions.Notices;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Abstractions.Contracts;
+using IT.Tangdao.Core.Ioc;
 
 namespace IT.Tangdao.Core.Abstractions.Navigation
 {
@@ -49,7 +50,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
             // 默认实现：尝试使用内置IOC容器解析
             try
             {
-                return TangdaoApplication.Provider.GetKeyedService<ITangdaoPage>(route.Key);
+                return ServiceLocator.Default.GetKeyedService<ITangdaoPage>(route.Key);
             }
             catch (Exception)
             {
@@ -67,7 +68,7 @@ namespace IT.Tangdao.Core.Abstractions.Navigation
         {
             try
             {
-                return TangdaoApplication.Provider.GetService<TPage>();
+                return ServiceLocator.Default.GetService<TPage>();
             }
             catch (Exception)
             {
