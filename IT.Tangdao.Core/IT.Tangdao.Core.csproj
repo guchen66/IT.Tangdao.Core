@@ -6,9 +6,9 @@
 	<UseWPF>true</UseWPF>
 	<Title>WPF快速开发工具包</Title>
 	<Authors>liuxin</Authors>
-	<Version>4.0.2</Version>
+	<Version>4.0.3</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-	<AssemblyVersion>3.1.1</AssemblyVersion>
+	<AssemblyVersion>4.2.3</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
