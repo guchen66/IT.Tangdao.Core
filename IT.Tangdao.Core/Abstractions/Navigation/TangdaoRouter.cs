@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using IT.Tangdao.Core.Mvvm;
 using IT.Tangdao.Core.Extensions;
-using IT.Tangdao.Core.Abstractions.Notices;
+using IT.Tangdao.Core.Abstractions.Messaging;
 using IT.Tangdao.Core.Common;
 using System.Runtime.Remoting;
 using IT.Tangdao.Core.Abstractions.Contracts;

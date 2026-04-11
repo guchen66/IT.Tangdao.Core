@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions.Notices
+namespace IT.Tangdao.Core.Abstractions.Messaging
 {
     /// <summary>
     /// 泛型通知接收器实现，用于接收特定类型的通知

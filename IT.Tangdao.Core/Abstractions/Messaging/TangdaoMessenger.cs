@@ -1,6 +1,7 @@
 ﻿using IT.Tangdao.Core.Abstractions.Contracts;
 using IT.Tangdao.Core.Abstractions.Loggers;
 using IT.Tangdao.Core.Common;
+using IT.Tangdao.Core.Events;
 using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Ioc;
 using System;
@@ -9,38 +10,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions.Notices
+namespace IT.Tangdao.Core.Abstractions.Messaging
 {
     /// <summary>
-    /// 通知指令的中介者，实现单例模式
-    /// 负责管理通知观察者的注册、注销和通知分发
+    /// 消息传递者，实现单例模式
+    /// 负责管理消息观察者的注册、注销和消息分发
     /// </summary>
-    public class NoticeMediator
+    public class TangdaoMessenger
     {
         /// <summary>
         /// 懒加载单例实例
         /// </summary>
-        private static readonly Lazy<NoticeMediator> _instance = new Lazy<NoticeMediator>(() => new NoticeMediator());
+        private static readonly Lazy<TangdaoMessenger> _instance = new Lazy<TangdaoMessenger>(() => new TangdaoMessenger());
 
         /// <summary>
-        /// 获取通知中介者的单例实例
+        /// 获取消息传递者的单例实例
         /// </summary>
-        public static NoticeMediator Instance => _instance.Value;
+        public static TangdaoMessenger Instance => _instance.Value;
 
         /// <summary>
-        /// 通知解析器实例，用于创建观察者
+        /// 观察者缓存实例，用于创建观察者
         /// </summary>
-        internal INoticeResolver Resolver { get; } = new NoticeResolver();
+        internal IObserverCache ObserverCache { get; } = new ObserverCache();
 
         /// <summary>
-        /// 观察者列表，存储所有注册的通知观察者
+        /// 观察者列表，存储所有注册的消息观察者
         /// </summary>
-        private readonly List<INoticeObserver> _observers = new List<INoticeObserver>();
+        private readonly List<IMessageObserver> _observers = new List<IMessageObserver>();
 
         /// <summary>
         /// Key到观察者实例的映射表，用于通过Key快速查找观察者
         /// </summary>
-        private readonly Dictionary<string, INoticeObserver> _keyToObserverMap = new Dictionary<string, INoticeObserver>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IMessageObserver> _keyToObserverMap = new Dictionary<string, IMessageObserver>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// 线程同步锁，保护观察者列表和映射表的并发访问
@@ -53,24 +54,24 @@ namespace IT.Tangdao.Core.Abstractions.Notices
         private static readonly object _staticLock = new object();
 
         /// <summary>
-        /// 值变化事件，当通知状态改变时触发
+        /// 当消息状态改变时触发
         /// </summary>
-        public event Action<NoticeContext> ValueChanged;
+        public event Action<MessageContext> MessageChanged;
 
         /// <summary>
-        /// 服务解析器委托，用于创建通知观察者实例
+        /// 服务解析器委托，用于创建消息观察者实例
         /// 委托形状：给我 TypeEntry，我还你实例
         /// </summary>
-        internal static Func<IRegistrationTypeEntry, INoticeObserver> ServiceResolver { get; private set; }
+        internal static Func<IRegistrationTypeEntry, IMessageObserver> ServiceResolver { get; private set; }
             = reg => DefaultResolve(reg);
 
         /// <summary>
         /// 默认服务解析实现，通过内置容器获取服务实例
         /// </summary>
-        /// <param name="reg">通知注册表，包含观察者类型信息</param>
-        /// <returns>创建的通知观察者实例，如果创建失败则返回null</returns>
-        private static INoticeObserver DefaultResolve(IRegistrationTypeEntry reg)
-            => ServiceLocator.Default.GetService(reg.RegisterType) as INoticeObserver;
+        /// <param name="reg">消息注册表，包含观察者类型信息</param>
+        /// <returns>创建的消息观察者实例，如果创建失败则返回null</returns>
+        private static IMessageObserver DefaultResolve(IRegistrationTypeEntry reg)
+            => ServiceLocator.Default.GetService(reg.RegisterType) as IMessageObserver;
 
         /// <summary>
         /// 设置服务解析器，用于自定义观察者实例的创建逻辑
@@ -78,7 +79,7 @@ namespace IT.Tangdao.Core.Abstractions.Notices
         /// </summary>
         /// <param name="resolver">自定义的服务解析器委托</param>
         /// <exception cref="ArgumentNullException">当resolver为null时抛出</exception>
-        public void SetResolver(Func<IRegistrationTypeEntry, INoticeObserver> resolver)
+        public void SetResolver(Func<IRegistrationTypeEntry, IMessageObserver> resolver)
         {
             if (resolver == null) TangdaoGuards.ThrowIfNull(nameof(resolver));
             lock (_staticLock)
@@ -88,29 +89,29 @@ namespace IT.Tangdao.Core.Abstractions.Notices
         /// <summary>
         /// 私有构造函数，实现单例模式
         /// </summary>
-        private NoticeMediator()
+        private TangdaoMessenger()
         { }
 
         /// <summary>
-        /// 设置自定义的通知观察者解析器
-        /// 允许外部注入自定义的INoticeResolver实现，提高依赖注入支持
+        /// 设置自定义的消息观察者解析器
+        /// 允许外部注入自定义的IObserverCache实现，提高依赖注入支持
         /// </summary>
-        /// <param name="resolver">自定义的INoticeResolver实例</param>
+        /// <param name="resolver">自定义的IObserverCache实例</param>
         /// <exception cref="ArgumentNullException">当resolver为null时抛出</exception>
-        public void SetResolver(INoticeResolver resolver)
+        public void SetResolver(IObserverCache resolver)
         {
             if (resolver == null) TangdaoGuards.ThrowIfNull(nameof(resolver));
 
-            // 创建一个包装器，将INoticeResolver实例转换为ServiceResolver委托
+            // 创建一个包装器，将IObserverCache实例转换为ServiceResolver委托
             SetResolver(reg => resolver.CreateObserver(reg));
         }
 
         /// <summary>
-        /// 注册通知观察者
+        /// 注册消息观察者
         /// </summary>
         /// <param name="key">观察者的Key，用于后续通过Key查找和通知</param>
-        /// <param name="observer">要注册的通知观察者实例</param>
-        internal void Register(string key, INoticeObserver observer)
+        /// <param name="observer">要注册的消息观察者实例</param>
+        internal void Register(string key, IMessageObserver observer)
         {
             if (observer == null) TangdaoGuards.ThrowIfNull(nameof(observer));
 
@@ -131,11 +132,11 @@ namespace IT.Tangdao.Core.Abstractions.Notices
         }
 
         /// <summary>
-        /// 注销通知观察者
+        /// 注销消息观察者
         /// </summary>
-        /// <param name="observer">要注销的通知观察者实例</param>
+        /// <param name="observer">要注销的消息观察者实例</param>
         /// <exception cref="ArgumentNullException">当observer为null时抛出</exception>
-        public void Unregister(INoticeObserver observer)
+        public void Unregister(IMessageObserver observer)
         {
             if (observer == null) TangdaoGuards.ThrowIfNull(nameof(observer));
 
@@ -152,7 +153,7 @@ namespace IT.Tangdao.Core.Abstractions.Notices
                     }
 
                     // 清理NoticeResolver中的缓存
-                    Resolver.RemoveFromCache(observer.GetType());
+                    ObserverCache.RemoveFromCache(observer.GetType());
                 }
             }
         }
@@ -174,7 +175,7 @@ namespace IT.Tangdao.Core.Abstractions.Notices
                     _keyToObserverMap.Remove(key);
 
                     // 清理NoticeResolver中的缓存
-                    Resolver.RemoveFromCache(observer.GetType());
+                    ObserverCache.RemoveFromCache(observer.GetType());
                 }
             }
         }
@@ -196,74 +197,87 @@ namespace IT.Tangdao.Core.Abstractions.Notices
                     // 清空Key到观察者的映射
                     _keyToObserverMap.Clear();
                     // 清空NoticeResolver中的缓存
-                    Resolver.ClearCache();
+                    ObserverCache.ClearCache();
                 }
             }
         }
 
         /// <summary>
-        /// 通知状态变化，向所有注册的观察者发送通知
-        /// 同时触发ValueChanged事件，方便UI层监听
+        /// 消息状态变化，向所有注册的观察者发送消息
+        /// 同时触发MessageChanged事件，方便UI层监听
         /// </summary>
-        /// <param name="context">通知上下文，包含通知的相关信息</param>
-        public void NotifyStateChange(NoticeContext context)
+        /// <param name="context">消息上下文，包含消息的相关信息</param>
+        public void NotifyStateChange(MessageContext context)
         {
-            NotifyObservers(context);
+            InternalNotifyObservers(context);
             // 使用本地变量缓存事件委托，避免多线程下的竞态条件
-            var valueChanged = ValueChanged;
-            valueChanged?.Invoke(context); // 让 UI 层也能监听
+            var message = MessageChanged;
+            message?.Invoke(context); // 让 UI 层也能监听
         }
 
         /// <summary>
-        /// 向所有注册的观察者发送通知
+        /// 向所有注册的观察者发送消息
         /// </summary>
-        /// <param name="context">通知上下文，包含通知的相关信息</param>
-        public void NotifyAll(NoticeContext context)
+        /// <param name="context">消息上下文，包含消息的相关信息</param>
+        public void NotifyAllObservers(MessageContext context)
         {
-            NotifyObservers(context);
+            InternalNotifyObservers(context);
         }
 
         /// <summary>
-        /// 向所有注册的观察者发送通知（私有辅助方法）
+        /// 向所有注册的观察者发送消息（私有辅助方法）
         /// </summary>
-        /// <param name="context">通知上下文，包含通知的相关信息</param>
-        private void NotifyObservers(NoticeContext context)
+        /// <param name="context">消息上下文，包含消息的相关信息</param>
+        private void InternalNotifyObservers(MessageContext context)
         {
             if (context == null) TangdaoGuards.ThrowIfNull(nameof(context));
 
-            List<INoticeObserver> observersCopy;
+            List<IMessageObserver> observersCopy;
             lock (_lock)
             {
-                observersCopy = new List<INoticeObserver>(_observers);
+                observersCopy = new List<IMessageObserver>(_observers);
             }
 
             foreach (var observer in observersCopy)
             {
-                observer.UpdateNotice(context);
+                if (observer.IsReceive)
+                {
+                    MessageEventArgs messageEventArgs = new MessageEventArgs(context);
+                    observer.MessageIntercepted?.Invoke(observer, messageEventArgs);
+                    observer.UpdateMessage(context);
+                }
             }
         }
 
         /// <summary>
-        /// 向指定的单个观察者发送通知
+        /// 向指定的单个观察者发送消息
         /// </summary>
         /// <param name="observer">要通知的观察者实例</param>
-        /// <param name="context">通知上下文，包含通知的相关信息</param>
+        /// <param name="context">消息上下文，包含消息的相关信息</param>
         /// <exception cref="ArgumentNullException">当observer或context为null时抛出</exception>
-        public void NotifySingle(INoticeObserver observer, NoticeContext context)
+        public void NotifyObserver(IMessageObserver observer, MessageContext context)
         {
             if (observer == null) TangdaoGuards.ThrowIfNull(nameof(observer));
             if (context == null) TangdaoGuards.ThrowIfNull(nameof(context));
 
-            observer.UpdateNotice(context);
+            if (observer.IsReceive)
+            {
+                if (observer.IsReceive)
+                {
+                    MessageEventArgs messageEventArgs = new MessageEventArgs(context);
+                    observer.MessageIntercepted?.Invoke(observer, messageEventArgs);
+                    observer.UpdateMessage(context);
+                }
+            }
         }
 
         /// <summary>
-        /// 通过Key向单个观察者发送通知
+        /// 通过Key向单个观察者发送消息
         /// </summary>
         /// <param name="key">观察者的Key，用于查找对应的观察者实例</param>
-        /// <param name="context">通知上下文，包含通知的相关信息</param>
+        /// <param name="context">消息上下文，包含消息的相关信息</param>
         /// <exception cref="ArgumentNullException">当key或context为null时抛出</exception>
-        public void NotifySingle(string key, NoticeContext context)
+        public void NotifyObserverByKey(string key, MessageContext context)
         {
             if (string.IsNullOrWhiteSpace(key)) TangdaoGuards.ThrowIfNull(nameof(key));
             if (context == null) TangdaoGuards.ThrowIfNull(nameof(context));
@@ -272,10 +286,15 @@ namespace IT.Tangdao.Core.Abstractions.Notices
             {
                 if (_keyToObserverMap.TryGetValue(key, out var observer))
                 {
-                    observer.UpdateNotice(context);
+                    if (observer.IsReceive)
+                    {
+                        MessageEventArgs messageEventArgs = new MessageEventArgs(context);
+                        observer.MessageIntercepted?.Invoke(observer, messageEventArgs);
+                        observer.UpdateMessage(context);
+                    }
                 }
                 // 如果找不到对应的观察者，这里可以选择抛出异常或者静默处理
-                // 考虑到通知系统的特性，静默处理可能更合适
+                // 考虑到消息系统的特性，静默处理可能更合适
             }
         }
     }

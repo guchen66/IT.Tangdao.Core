@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Abstractions.Notices
+namespace IT.Tangdao.Core.Abstractions.Messaging
 {
     /// <summary>
     /// 通知接收器接口，用于接收发布者发送的通知

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IT.Tangdao.Core.Abstractions.Notices;
+using IT.Tangdao.Core.Abstractions.Messaging;
 using IT.Tangdao.Core.Common;
 
 namespace IT.Tangdao.Core.Abstractions.Navigation

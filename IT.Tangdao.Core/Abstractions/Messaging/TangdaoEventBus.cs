@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Events;
 
-namespace IT.Tangdao.Core.Abstractions.Notices
+namespace IT.Tangdao.Core.Abstractions.Messaging
 {
     public static class TangdaoEventBus
     {

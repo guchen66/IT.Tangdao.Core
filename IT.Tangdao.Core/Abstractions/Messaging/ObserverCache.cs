@@ -10,21 +10,21 @@ using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Abstractions.Contracts;
 
-namespace IT.Tangdao.Core.Abstractions.Notices
+namespace IT.Tangdao.Core.Abstractions.Messaging
 {
     /// <summary>
-    /// 通知观察者解析器，实现了INoticeResolver接口
-    /// 负责根据通知注册表创建通知观察者实例
+    /// 观察者缓存，实现了IObserverCache接口
+    /// 负责根据消息注册表创建消息观察者实例
     /// 内部使用缓存机制避免重复创建相同类型的观察者实例
     /// </summary>
-    public sealed class NoticeResolver : INoticeResolver
+    public sealed class ObserverCache : IObserverCache
     {
         /// <summary>
         /// 观察者实例缓存，用于存储已经创建的观察者实例
         /// Key: 观察者类型的完整名称
         /// Value: 对应的观察者实例
         /// </summary>
-        private readonly Dictionary<string, INoticeObserver> _observerCache = new Dictionary<string, INoticeObserver>();
+        private readonly Dictionary<string, IMessageObserver> _observerCache = new Dictionary<string, IMessageObserver>();
 
         /// <summary>
         /// 线程同步锁，保护缓存的并发访问
@@ -37,7 +37,7 @@ namespace IT.Tangdao.Core.Abstractions.Notices
         /// <param name="noticeRegistry">通知注册表，包含观察者类型信息</param>
         /// <returns>创建的通知观察者实例，如果创建失败则返回null</returns>
         /// <exception cref="ArgumentNullException">当noticeRegistry为null时抛出</exception>
-        public INoticeObserver CreateObserver(IRegistrationTypeEntry noticeRegistry)
+        public IMessageObserver CreateObserver(IRegistrationTypeEntry noticeRegistry)
         {
             if (noticeRegistry == null) TangdaoGuards.ThrowIfNull(nameof(noticeRegistry));
 
@@ -45,7 +45,7 @@ namespace IT.Tangdao.Core.Abstractions.Notices
             string cacheKey = noticeRegistry.RegisterType.FullName;
 
             // 先检查缓存中是否已经存在该观察者实例
-            INoticeObserver observer;
+            IMessageObserver observer;
             lock (_lock)
             {
                 if (_observerCache.TryGetValue(cacheKey, out observer))
@@ -55,7 +55,7 @@ namespace IT.Tangdao.Core.Abstractions.Notices
             }
 
             // 缓存中不存在，创建新实例
-            observer = NoticeMediator.ServiceResolver(noticeRegistry);
+            observer = TangdaoMessenger.ServiceResolver(noticeRegistry);
 
             // 如果创建成功，添加到缓存中
             if (observer != null)

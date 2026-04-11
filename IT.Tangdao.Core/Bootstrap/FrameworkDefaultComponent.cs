@@ -1,7 +1,7 @@
 ﻿using IT.Tangdao.Core.Abstractions.Configurations;
 using IT.Tangdao.Core.Abstractions.FileAccessor;
 using IT.Tangdao.Core.Abstractions.Navigation;
-using IT.Tangdao.Core.Abstractions.Notices;
+using IT.Tangdao.Core.Abstractions.Messaging;
 using IT.Tangdao.Core.Commands;
 using IT.Tangdao.Core.Components;
 using IT.Tangdao.Core.DaoTasks;

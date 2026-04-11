@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Events;
 
-namespace IT.Tangdao.Core.Abstractions.Notices
+namespace IT.Tangdao.Core.Abstractions.Messaging
 {
     /// <summary>
     /// 通知接收器接口，用于接收发布者发送的通用通知

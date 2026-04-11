@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IT.Tangdao.Core.Abstractions.Messaging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,13 @@ namespace IT.Tangdao.Core.Events
 {
     public class MessageEventArgs : TangdaoEventArgs
     {
-        public string Message { get; set; }
+        public MessageContext Context { get; set; }
 
-        public MessageEventArgs(string message)
+        public bool Cancel { get; set; }
+
+        public MessageEventArgs(MessageContext context)
         {
-            Message = message;
+            Context = context;
         }
     }
 }
