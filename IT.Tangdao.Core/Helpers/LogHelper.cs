@@ -126,9 +126,6 @@ namespace IT.Tangdao.Core.Helpers
         /// <summary>
         /// 以JSON格式保存日志（追加模式）
         /// </summary>
-        // <summary>
-        /// 以JSON格式保存日志（追加模式）
-        /// </summary>
         private static void SaveAsJson(LogItem logItem, string filePath)
         {
             if (!File.Exists(filePath))

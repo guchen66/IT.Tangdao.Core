@@ -17,7 +17,7 @@ namespace IT.Tangdao.Core.Converters.Core
         {
             _parser = parser
                    ?? (TypeParser.Table.TryGetValue(typeof(T), out var p)
-                       ? (Func<string, T>)(s => (T)p(s))
+                       ? (Func<string, T>)(s => (T)p(s, null))
                        : _ => throw new NotSupportedException($"未注册 {typeof(T)} 的解析器"));
         }
 
