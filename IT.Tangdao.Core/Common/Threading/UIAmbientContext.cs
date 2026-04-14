@@ -9,18 +9,17 @@ using System.Threading.Tasks;
 namespace IT.Tangdao.Core.Threading
 {
     /// <summary>
-    /// 兼容 .NET 6+ 的 AmbientContext：
-    /// - 值类型：ThreadStatic，0 分配
-    /// - 引用类型：AsyncLocal，随 ExecutionContext 流动
-    /// - 支持“同类型多份数据”（具名槽）
+    /// 专为UI线程开发的简单传输链路
+    /// 禁止UI-Task，Task-Task传输
     /// </summary>
-    public static class AmbientContext
+    public static class UIAmbientContext
     {
         #region ---------- 值类型 ----------
 
         private static class Slot<T> where T : struct
         {
-            [ThreadStatic] private static T _value;
+            [ThreadStatic]
+            private static T _value;
 
             public static T Value
             {
