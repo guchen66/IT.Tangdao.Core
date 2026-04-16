@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.Enums;
+﻿using IT.Tangdao.Core.Abstractions.Results;
+using IT.Tangdao.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,11 +51,11 @@ namespace IT.Tangdao.Core.DaoTasks
         /// <summary>
         /// 任务执行结果
         /// </summary>
-        object Result { get; }
+        IResponseResult<ITaskItem> Result { get; }
 
         /// <summary>
-        /// 任务异常信息
+        /// 回调一个任务
         /// </summary>
-        Exception Exception { get; }
+        TaskCompletionSource<ITaskItem> TCS { get; }
     }
 }

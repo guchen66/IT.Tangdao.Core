@@ -9,93 +9,32 @@ using IT.Tangdao.Core.Enums;
 
 namespace IT.Tangdao.Core.DaoTasks
 {
+    /// <summary>
+    /// 任务队列管理器
+    /// 负责任务的添加、取消、查询等队列管理操作
+    /// 遵循单一职责原则，仅关注任务队列的管理
+    /// </summary>
     public class TaskQueueManager : ITaskQueueManager
     {
-        private readonly ManualResetEventSlim _manual = new ManualResetEventSlim();
-        private CancellationTokenSource _cts;
-        private volatile bool _isPaused;
-        private readonly object _lock = new object();
-
-        // 任务队列，按优先级排序
-        private readonly SortedDictionary<TaskPriority, Queue<TaskItem>> _taskQueue = new SortedDictionary<TaskPriority, Queue<TaskItem>>();
-
-        // 任务字典，用于快速查找
+        /// <summary>
+        /// 任务字典，用于快速查找任务
+        /// </summary>
         private readonly Dictionary<Guid, TaskItem> _taskDict = new Dictionary<Guid, TaskItem>();
 
-        // 任务执行任务
-        private Task _executionTask;
+        /// <summary>
+        /// 任务队列，按优先级排序
+        /// </summary>
+        private readonly List<TaskItem> _taskQueue = new List<TaskItem>();
 
-        public TaskQueueManager()
-        {
-            // 初始化不同优先级的队列
-            foreach (TaskPriority priority in Enum.GetValues(typeof(TaskPriority)))
-            {
-                _taskQueue.Add(priority, new Queue<TaskItem>());
-            }
-        }
+        /// <summary>
+        /// 线程安全锁
+        /// </summary>
+        private readonly object _lock = new object();
 
-        public async Task StartAsync(IProgress<IAddTaskItem> progress)
-        {
-            lock (_lock)
-            {
-                _cts?.Cancel();
-                _cts = new CancellationTokenSource();
-                _manual.Set();
-                _isPaused = false;
-            }
-
-            try
-            {
-                for (int i = 0; i < 100; i++)
-                {
-                    _cts.Token.ThrowIfCancellationRequested();
-
-                    Random random = new Random();
-                    int randomNumber = random.Next(0, 11);
-                    bool result = randomNumber > 5;
-                    progress.Report(new AddTaskItem()
-                    {
-                        NewItem = "未完成",
-                    });
-
-                    await Task.Delay(1000, _cts.Token);
-                    if (_isPaused)
-                    {
-                        await Task.Run(() => { _manual.Wait(_cts.Token); });
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Console.WriteLine("任务已取消");
-            }
-        }
-
-        public void Pause()
-        {
-            lock (_lock)
-            {
-                _isPaused = true;
-                _manual.Reset();
-            }
-        }
-
-        public void Resume()
-        {
-            lock (_lock)
-            {
-                _isPaused = false;
-                _manual.Set();
-            }
-        }
-
-        public void Stop()
-        {
-            lock (_lock)
-            {
-                _cts?.Cancel();
-            }
-        }
+        /// <summary>
+        /// 是否已释放
+        /// </summary>
+        private bool _isDisposed = false;
 
         /// <summary>
         /// 添加任务
@@ -116,14 +55,16 @@ namespace IT.Tangdao.Core.DaoTasks
 
             lock (_lock)
             {
-                _taskQueue[priority].Enqueue(taskItem);
                 _taskDict.Add(taskItem.Id, taskItem);
 
-                // 如果执行任务未运行，启动执行任务
-                if (_executionTask == null || _executionTask.IsCompleted)
+                int insertIndex = 0;
+                foreach (var item in _taskQueue)
                 {
-                    _executionTask = ExecuteTasksAsync();
+                    if (item.Priority < taskItem.Priority)
+                        break;
+                    insertIndex++;
                 }
+                _taskQueue.Insert(insertIndex, taskItem);
             }
 
             return taskItem.Id;
@@ -144,7 +85,6 @@ namespace IT.Tangdao.Core.DaoTasks
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            // UI任务包装，确保在UI线程执行
             Func<CancellationToken, Task<object>> uiAction = async (token) =>
             {
                 return await TangdaoTaskScheduler.ExecuteAsync(async (task) =>
@@ -167,21 +107,17 @@ namespace IT.Tangdao.Core.DaoTasks
             {
                 if (_taskDict.TryGetValue(taskId, out var taskItem))
                 {
-                    // 只能取消未开始的任务
                     if (taskItem.Status == TaskStatus.Created)
                     {
-                        // 从字典中移除
                         _taskDict.Remove(taskId);
-
-                        // 从队列中移除（需要重新创建队列）
-                        var newQueue = new Queue<TaskItem>(_taskQueue[taskItem.Priority].Where(t => t.Id != taskId));
-                        _taskQueue[taskItem.Priority] = newQueue;
-
+                        _taskQueue.RemoveAll(t => t.Id == taskId);
+                        taskItem.Status = TaskStatus.Canceled;
+                        taskItem.CompletedTime = DateTime.Now;
+                        taskItem.TCS.TrySetResult(taskItem);
                         return true;
                     }
                 }
             }
-
             return false;
         }
 
@@ -193,7 +129,7 @@ namespace IT.Tangdao.Core.DaoTasks
         {
             lock (_lock)
             {
-                return _taskDict.Values.ToList<ITaskItem>();
+                return _taskDict.Values.Cast<ITaskItem>().ToList();
             }
         }
 
@@ -210,79 +146,6 @@ namespace IT.Tangdao.Core.DaoTasks
         }
 
         /// <summary>
-        /// 执行任务队列
-        /// </summary>
-        private async Task ExecuteTasksAsync()
-        {
-            while (true)
-            {
-                TaskItem taskItem = null;
-
-                // 按优先级从高到低查找任务
-                lock (_lock)
-                {
-                    foreach (var priority in Enum.GetValues(typeof(TaskPriority)).Cast<TaskPriority>().Reverse())
-                    {
-                        if (_taskQueue[priority].Count > 0)
-                        {
-                            taskItem = _taskQueue[priority].Dequeue();
-                            break;
-                        }
-                    }
-
-                    // 如果没有任务，退出循环
-                    if (taskItem == null)
-                    {
-                        break;
-                    }
-
-                    // 更新任务状态
-                    taskItem.Status = TaskStatus.Running;
-                    taskItem.StartTime = DateTime.Now;
-                }
-
-                try
-                {
-                    // 执行任务
-                    var result = await taskItem.Action(_cts.Token);
-
-                    // 更新任务状态
-                    lock (_lock)
-                    {
-                        taskItem.Status = TaskStatus.RanToCompletion;
-                        taskItem.Result = result;
-                        taskItem.CompletedTime = DateTime.Now;
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    lock (_lock)
-                    {
-                        taskItem.Status = TaskStatus.Canceled;
-                        taskItem.CompletedTime = DateTime.Now;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    lock (_lock)
-                    {
-                        taskItem.Status = TaskStatus.Faulted;
-                        taskItem.Exception = ex;
-                        taskItem.CompletedTime = DateTime.Now;
-                    }
-                }
-                finally
-                {
-                    // 检查是否需要暂停
-                    if (_isPaused)
-                    {
-                        await Task.Run(() => { _manual.Wait(_cts.Token); });
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// 空的任务
         /// </summary>
         /// <returns></returns>
@@ -291,11 +154,71 @@ namespace IT.Tangdao.Core.DaoTasks
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 出队一个任务（内部方法）
+        /// </summary>
+        /// <returns>任务项，如果队列为空则返回null</returns>
+        internal TaskItem Dequeue()
+        {
+            lock (_lock)
+            {
+                if (_taskQueue.Count == 0)
+                    return null;
+
+                var taskItem = _taskQueue[0];
+                _taskQueue.RemoveAt(0);
+                return taskItem;
+            }
+        }
+
+        /// <summary>
+        /// 检查队列是否为空（内部方法）
+        /// </summary>
+        /// <returns>是否为空</returns>
+        internal bool IsEmpty()
+        {
+            lock (_lock)
+            {
+                return _taskQueue.Count == 0;
+            }
+        }
+
+        /// <summary>
+        /// 根据ID获取任务（内部方法）
+        /// </summary>
+        /// <param name="taskId">任务ID</param>
+        /// <returns>任务项</returns>
+        internal TaskItem GetTask(Guid taskId)
+        {
+            lock (_lock)
+            {
+                _taskDict.TryGetValue(taskId, out var taskItem);
+                return taskItem;
+            }
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _manual?.Dispose();
+            if (!_isDisposed)
+            {
+                _isDisposed = true;
+                lock (_lock)
+                {
+                    foreach (var task in _taskDict.Values)
+                    {
+                        if (task.Status == TaskStatus.Created)
+                        {
+                            task.Status = TaskStatus.Canceled;
+                            task.CompletedTime = DateTime.Now;
+                        }
+                    }
+                    _taskDict.Clear();
+                    _taskQueue.Clear();
+                }
+            }
         }
     }
 }

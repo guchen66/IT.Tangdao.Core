@@ -6,7 +6,7 @@
 	<UseWPF>true</UseWPF>
 	<Title>WPF快速开发工具包</Title>
 	<Authors>liuxin</Authors>
-	<Version>4.0.5</Version>
+	<Version>4.0.6</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>4.2.3</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>

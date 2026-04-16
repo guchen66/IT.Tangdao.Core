@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 namespace IT.Tangdao.Core.DaoTasks
 {
     /// <summary>
-    /// 增强的任务服务接口
+    /// 任务队列服务接口
+    /// 负责注册取消，查询，清空
     /// </summary>
-    public interface ITaskQueueManager : ITaskQueue, IDisposable
+    public interface ITaskQueueManager : IDisposable
     {
         /// <summary>
         /// 添加任务
