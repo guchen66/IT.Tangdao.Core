@@ -13,7 +13,7 @@ namespace IT.Tangdao.Core.Commands
     /// <summary>
     /// 委托注册表的并发实现类
     /// </summary>
-    public sealed class ActionTable : IActionTable
+    public sealed class ActionTable : ActionTableBase
     {
         /// <summary>
         /// 存储无参数委托的并发字典
@@ -21,31 +21,11 @@ namespace IT.Tangdao.Core.Commands
         private readonly ConcurrentDictionary<string, ActionEntry> _map = new ConcurrentDictionary<string, ActionEntry>();
 
         /// <summary>
-        /// 注册委托时发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Registered;
-
-        /// <summary>
-        /// 移除委托时发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Unregistered;
-
-        /// <summary>
-        /// 委托执行时发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Executing;
-
-        /// <summary>
-        /// 微弱执行后发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Executed;
-
-        /// <summary>
         /// 注册一个无参数的委托处理程序
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <param name="action">要注册的无参数委托</param>
-        public void Register(string key, Action action, TaskPriority priority = TaskPriority.Normal)
+        public override void Register(string key, Action action, TaskPriority priority = TaskPriority.Normal)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be null or whitespace.", nameof(key));
@@ -58,7 +38,7 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <param name="action">要注册的带ActionResult参数的委托</param>
-        public void Register(string key, Action<ActionResult> action, TaskPriority priority = TaskPriority.Normal)
+        public override void Register(string key, Action<ActionResult> action, TaskPriority priority = TaskPriority.Normal)
         {
             ActionEntry commandEntry = new ActionEntry(action, priority);
             RegisterInternal(key, commandEntry);
@@ -83,7 +63,7 @@ namespace IT.Tangdao.Core.Commands
             });
 
             // 触发注册事件
-            OnRegisterChanged(ActionTableEventType.Registered, key, commandEntry.Priority);
+            OnRegistered(ActionTableEventType.Registered, key, commandEntry.Priority);
         }
 
         /// <summary>
@@ -91,7 +71,7 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <returns>如果找到匹配的处理程序则返回该委托，否则返回null</returns>
-        public Action GetHandler(string key)
+        public override Action GetHandler(string key)
         {
             return _map.TryGetValue(key, out var cmd) ? cmd.Action : () => { };
         }
@@ -101,7 +81,7 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <returns>如果找到匹配的处理程序则返回该委托，否则返回null</returns>
-        public Action<ActionResult> GetResultHandler(string key)
+        public override Action<ActionResult> GetResultHandler(string key)
         {
             return _map.TryGetValue(key, out var cmd) ? cmd.ActionResult : action => { };
         }
@@ -111,14 +91,14 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <returns>如果成功移除则返回true，否则返回false</returns>
-        public bool UnregisterHandler(string key)
+        public override bool UnregisterHandler(string key)
         {
             if (_map.TryGetValue(key, out var e) && e.Action != null)
             {
                 if (_map.TryRemove(key, out _))
                 {
                     // 触发移除事件
-                    OnUnregisterChanged(ActionTableEventType.Unregistered, key, e.Priority);
+                    OnUnregistered(ActionTableEventType.Unregistered, key, e.Priority);
                     return true;
                 }
             }
@@ -130,14 +110,14 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <returns>如果成功移除则返回true，否则返回false</returns>
-        public bool UnregisterResultHandler(string key)
+        public override bool UnregisterResultHandler(string key)
         {
             if (_map.TryGetValue(key, out var e) && e.ActionResult != null)
             {
                 if (_map.TryRemove(key, out _))
                 {
                     // 触发移除事件
-                    OnUnregisterChanged(ActionTableEventType.Unregistered, key, e.Priority);
+                    OnUnregistered(ActionTableEventType.Unregistered, key, e.Priority);
                     return true;
                 }
             }
@@ -149,7 +129,7 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <returns>如果已注册则返回true，否则返回false</returns>
-        public bool IsHandlerRegistered(string key)
+        public override bool IsHandlerRegistered(string key)
         {
             return _map.TryGetValue(key, out var e) && e.Action != null;
         }
@@ -159,7 +139,7 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <returns>如果已注册则返回true，否则返回false</returns>
-        public bool IsResultHandlerRegistered(string key)
+        public override bool IsResultHandlerRegistered(string key)
         {
             return _map.TryGetValue(key, out var e) && e.ActionResult != null;
         }
@@ -168,7 +148,7 @@ namespace IT.Tangdao.Core.Commands
         /// 获取快照信息
         /// </summary>
         /// <returns></returns>
-        IReadOnlyDictionary<string, IActionInfo> IActionTable.GetActionInfo()
+        public override IReadOnlyDictionary<string, IActionInfo> GetActionInfo()
         {
             return _map.ToDictionary(kv => kv.Key, kv => (IActionInfo)kv.Value);
         }
@@ -177,18 +157,18 @@ namespace IT.Tangdao.Core.Commands
         /// 执行指定键的无参数委托处理程序
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
-        public void Execute(string key)
+        public override void Execute(string key)
         {
-            if (_map.TryGetValue(key, out var entry) && entry.Action != null)
+            if (IsActive && _map.TryGetValue(key, out var entry) && entry.Action != null)
             {
                 // 触发执行前事件
-                OnExecutingChanged(ActionTableEventType.Executing, key, entry.Priority);
+                OnExecuting(ActionTableEventType.Executing, key, entry.Priority);
 
                 // 执行委托
                 entry.Action.Invoke();
 
                 // 触发执行后事件
-                OnExecutedChanged(ActionTableEventType.Executed, key, entry.Priority);
+                OnExecuted(ActionTableEventType.Executed, key, entry.Priority);
             }
         }
 
@@ -197,63 +177,19 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <param name="result">传递给委托处理程序的ActionResult实例</param>
-        public void Execute(string key, ActionResult result)
+        public override void Execute(string key, ActionResult result)
         {
-            if (_map.TryGetValue(key, out var entry) && entry.ActionResult != null)
+            if (IsActive && _map.TryGetValue(key, out var entry) && entry.ActionResult != null)
             {
                 // 触发执行前事件
-                OnExecutingChanged(ActionTableEventType.Executing, key, entry.Priority);
+                OnExecuting(ActionTableEventType.Executing, key, entry.Priority);
 
                 // 执行委托
                 entry.ActionResult.Invoke(result);
 
                 // 触发执行后事件
-                OnExecutedChanged(ActionTableEventType.Executed, key, entry.Priority);
+                OnExecuted(ActionTableEventType.Executed, key, entry.Priority);
             }
-        }
-
-        /// <summary>
-        /// 触发注册委托事件
-        /// </summary>
-        /// <param name="eventType">事件类型</param>
-        /// <param name="key">委托的唯一标识符</param>
-        /// <param name="priority">委托优先级</param>
-        private void OnRegisterChanged(ActionTableEventType eventType, string key, TaskPriority priority)
-        {
-            Registered?.Invoke(this, new ActionTableEventArgs(eventType, key, priority));
-        }
-
-        /// <summary>
-        /// 触发移除委托事件
-        /// </summary>
-        /// <param name="eventType">事件类型</param>
-        /// <param name="key">委托的唯一标识符</param>
-        /// <param name="priority">委托优先级</param>
-        private void OnUnregisterChanged(ActionTableEventType eventType, string key, TaskPriority priority)
-        {
-            Unregistered?.Invoke(this, new ActionTableEventArgs(eventType, key, priority));
-        }
-
-        /// <summary>
-        /// 触发执行委托事件
-        /// </summary>
-        /// <param name="eventType">事件类型</param>
-        /// <param name="key">委托的唯一标识符</param>
-        /// <param name="priority">委托优先级</param>
-        private void OnExecutingChanged(ActionTableEventType eventType, string key, TaskPriority priority)
-        {
-            Executing?.Invoke(this, new ActionTableEventArgs(eventType, key, priority));
-        }
-
-        /// <summary>
-        /// 触发注册事件
-        /// </summary>
-        /// <param name="eventType">事件类型</param>
-        /// <param name="key">委托的唯一标识符</param>
-        /// <param name="priority">委托优先级</param>
-        private void OnExecutedChanged(ActionTableEventType eventType, string key, TaskPriority priority)
-        {
-            Executed?.Invoke(this, new ActionTableEventArgs(eventType, key, priority));
         }
 
         /// <summary>
@@ -262,12 +198,12 @@ namespace IT.Tangdao.Core.Commands
         private class ActionEntry : IActionInfo
         {
             /// <summary>
-            /// 委托委托
+            /// 委托
             /// </summary>
             public Action Action { get; }
 
             /// <summary>
-            /// 委托委托
+            /// 带结果的委托
             /// </summary>
             public Action<ActionResult> ActionResult { get; }
 
@@ -279,7 +215,7 @@ namespace IT.Tangdao.Core.Commands
             /// <summary>
             /// 构造函数
             /// </summary>
-            /// <param name="action">委托委托</param>
+            /// <param name="action">委托</param>
             /// <param name="priority">委托优先级</param>
             public ActionEntry(Action action, TaskPriority priority)
             {

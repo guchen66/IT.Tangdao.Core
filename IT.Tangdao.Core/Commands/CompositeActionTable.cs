@@ -12,12 +12,7 @@ namespace IT.Tangdao.Core.Commands
     /// <summary>
     /// 复合委托注册表类，用于组合多个IActionTable实例
     /// </summary>
-    /// <remarks>
-    /// 实现了IActionTable接口，内部管理多个IActionTable实例，支持批量操作
-    /// 类似于Prism框架的CompositeCommand类，但针对IActionTable接口设计
-    /// 采用密封类设计，防止继承
-    /// </remarks>
-    public sealed class CompositeActionTable : IActionTable, IActionTableHandler
+    public sealed class CompositeActionTable : ActionTableBase
     {
         /// <summary>
         /// 用于存储多个IActionTable实例的队列
@@ -25,34 +20,9 @@ namespace IT.Tangdao.Core.Commands
         private readonly Queue<IActionTable> _actionTables = new Queue<IActionTable>();
 
         /// <summary>
-        /// 指示是否激活复合操作的标志
-        /// </summary>
-        private readonly bool _actionActive;
-
-        /// <summary>
         /// 用于在特定线程上执行命令的同步上下文
         /// </summary>
         private readonly SynchronizationContext _synchronizationContext;
-
-        /// <summary>
-        /// 注册委托时发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Registered;
-
-        /// <summary>
-        /// 移除委托时发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Unregistered;
-
-        /// <summary>
-        /// 委托执行时发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Executing;
-
-        /// <summary>
-        /// 委托执行后发生的事件
-        /// </summary>
-        public event EventHandler<ActionTableEventArgs> Executed;
 
         /// <summary>
         /// 无参构造函数，默认激活复合操作
@@ -68,7 +38,7 @@ namespace IT.Tangdao.Core.Commands
         /// <param name="synchronizationContext">用于执行命令的同步上下文，默认为当前线程的上下文</param>
         public CompositeActionTable(bool actionActive)
         {
-            _actionActive = actionActive;
+            IsActive = actionActive;
             _synchronizationContext = SynchronizationContext.Current;
         }
 
@@ -77,19 +47,19 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <param name="priority">委托优先级</param>
-        private void OnRegistered(string key, TaskPriority priority)
+        private void OnRegisteredPrivate(string key, TaskPriority priority)
         {
             // 如果设置了同步上下文，则在该上下文中触发事件
             if (_synchronizationContext != null)
             {
                 _synchronizationContext.Post(state =>
                 {
-                    Registered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Registered, key, priority));
+                    OnRegistered(ActionTableEventType.Registered, key, priority);
                 }, null);
             }
             else
             {
-                Registered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Registered, key, priority));
+                OnRegistered(ActionTableEventType.Registered, key, priority);
             }
         }
 
@@ -98,19 +68,19 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <param name="priority">委托优先级</param>
-        private void OnUnregistered(string key, TaskPriority priority)
+        private void OnUnregisteredPrivate(string key, TaskPriority priority)
         {
             // 如果设置了同步上下文，则在该上下文中触发事件
             if (_synchronizationContext != null)
             {
                 _synchronizationContext.Post(state =>
                 {
-                    Unregistered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Unregistered, key, priority));
+                    OnUnregistered(ActionTableEventType.Unregistered, key, priority);
                 }, null);
             }
             else
             {
-                Unregistered?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Unregistered, key, priority));
+                OnUnregistered(ActionTableEventType.Unregistered, key, priority);
             }
         }
 
@@ -119,19 +89,19 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <param name="priority">委托优先级</param>
-        private void OnExecuting(string key, TaskPriority priority)
+        private void OnExecutingPrivate(string key, TaskPriority priority)
         {
             // 如果设置了同步上下文，则在该上下文中触发事件
             if (_synchronizationContext != null)
             {
                 _synchronizationContext.Post(state =>
                 {
-                    Executing?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executing, key, priority));
+                    OnExecuting(ActionTableEventType.Executing, key, priority);
                 }, null);
             }
             else
             {
-                Executing?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executing, key, priority));
+                OnExecuting(ActionTableEventType.Executing, key, priority);
             }
         }
 
@@ -140,19 +110,19 @@ namespace IT.Tangdao.Core.Commands
         /// </summary>
         /// <param name="key">委托的唯一标识符</param>
         /// <param name="priority">委托优先级</param>
-        private void OnExecuted(string key, TaskPriority priority)
+        private void OnExecutedPrivate(string key, TaskPriority priority)
         {
             // 如果设置了同步上下文，则在该上下文中触发事件
             if (_synchronizationContext != null)
             {
                 _synchronizationContext.Post(state =>
                 {
-                    Executed?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executed, key, priority));
+                    OnExecuted(ActionTableEventType.Executed, key, priority);
                 }, null);
             }
             else
             {
-                Executed?.Invoke(this, new ActionTableEventArgs(ActionTableEventType.Executed, key, priority));
+                OnExecuted(ActionTableEventType.Executed, key, priority);
             }
         }
 
@@ -171,10 +141,10 @@ namespace IT.Tangdao.Core.Commands
             // 如果子表实现了IActionTableHandler，订阅其事件
             if (actionTable is IActionTableHandler handler)
             {
-                handler.Registered += (sender, e) => OnRegistered(e.Key, e.Priority);
-                handler.Unregistered += (sender, e) => OnUnregistered(e.Key, e.Priority);
-                handler.Executing += (sender, e) => OnExecuting(e.Key, e.Priority);
-                handler.Executed += (sender, e) => OnExecuted(e.Key, e.Priority);
+                handler.Registered += (sender, e) => OnRegisteredPrivate(e.Key, e.Priority);
+                handler.Unregistered += (sender, e) => OnUnregisteredPrivate(e.Key, e.Priority);
+                handler.Executing += (sender, e) => OnExecutingPrivate(e.Key, e.Priority);
+                handler.Executed += (sender, e) => OnExecutedPrivate(e.Key, e.Priority);
             }
 
             _actionTables.Enqueue(actionTable);
@@ -202,11 +172,8 @@ namespace IT.Tangdao.Core.Commands
         /// <remarks>
         /// 将命令注册到所有内部IActionTable实例中
         /// </remarks>
-        public void Register(string key, Action action, TaskPriority priority = TaskPriority.Normal)
+        public override void Register(string key, Action action, TaskPriority priority = TaskPriority.Normal)
         {
-            if (!_actionActive)
-                return;
-
             foreach (var actionTable in _actionTables)
             {
                 actionTable.Register(key, action, priority);
@@ -222,11 +189,8 @@ namespace IT.Tangdao.Core.Commands
         /// <remarks>
         /// 将命令注册到所有内部IActionTable实例中
         /// </remarks>
-        public void Register(string key, Action<ActionResult> action, TaskPriority priority = TaskPriority.Normal)
+        public override void Register(string key, Action<ActionResult> action, TaskPriority priority = TaskPriority.Normal)
         {
-            if (!_actionActive)
-                return;
-
             foreach (var actionTable in _actionTables)
             {
                 actionTable.Register(key, action, priority);
@@ -242,7 +206,7 @@ namespace IT.Tangdao.Core.Commands
         /// 按照添加顺序，返回最后一个注册的IActionTable实例中的命令处理程序
         /// 如果没有找到，返回null
         /// </remarks>
-        public Action GetHandler(string key)
+        public override Action GetHandler(string key)
         {
             // 从最后一个添加的IActionTable开始查找，返回第一个找到的处理程序
             return _actionTables.LastOrDefault(table => table.IsHandlerRegistered(key))?.GetHandler(key);
@@ -257,7 +221,7 @@ namespace IT.Tangdao.Core.Commands
         /// 按照添加顺序，返回最后一个注册的IActionTable实例中的命令处理程序
         /// 如果没有找到，返回null
         /// </remarks>
-        public Action<ActionResult> GetResultHandler(string key)
+        public override Action<ActionResult> GetResultHandler(string key)
         {
             // 从最后一个添加的IActionTable开始查找，返回第一个找到的处理程序
             return _actionTables.LastOrDefault(table => table.IsResultHandlerRegistered(key))?.GetResultHandler(key);
@@ -271,7 +235,7 @@ namespace IT.Tangdao.Core.Commands
         /// <remarks>
         /// 移除所有内部IActionTable实例中对应的命令处理程序
         /// </remarks>
-        public bool UnregisterHandler(string key)
+        public override bool UnregisterHandler(string key)
         {
             bool result = false;
             foreach (var actionTable in _actionTables)
@@ -292,7 +256,7 @@ namespace IT.Tangdao.Core.Commands
         /// <remarks>
         /// 移除所有内部IActionTable实例中对应的命令处理程序
         /// </remarks>
-        public bool UnregisterResultHandler(string key)
+        public override bool UnregisterResultHandler(string key)
         {
             bool result = false;
             foreach (var actionTable in _actionTables)
@@ -313,7 +277,7 @@ namespace IT.Tangdao.Core.Commands
         /// <remarks>
         /// 检查所有内部IActionTable实例，只要有一个已注册该处理程序，就返回true
         /// </remarks>
-        public bool IsHandlerRegistered(string key)
+        public override bool IsHandlerRegistered(string key)
         {
             return _actionTables.Any(table => table.IsHandlerRegistered(key));
         }
@@ -326,7 +290,7 @@ namespace IT.Tangdao.Core.Commands
         /// <remarks>
         /// 检查所有内部IActionTable实例，只要有一个已注册该处理程序，就返回true
         /// </remarks>
-        public bool IsResultHandlerRegistered(string key)
+        public override bool IsResultHandlerRegistered(string key)
         {
             return _actionTables.Any(table => table.IsResultHandlerRegistered(key));
         }
@@ -338,7 +302,7 @@ namespace IT.Tangdao.Core.Commands
         /// <remarks>
         /// 合并所有内部IActionTable实例的命令信息，相同key的命令信息保留最后一个添加的IActionTable实例中的信息
         /// </remarks>
-        public IReadOnlyDictionary<string, IActionInfo> GetActionInfo()
+        public override IReadOnlyDictionary<string, IActionInfo> GetActionInfo()
         {
             var result = new Dictionary<string, IActionInfo>();
             foreach (var actionTable in _actionTables)
@@ -361,9 +325,9 @@ namespace IT.Tangdao.Core.Commands
         /// 执行最后一个添加的IActionTable实例中注册的命令处理程序
         /// 触发执行前后事件
         /// </remarks>
-        public void Execute(string key)
+        public override void Execute(string key)
         {
-            if (_actionActive)
+            if (IsActive)
             {
                 // 查找最后一个注册了该命令的IActionTable
                 var targetTable = _actionTables.LastOrDefault(table => table.IsHandlerRegistered(key));
@@ -373,13 +337,13 @@ namespace IT.Tangdao.Core.Commands
                     var priority = targetTable.GetActionInfo().TryGetValue(key, out var info) ? info.Priority : TaskPriority.Normal;
 
                     // 触发执行前事件
-                    OnExecuting(key, priority);
+                    OnExecutingPrivate(key, priority);
 
                     // 执行命令
                     targetTable.Execute(key);
 
                     // 触发执行后事件
-                    OnExecuted(key, priority);
+                    OnExecutedPrivate(key, priority);
                 }
             }
         }
@@ -393,9 +357,9 @@ namespace IT.Tangdao.Core.Commands
         /// 执行最后一个添加的IActionTable实例中注册的命令处理程序
         /// 触发执行前后事件
         /// </remarks>
-        public void Execute(string key, ActionResult result)
+        public override void Execute(string key, ActionResult result)
         {
-            if (_actionActive)
+            if (IsActive)
             {
                 // 查找最后一个注册了该命令的IActionTable
                 var targetTable = _actionTables.LastOrDefault(table => table.IsResultHandlerRegistered(key));
@@ -405,13 +369,13 @@ namespace IT.Tangdao.Core.Commands
                     var priority = targetTable.GetActionInfo().TryGetValue(key, out var info) ? info.Priority : TaskPriority.Normal;
 
                     // 触发执行前事件
-                    OnExecuting(key, priority);
+                    OnExecutingPrivate(key, priority);
 
                     // 执行命令
                     targetTable.Execute(key, result);
 
                     // 触发执行后事件
-                    OnExecuted(key, priority);
+                    OnExecutedPrivate(key, priority);
                 }
             }
         }

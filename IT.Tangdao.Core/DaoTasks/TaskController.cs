@@ -71,8 +71,7 @@ namespace IT.Tangdao.Core.DaoTasks
         /// 通过构造器注入任务队列管理器，实现依赖注入
         /// </summary>
         /// <param name="taskQueueManager">任务队列管理器</param>
-        public TaskController(ITaskQueueManager taskQueueManager)
-            : this(taskQueueManager, TaskThreadType.Auto)
+        public TaskController(ITaskQueueManager taskQueueManager) : this(taskQueueManager, TaskThreadType.Auto)
         {
         }
 

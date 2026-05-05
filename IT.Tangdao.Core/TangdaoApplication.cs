@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.DaoTasks;
+using IT.Tangdao.Core.Abstractions.Loggers;
 
 namespace IT.Tangdao.Core
 {
@@ -22,36 +23,36 @@ namespace IT.Tangdao.Core
     /// 2. 自动解析主窗口并显示；
     /// 3. 全局 Provider 可后续解析 ViewModel、DialogService...
     /// </summary>
-    /// <summary>
-    /// WPF 专用启动入口。
-    /// 1. OnStartup 里触发用户注册；
-    /// 2. 自动解析主窗口并显示；
-    /// 3. 全局 Provider 可后续解析 ViewModel、DialogService...
-    /// </summary>
-    public abstract class TangdaoApplication : Application
+    [AssemblyScan]
+    public class TangdaoApplication : TangdaoApplicationBase
     {
         protected static ITangdaoProvider Provider { get; private set; }
+
+        //框架测试阶段，先保留日志记录
+        private static readonly ITangdaoLogger Logger = TangdaoLogger.Get(typeof(TangdaoApplication));
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
+            InitializeInternal();
             // ① 仅在此处Build
-            var builder = new TangdaoContainerBuilder();
+            var builder = TangdaoContainerBuilder.Current;
             RegisterServices(builder.Container);   // 暴露 Container 仅此时有效
 
             //发现Module模块，注册模块
-            // ② 发现 + 注册模块
             var moduleCatalog = DiscoverModules();
             RegisterModules(moduleCatalog, builder);
             builder.ValidateDependencies();
-
             Provider = builder.Build().BuildProvider();
+
             ServiceLocator.Default.Initialize(Provider);
-            builder.RaiseBuilt(Provider);  //回调插件的Initialized
+            builder.RaiseBuilt(Provider);     //回调插件的Initialized
+
             // ② 留给子类做额外配置
             Configure();
             AsyncTaskHandler(Provider.GetService<ITaskQueueManager>()).ConfigureAwait(false);
+
             // ③ 创建主窗口
             var window = CreateWindow();
             // ② 摆烂时走约定
@@ -65,12 +66,12 @@ namespace IT.Tangdao.Core
             }
         }
 
-        /// <summary>
-        /// 仅在此方法内使用 Container，不要持有字段引用
-        /// </summary>
-        /// <param name="container"></param>
-        protected abstract void RegisterServices(ITangdaoContainer container);
+        private void InitializeInternal()
+        {
+            TangdaoContainerBuilder.SetContainerExtension(CreateContainer);
+        }
 
+        /// 仅在此方法内使用 Container，不要持有字段引用
         protected virtual void Configure()
         {
         }
@@ -79,10 +80,6 @@ namespace IT.Tangdao.Core
         /// 异步任务处理器
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task AsyncTaskHandler(ITaskQueueManager taskQueueManager)
-        {
-            await taskQueueManager.Empty();
-        }
 
         /// <summary>
         /// 子类**可重写**。
@@ -103,12 +100,6 @@ namespace IT.Tangdao.Core
         }
 
         /// <summary>
-        /// 约定装配主窗口：
-        /// 1. 解析 TShell；
-        /// 2. 扫描所有 [InjectContent] 标记的 ContentControl；
-        /// 3. 按约定加载 UserControl + ViewModel 并注入。
-        /// </summary>
-        /// <summary>
         /// 类型安全入口：子类可主动调用，也可被框架自动调用。
         /// </summary>
         protected static Window CreateShell<TShell>() where TShell : Window
@@ -126,19 +117,14 @@ namespace IT.Tangdao.Core
             var shell = (Window)Provider.GetService(shellType)
                      ?? throw new InvalidOperationException($"主窗口 {shellType.Name} 未注册。");
 
-            // 自动绑定窗口的 ViewModel
-            AutoBindViewModel(shell, shellType);
+            ViewToViewModelLocator.AutoBindViewModel(shell, shellType);
             return shell;
         }
 
         /// <summary>
-        /// 自动为 View 绑定对应的 ViewModel
+        /// 要想生效，用户代码需要写[assembly: TangdaoModule(typeof(DemoModule))]
         /// </summary>
-        private static void AutoBindViewModel(DependencyObject view, Type viewType)
-        {
-            ViewToViewModelLocator.AutoBindViewModel(view, viewType, Provider);
-        }
-
+        /// <returns></returns>
         private static List<ITangdaoModule> DiscoverModules()
         {
             var list = new List<ITangdaoModule>();

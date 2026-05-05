@@ -94,7 +94,8 @@ namespace IT.Tangdao.Core.Helpers
         /// <summary>
         /// 获取根目录下的指定json文件并打开查看内容
         /// </summary>
-        /// <param name="resourceName"></param>
+        /// <param name="resourceName">json文件名称，带json后缀</param>
+        /// <param name="selector">读取对象值</param>
         /// <returns></returns>
         public static async Task<string> GetJsonContentAsync(string resourceName, string selector)
         {

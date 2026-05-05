@@ -1,6 +1,7 @@
 ﻿using IT.Tangdao.Core.Extensions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,18 @@ namespace IT.Tangdao.Core.Ioc
 
         public ITangdaoContainer Container { get; }
 
+        private static TangdaoContainerBuilder _current;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static TangdaoContainerBuilder Current => _current ?? (_current = _lazyContainer?.Value);
+
+        private static Lazy<TangdaoContainerBuilder> _lazyContainer;
+
+        public static void SetContainerExtension(Func<TangdaoContainerBuilder> factory) => _lazyContainer = new Lazy<TangdaoContainerBuilder>(factory);
+
         public TangdaoContainerBuilder()
         {
-            Container = new TangdaoContainer(); // 内部已带空 Registry
+            Container = new TangdaoContainer();
         }
 
         public void ValidateDependencies()
@@ -30,6 +40,7 @@ namespace IT.Tangdao.Core.Ioc
         public ITangdaoContainer Build()
         {
             // 目前只是快照返回，后续可加锁防再写
+
             return Container;
         }
 

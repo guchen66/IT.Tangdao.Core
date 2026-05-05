@@ -307,14 +307,11 @@ namespace IT.Tangdao.Core.Helpers
             return lambda.Compile(); // 编译成委托，执行速度快
         }
 
-        /// 只映射 public 实例属性，且节点名必须与属性名完全一致（大小写敏感）。
-        /// 类型转换失败时静默跳过，不会抛异常。
-        /// </summary>
         /// <summary>
         /// 生成XElement到对象的映射委托
         /// </summary>
-        /// <param name="type">目标类型</param>
-        /// <returns>映射委托</returns>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static Action<XElement, object> GenerateMapDelegate(Type type)
         {
             // 获取所有可写公共属性

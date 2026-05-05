@@ -13,6 +13,7 @@ using System.Reflection;
 using IT.Tangdao.Core.Abstractions.Loggers;
 using System.Threading;
 using IT.Tangdao.Core.Abstractions.Contracts;
+using IT.Tangdao.Core.Ioc;
 
 namespace IT.Tangdao.Core.Mvvm
 {
@@ -62,8 +63,10 @@ namespace IT.Tangdao.Core.Mvvm
         /// <summary>
         /// 自动为 View 绑定对应的 ViewModel
         /// </summary>
-        public static void AutoBindViewModel(DependencyObject view, Type viewType, ITangdaoProvider Provider)
+        public static void AutoBindViewModel(DependencyObject view, Type viewType)
         {
+            //窗体Bind之前ServiceLocator服务定位器已经填充了数据，可以直接使用
+            var Provider = ServiceLocator.Default;
             // 查找对应的 ViewModel 类型
             var viewModelType = FindViewModelType(viewType);
 
