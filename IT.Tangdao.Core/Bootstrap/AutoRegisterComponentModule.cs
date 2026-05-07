@@ -3,6 +3,7 @@ using IT.Tangdao.Core.Abstractions.Loggers;
 using IT.Tangdao.Core.Extensions;
 using IT.Tangdao.Core.Ioc;
 using IT.Tangdao.Core.Mvvm;
+using IT.Tangdao.Core.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace IT.Tangdao.Core.Bootstrap
 
         public void OnInitialized(ITangdaoProvider provider)
         {
+            provider.GetService<WindowAction>();
         }
     }
 }

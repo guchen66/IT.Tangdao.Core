@@ -14,6 +14,7 @@ using System.Windows.Media;
 using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.DaoTasks;
 using IT.Tangdao.Core.Abstractions.Loggers;
+using IT.Tangdao.Core.Windows;
 
 namespace IT.Tangdao.Core
 {
@@ -51,6 +52,8 @@ namespace IT.Tangdao.Core
 
             // ② 留给子类做额外配置
             Configure();
+
+            ConfigureWindow();
             AsyncTaskHandler(Provider.GetService<ITaskQueueManager>()).ConfigureAwait(false);
 
             // ③ 创建主窗口
@@ -71,9 +74,15 @@ namespace IT.Tangdao.Core
             TangdaoContainerBuilder.SetContainerExtension(CreateContainer);
         }
 
-        /// 仅在此方法内使用 Container，不要持有字段引用
         protected virtual void Configure()
         {
+        }
+
+        private void ConfigureWindow()
+        {
+            var build = Provider.GetService<IWindowBuilder>();
+            ConfigureWindowPipe(build);
+            build.ExecuteAll();
         }
 
         /// <summary>

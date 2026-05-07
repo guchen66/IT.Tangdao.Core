@@ -2,6 +2,7 @@
 using IT.Tangdao.Core.DaoTasks;
 using IT.Tangdao.Core.Events;
 using IT.Tangdao.Core.Ioc;
+using IT.Tangdao.Core.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,10 @@ namespace IT.Tangdao.Core
         public virtual async Task AsyncTaskHandler(ITaskQueueManager taskQueueManager)
         {
             await taskQueueManager.Empty();
+        }
+
+        public virtual void ConfigureWindowPipe(IWindowBuilder windowBuilder)
+        {
         }
     }
 }

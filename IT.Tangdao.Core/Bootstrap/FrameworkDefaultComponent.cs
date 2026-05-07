@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IT.Tangdao.Core.Windows;
 
 namespace IT.Tangdao.Core.Bootstrap
 {
@@ -42,6 +43,11 @@ namespace IT.Tangdao.Core.Bootstrap
             //注册异步任务器
             container.AddTangdaoSingleton<ITaskController, TaskController>();
 
+            //登录窗体以及Window管理通道
+            container.AddTangdaoSingleton<IWindowBuilder, WindowBuilder>();
+            container.AddTangdaoSingleton<IWindowPipeline, WindowPipeline>();
+            container.AddTangdaoSingleton<IWindowGuard, LoginSignGuard>();
+            container.AddTangdaoSingleton<WindowAction>();
             //注册导航服务
             container.AddTangdaoTransientFactory<ITangdaoRouterResolver>(provider =>
             {
