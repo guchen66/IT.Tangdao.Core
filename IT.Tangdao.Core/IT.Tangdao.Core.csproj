@@ -6,9 +6,9 @@
 	<UseWPF>true</UseWPF>
 	<Title>WPF快速开发工具包</Title>
 	<Authors>liuxin</Authors>
-	<Version>4.0.9</Version>
+	<Version>4.0.12</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-	<AssemblyVersion>4.2.3</AssemblyVersion>
+	<AssemblyVersion>4.0.0</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -18,6 +18,9 @@
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	 <!--配置强签名-->
+	 <SignAssembly>True</SignAssembly>
+	 <AssemblyOriginatorKeyFile>..\IT.Tangdao.Core.snk</AssemblyOriginatorKeyFile>
 	<Copyright>Copyright (c) liuxin 2023-$([System.DateTime]::Now.ToString(`yyyy`))</Copyright>
   </PropertyGroup>
 
@@ -35,6 +38,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<Description>[重大变更] v4.0 重构了命名空间，详见 README。</Description>
+		
 	</PropertyGroup>
  <ItemGroup>
    <None Include="..\LICENSE.md">

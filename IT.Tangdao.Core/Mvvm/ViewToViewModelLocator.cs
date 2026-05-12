@@ -99,9 +99,51 @@ namespace IT.Tangdao.Core.Mvvm
         }
 
         /// <summary>
+        /// 发现并绑定ViewModel
+        /// </summary>
+        /// <param name="view"></param>
+        public static void FindAndBindViewModel(DependencyObject view)
+        {
+            // 方法内部获取 view 的实际类型
+            Type viewType = view.GetType();
+
+            var provider = ServiceLocator.Default;
+
+            // 查找对应的 ViewModel 类型
+            var viewModelType = FindViewModelType(viewType);
+
+            if (viewModelType != null)
+            {
+                var viewModel = provider.GetService(viewModelType);
+                if (viewModel != null)
+                {
+                    // 使用 as 进行安全转换
+                    if (view is FrameworkElement frameworkElement)
+                    {
+                        frameworkElement.DataContext = viewModel;
+
+                        if (viewModel is IViewReady life)
+                        {
+                            RoutedEventHandler handler = null;
+                            handler = (s, e) =>
+                            {
+                                frameworkElement.Loaded -= handler;
+                                life.OnViewLoaded();
+                            };
+                            frameworkElement.Loaded += handler;
+                            if (frameworkElement.IsLoaded)
+                                handler(frameworkElement, new RoutedEventArgs());
+                        }
+                    }
+                }
+            }
+            RegisterAutoViews();
+        }
+
+        /// <summary>
         /// 根据 View 类型查找对应的 ViewModel 类型
         /// </summary>
-        private static Type FindViewModelType(Type viewType)
+        public static Type FindViewModelType(Type viewType)
         {
             if (viewType == null) return null;
 

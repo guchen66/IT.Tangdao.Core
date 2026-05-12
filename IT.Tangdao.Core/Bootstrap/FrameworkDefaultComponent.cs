@@ -45,15 +45,15 @@ namespace IT.Tangdao.Core.Bootstrap
 
             //登录窗体以及Window管理通道
             container.AddTangdaoSingleton<IWindowBuilder, WindowBuilder>();
-            container.AddTangdaoSingleton<IWindowPipeline, WindowPipeline>();
-            container.AddTangdaoSingleton<IWindowGuard, LoginSignGuard>();
+            container.AddTangdaoTransient<IWindowPipeline, WindowPipeline>();
+            container.AddTangdaoTransient<IWindowGuard, LoginSignGuard>();
             container.AddTangdaoSingleton<WindowAction>();
             //注册导航服务
             container.AddTangdaoTransientFactory<ITangdaoRouterResolver>(provider =>
             {
                 return new TangdaoRouterResolver(entry => provider.GetService(entry.RegisterType) as ITangdaoPage);
             });
-
+            
             container.AddTangdaoSingleton<ITangdaoRouter, TangdaoRouter>();
             var loader = new TangdaoConfigLoader();
             // 2. 立即 Load 并塞进容器
