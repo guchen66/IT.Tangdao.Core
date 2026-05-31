@@ -10,8 +10,14 @@ namespace IT.Tangdao.Core.Events
     {
         void Publish<T>(T @event = null) where T : EventBase, new();
 
+        Task PublishAsync<T>(T @event = null) where T : EventBase, new();
+
         void Subscribe<T>(DaoEventHandler<T> handler) where T : EventBase, new();
 
+        void SubscribeAsync<T>(DaoAsyncEventHandler<T> handler) where T : EventBase, new();
+
         void UnSubscribe<T>(DaoEventHandler<T> handler) where T : EventBase, new();
+
+        void UnSubscribeAsync<T>(DaoAsyncEventHandler<T> handler) where T : EventBase, new();
     }
 }

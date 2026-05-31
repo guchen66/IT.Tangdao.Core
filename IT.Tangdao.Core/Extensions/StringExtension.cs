@@ -16,6 +16,13 @@ namespace IT.Tangdao.Core.Extensions
     public static class StringExtension
     {
         /// <summary>
+        ///  null、空、空白 或 "NULL"（忽略大小写）都视为空
+        /// </summary>
+        public static bool IsNullOrEmptyToken(this string value)
+            => string.IsNullOrWhiteSpace(value) ||
+               value.Equals("NULL", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
         /// string转int类型
         /// </summary>
         /// <param name="str"></param>

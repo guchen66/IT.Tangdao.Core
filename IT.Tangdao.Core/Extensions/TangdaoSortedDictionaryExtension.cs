@@ -1,10 +1,11 @@
-﻿using IT.Tangdao.Core.Helpers;
+﻿using IT.Tangdao.Core.Collections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IT.Tangdao.Core.Utilities;
 
 namespace IT.Tangdao.Core.Extensions
 {

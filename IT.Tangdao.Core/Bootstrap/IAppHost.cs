@@ -21,6 +21,12 @@ namespace IT.Tangdao.Core.Bootstrap
         TangdaoPipe<T> Handler { get; }
 
         /// <summary>
+        /// 创建宿主数据
+        /// </summary>
+        /// <returns></returns>
+        T CreateHost();
+
+        /// <summary>
         /// 处理自动绑定
         /// </summary>
         IBindHandler Binding { get; }
@@ -31,9 +37,5 @@ namespace IT.Tangdao.Core.Bootstrap
         /// <param name="taskQueueManager"></param>
         /// <returns></returns>
         Task AsyncTaskHandler(ITaskQueueManager taskQueueManager);
-    }
-
-    public class TangdaoHost
-    {
     }
 }

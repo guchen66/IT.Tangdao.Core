@@ -1,16 +1,16 @@
 ﻿using IT.Tangdao.Core.Abstractions.Loggers;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Extensions;
 using System;
 using System.IO;
 using IT.Tangdao.Core.Paths;
 using IT.Tangdao.Core.Ambient;
+using IT.Tangdao.Core.Infrastructure;
 
 namespace IT.Tangdao.Core.Abstractions.FileAccessor
 {
-    // <summary>
+    /// <summary>
     /// 缓存查询构建器实现
     /// </summary>
     public class CacheQueryBuilder : ICacheQueryBuilder
@@ -30,7 +30,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
             // ② 磁盘读 + 探测
             var content = File.ReadAllText(path);
-            var detectedType = t == DaoFileType.None ? FileHelper.DetectFromContent(content) : t;
+            var detectedType = t == DaoFileType.None ? FileQueryable.DetectFromContent(content) : t;
 
             // ③ 新实例（无参构造）
             var fresh = new ContentQueryable

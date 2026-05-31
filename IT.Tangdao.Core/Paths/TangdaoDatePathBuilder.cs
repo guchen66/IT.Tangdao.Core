@@ -100,6 +100,6 @@ namespace IT.Tangdao.Core.Paths
         /// </summary>
         /// <returns>更新后的日期路径构建器</returns>
         public TangdaoDatePathBuilder FromSolution()
-            => new TangdaoDatePathBuilder(TangdaoPath.Instance.GetSolutionDirectory());
+            => new TangdaoDatePathBuilder(TangdaoPath.GetSolutionDirectory());
     }
 }

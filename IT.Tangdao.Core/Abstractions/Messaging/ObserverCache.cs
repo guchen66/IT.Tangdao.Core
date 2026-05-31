@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using IT.Tangdao.Core.Events;
 using IT.Tangdao.Core.Ioc;
 using IT.Tangdao.Core.Extensions;
-using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Abstractions.Contracts;
+using IT.Tangdao.Core.Utilities;
 
 namespace IT.Tangdao.Core.Abstractions.Messaging
 {

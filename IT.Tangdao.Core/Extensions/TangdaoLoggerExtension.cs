@@ -2,8 +2,8 @@
 using IT.Tangdao.Core.Abstractions.Loggers;
 using IT.Tangdao.Core.Configurations;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.Paths;
+using IT.Tangdao.Core.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -38,19 +38,19 @@ namespace IT.Tangdao.Core.Extensions
 
             try
             {
-                var root = LogHelper.GetLogRoot();
+                var root = LogUtils.GetLogRoot();
                 string filePath;
 
                 // 检查是否使用日期路径
-                var config = LogHelper.GetConfigList().LastOrDefault();
+                var config = LogUtils.GetConfigList().LastOrDefault();
                 if (config != null && config.UseDatePath)
                 {
                     // 使用日期路径
-                    var extension = LogHelper.GetLogExtension();
+                    var extension = LogUtils.GetLogExtension();
                     var extensionWithoutDot = extension.TrimStart('.');
                     var basePath = string.IsNullOrEmpty(category) ? root : Path.Combine(root, category);
                     var fileName = $"{DateTime.Now.ToString("yyMMdd")}_Local.{extensionWithoutDot}";
-                    var datePath = TangdaoPath.Instance.DateFrom(basePath).BuildFile(fileName);
+                    var datePath = TangdaoPath.DateFrom(basePath).BuildFile(fileName);
                     filePath = datePath.Value;
                 }
                 else
@@ -59,7 +59,7 @@ namespace IT.Tangdao.Core.Extensions
                     var dir = string.IsNullOrEmpty(category) ? root : Path.Combine(root, category);
                     Directory.CreateDirectory(dir);
 
-                    var extension = LogHelper.GetLogExtension();
+                    var extension = LogUtils.GetLogExtension();
                     var fileName = $"{DateTime.Now:yyyyMMdd}{extension}";
                     filePath = Path.Combine(dir, fileName);
                 }
@@ -83,8 +83,7 @@ namespace IT.Tangdao.Core.Extensions
 
                 lock (fileLock)
                 {
-                    // 使用LogHelper保存日志
-                    LogHelper.SaveLogToFile(logItem, filePath);
+                    LogUtils.SaveLogToFile(logItem, filePath);
                 }
             }
             catch (Exception ex)

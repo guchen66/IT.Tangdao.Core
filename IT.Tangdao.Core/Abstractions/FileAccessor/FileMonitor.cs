@@ -1,7 +1,7 @@
 ﻿using IT.Tangdao.Core.Configurations;
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Events;
-using IT.Tangdao.Core.Helpers;
+using IT.Tangdao.Core.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -89,7 +89,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         private void MonitorFileType(DaoFileType fileType)
         {
-            var files = FileHelper.SelectFilesByDaoFileType(
+            var files = FileQueryable.SelectFilesByDaoFileType(
                 _config.MonitorRootPath,
                 fileType,
                 _config.IncludeSubdirectories);
@@ -127,7 +127,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
         {
             try
             {
-                string extension = FileHelper.GetExtensionFromFileType(fileType);
+                string extension = FileQueryable.GetExtensionFromFileType(fileType);
                 var files = Directory.GetFiles(directoryPath, $"*{extension}", SearchOption.AllDirectories);
 
                 foreach (var filePath in files)
@@ -158,7 +158,7 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
             try
             {
-                string extension = FileHelper.GetExtensionFromFileType(fileType);
+                string extension = FileQueryable.GetExtensionFromFileType(fileType);
                 var watcher = new FileSystemWatcher
                 {
                     Path = directoryPath,

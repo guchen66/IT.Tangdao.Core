@@ -1,4 +1,5 @@
-﻿using IT.Tangdao.Core.Bootstrap;
+﻿using IT.Tangdao.Core.Abstractions.Contracts;
+using IT.Tangdao.Core.Bootstrap;
 using IT.Tangdao.Core.DaoTasks;
 using IT.Tangdao.Core.Events;
 using IT.Tangdao.Core.Ioc;
@@ -12,9 +13,9 @@ using System.Windows;
 
 namespace IT.Tangdao.Core
 {
-    public abstract class TangdaoApplicationBase : Application, IAppHost<TangdaoHost>, ITangdaoDataProvider
+    public abstract class TangdaoApplicationBase : Application, IAppHost<ITangdaoHost>, ITangdaoDataProvider
     {
-        public TangdaoPipe<TangdaoHost> Handler { get; set; }
+        public TangdaoPipe<ITangdaoHost> Handler { get; set; }
 
         public IBindHandler Binding { get; } = new BindHandler();
 
@@ -46,6 +47,15 @@ namespace IT.Tangdao.Core
         /// </summary>
         protected virtual void Configure()
         {
+        }
+
+        /// <summary>
+        /// 创建宿主数据
+        /// </summary>
+        /// <returns></returns>
+        public virtual ITangdaoHost CreateHost()
+        {
+            return new TangdaoHost();
         }
 
         /// <summary>

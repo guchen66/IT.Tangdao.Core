@@ -1,5 +1,5 @@
 ﻿using IT.Tangdao.Core.Extensions;
-using IT.Tangdao.Core.Helpers;
+using IT.Tangdao.Core.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,7 +42,7 @@ namespace IT.Tangdao.Core.Paths
         {
             get
             {
-                return FileHelper.IsRoot(_path);
+                return FileQueryable.IsRoot(_path);
             }
         }
 

@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Abstractions.Contracts;
-using IT.Tangdao.Core.Helpers;
+using IT.Tangdao.Core.Collections;
 
 namespace IT.Tangdao.Core.Extensions
 {

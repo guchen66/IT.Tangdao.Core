@@ -1,5 +1,4 @@
 ﻿using IT.Tangdao.Core.Abstractions.Results;
-using IT.Tangdao.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IT.Tangdao.Core.Configurations;
+using IT.Tangdao.Core.Utilities;
+using IT.Tangdao.Core.Collections;
 
 namespace IT.Tangdao.Core.Extensions
 {
@@ -329,7 +330,7 @@ namespace IT.Tangdao.Core.Extensions
                 TangdaoGuards.ThrowIfNull(result);
             if (result.Data is TangdaoSortedDictionary<string, string> dict)
             {
-                return DictToObject.Convert<T>(dict);
+                return DictToObjectUtils.Convert<T>(dict);
             }
             throw new NotImplementedException();
         }

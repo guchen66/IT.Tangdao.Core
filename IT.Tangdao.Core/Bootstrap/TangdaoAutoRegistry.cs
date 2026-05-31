@@ -1,7 +1,6 @@
 ﻿using IT.Tangdao.Core.Attributes;
 using IT.Tangdao.Core.Enums;
 using IT.Tangdao.Core.Extensions;
-using IT.Tangdao.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace IT.Tangdao.Core.Bootstrap
     {
         public static void Register(ITangdaoContainer tangdaoContainer)
         {
-            var AttributeInfos = TangdaoAttributeSelector.GetAttributeInfos<AutoRegisterAttribute>();
+            var AttributeInfos = AttributeSelector.GetAttributeInfos<AutoRegisterAttribute>();
             Array.Sort(AttributeInfos, (a, b) => a.Attribute.CompareTo(b.Attribute));
             foreach (var info in AttributeInfos)
             {

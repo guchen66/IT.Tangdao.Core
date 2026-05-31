@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using IT.Tangdao.Core.Helpers;
 using IT.Tangdao.Core.DaoTasks;
 using IT.Tangdao.Core.Abstractions.Loggers;
 using IT.Tangdao.Core.Windows;
@@ -165,7 +164,7 @@ namespace IT.Tangdao.Core
         private static List<ITangdaoModule> DiscoverModules()
         {
             var list = new List<ITangdaoModule>();
-            foreach (var asm in AssemblyHelper.GetModuleAssemblies())
+            foreach (var asm in AssemblyExtension.GetModuleAssemblies())
             {
                 foreach (var attr in asm.GetCustomAttributes<TangdaoModuleAttribute>())
                 {

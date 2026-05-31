@@ -3,7 +3,6 @@ using IT.Tangdao.Core.Abstractions.Results;
 using IT.Tangdao.Core.Abstractions;
 using IT.Tangdao.Core.Common;
 using IT.Tangdao.Core.Enums;
-using IT.Tangdao.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using IT.Tangdao.Core.Paths;
 using IT.Tangdao.Core.Ambient;
+using IT.Tangdao.Core.Serializers;
+using IT.Tangdao.Core.Infrastructure;
 
 namespace IT.Tangdao.Core.Extensions
 {
@@ -39,18 +40,18 @@ namespace IT.Tangdao.Core.Extensions
                 var parameter = TangdaoContext.GetTangdaoParameter(rootKey);
                 string content = parameter.Get<string>(rootKey);
 
-                var detected = FileHelper.DetectFromContent(content);
+                var detected = FileQueryable.DetectFromContent(content);
 
                 switch (detected)
                 {
                     case DaoFileType.Xml:
-                        return TangdaoXmlSerializer.Deserialize<T>(content);
+                        return TangdaoXmlConvert.Deserialize<T>(content);
 
                     case DaoFileType.Json:
                         return JsonConvert.DeserializeObject<T>(content);
 
                     case DaoFileType.Config:
-                        return ConfigFolderHelper.DeserializeObject<T>(content);
+                        return TangdaoConfigConvert.DeserializeObject<T>(content);
 
                     default:
                         throw new NotSupportedException($"不支持的文件类型: {detected}");
