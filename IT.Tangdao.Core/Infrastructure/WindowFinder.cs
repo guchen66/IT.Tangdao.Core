@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
+using IT.Tangdao.Core.Bootstrap;
 
 namespace IT.Tangdao.Core.Infrastructure
 {
@@ -49,6 +50,25 @@ namespace IT.Tangdao.Core.Infrastructure
 
             // 如果当前父元素不是MainWindow，递归调用FindMainWindow查找
             return FindMainWindow(parent);
+        }
+
+        public static Type GetWindow(ITangdaoDataProvider tangdaoDataProvider)
+        {
+            var assembly = tangdaoDataProvider.GetType().Assembly;
+            var windowTypes = assembly.GetExportedTypes().Where(t => t.IsSubclassOf(typeof(Window))).ToList();
+            if (windowTypes.Count == 0)
+            {
+                return null;
+            }
+
+            if (windowTypes.Count > 1)
+            {
+                string typeNames = string.Join(", ", windowTypes.Select(t => t.Name));
+                throw new InvalidOperationException(
+                    $"找到多个 Window 派生类：{typeNames}。\n" +
+                    "请重写 CreateWindow() 方法明确指定要使用的主窗口。");
+            }
+            return windowTypes[0];
         }
     }
 }

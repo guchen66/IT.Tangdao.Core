@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core
+namespace IT.Tangdao.Core.Infrastructure
 {
     /// <summary>
     /// 特性扫描器
