@@ -77,9 +77,9 @@ namespace IT.Tangdao.Core
             RegisterServices(builder.Container);
             //发现Module模块
             var moduleCatalog = ModuleFinder.SelectModules();
-            //注册模块
+            //注册模块+模块回调
             ModuleFinder.RegisterModules(moduleCatalog, builder);
-            //模块回调
+            //防御性编程，运行时检测未注册的服务
             builder.ValidateDependencies();
         }
 

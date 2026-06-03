@@ -25,7 +25,7 @@ namespace IT.Tangdao.Core
             Registry = new ServiceRegistry();
         }
 
-        public void Register(IServiceEntry entry)
+        void ITangdaoContainer.Register(IServiceEntry entry)
         {
             if (entry == null) ArgumentNullException.ThrowIfNull(entry);
             Registry.Add(entry);

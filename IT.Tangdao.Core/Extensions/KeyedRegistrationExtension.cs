@@ -11,17 +11,17 @@ namespace IT.Tangdao.Core.Extensions
     {
         #region 泛型便利
 
-        public static ITangdaoContainer AddKeyedTransient<TService, TImpl>(this ITangdaoContainer container,
+        public static ITangdaoContainer RegisterKeyedTransient<TService, TImpl>(this ITangdaoContainer container,
                                                                             object key)
             where TImpl : TService
             => AddKeyed<TService, TImpl>(container, key, new TransientStrategy());
 
-        public static ITangdaoContainer AddKeyedSingleton<TService, TImpl>(this ITangdaoContainer container,
+        public static ITangdaoContainer RegisterKeyedSingleton<TService, TImpl>(this ITangdaoContainer container,
                                                                             object key)
             where TImpl : TService
             => AddKeyed<TService, TImpl>(container, key, new SingletonStrategy());
 
-        public static ITangdaoContainer AddKeyedScoped<TService, TImpl>(this ITangdaoContainer container,
+        public static ITangdaoContainer RegisterKeyedScoped<TService, TImpl>(this ITangdaoContainer container,
                                                                          object key)
             where TImpl : TService
             => AddKeyed<TService, TImpl>(container, key, new ScopedStrategy());
