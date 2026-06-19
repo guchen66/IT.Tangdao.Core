@@ -19,7 +19,7 @@ namespace IT.Tangdao.Core.Attributes
         public RegisterMode Mode { get; set; }
 
         /// <summary>
-        /// 注册的顺序，数字越小最新注册
+        /// 注册的顺序，数字越小优先级最高
         /// </summary>
         public int Order { get; set; }
 
