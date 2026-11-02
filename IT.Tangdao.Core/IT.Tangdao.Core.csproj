@@ -2,11 +2,11 @@
 
  <PropertyGroup>
    
-	<TargetFramework>net6.0-windows</TargetFramework>
+	<TargetFrameworks>net6.0-windows;net8.0-windows</TargetFrameworks>
 	<UseWPF>true</UseWPF>
 	<Title>WPF快速开发工具包</Title>
 	<Authors>liuxin</Authors>
-	<Version>4.0.15</Version>
+	<Version>4.0.18</Version>
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<AssemblyVersion>4.0.0</AssemblyVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -61,12 +61,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	  <Reference Include="Microsoft.Windows.SDK.NET">
-		  <HintPath>E:\nuget\MyPackages\Microsoft.Windows.SDK.NET.dll</HintPath>
-	  </Reference>
-	  <Reference Include="WinRT.Runtime">
-		  <HintPath>E:\nuget\MyPackages\WinRT.Runtime.dll</HintPath>
-	  </Reference>
   </ItemGroup>
 
   <ItemGroup>

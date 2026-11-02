@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IT.Tangdao.Core.Threading
+namespace IT.Tangdao.Threading
 {
     /// <summary>
     /// 增强版 CountdownEvent：支持一次减 N、动态加 N、父子级联

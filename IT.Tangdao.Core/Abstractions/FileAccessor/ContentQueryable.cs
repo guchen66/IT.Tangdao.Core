@@ -33,6 +33,12 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public DaoFileType DetectedType { get; set; }
 
+        /// <summary>
+        /// 读取结果。成功时 IsSuccess 为 true；
+        /// 失败时保留原始异常，Content 为 null（空文件内容是空字符串，不返回 null）。
+        /// </summary>
+        public ResponseResult Status { get; set; } = ResponseResult.Success();
+
         #endregion
 
         #region-- ctor--
@@ -52,6 +58,10 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public IXmlQueryable AsXml()
         {
+            if (!Status.IsSuccess)
+            {
+                return this;   // 读取已失败，交给下游查询方法统一报告原因
+            }
             if (DetectedType == DaoFileType.Xml)
             {
                 return this;
@@ -61,6 +71,10 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public IJsonQueryable AsJson()
         {
+            if (!Status.IsSuccess)
+            {
+                return this;   // 读取已失败，交给下游查询方法统一报告原因
+            }
             if (DetectedType == DaoFileType.Json)
             {
                 return this;
@@ -70,6 +84,10 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public IConfigQueryable AsConfig()
         {
+            if (!Status.IsSuccess)
+            {
+                return this;   // 读取已失败，交给下游查询方法统一报告原因
+            }
             // 如果是 Config 类型，或者是未读取状态（用于读取默认 App.config），都允许转换
             if (DetectedType == DaoFileType.Config || DetectedType == DaoFileType.None)
             {
@@ -80,6 +98,10 @@ namespace IT.Tangdao.Core.Abstractions.FileAccessor
 
         public IIniQueryable AsIni()
         {
+            if (!Status.IsSuccess)
+            {
+                return this;   // 读取已失败，交给下游查询方法统一报告原因
+            }
             if (DetectedType == DaoFileType.Ini)
             {
                 return this;

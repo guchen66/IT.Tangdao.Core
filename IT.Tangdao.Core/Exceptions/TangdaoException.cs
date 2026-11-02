@@ -24,10 +24,11 @@ namespace IT.Tangdao.Core.Exceptions
         }
 
 #if NET8_0_OR_GREATER
-    [System.Runtime.Serialization.Constructor]
+    [Obsolete(DiagnosticId = "SYSLIB0051")] // 在 .NET 8+ 中标记为过时
 #endif
-
-        protected TangdaoException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
+        protected TangdaoException(SerializationInfo info, StreamingContext context): base(info, context)
+        {
+            // 构造函数体
+        }
     }
 }

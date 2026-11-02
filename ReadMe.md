@@ -762,6 +762,34 @@ public class MainWindowViewModel : BindableBase
  }
 ```
 
+也可以一次性生成某个命名空间下的所有实体类
+
+```
+// 1) 标记层：接口打在抽象基类上，具体子类自动继承传递
+public abstract class EntityBase { }
+public abstract class AutoIncrementEntity    : EntityBase, ITangdaoFakeEntity { }
+public abstract class NotAutoIncrementEntity : EntityBase, ITangdaoFakeEntity { }
+
+public class User  : AutoIncrementEntity { }        // 自动命中
+public class Order : NotAutoIncrementEntity { }      // 自动命中
+
+[TangdaoFakeIgnore]                                   // 个别类退出
+public class AuditLog : AutoIncrementEntity { }
+
+// 2) 配置 + 扫描 + 生成
+var config = new TangdaoFakerConfig();
+config.Scan(Assembly.Load("程序集"));
+
+var all   = config.Build(10);              // Dictionary<Type, object>，value 是 List<T>
+var users = config.BuildFor<User>(10);     // List<User>
+
+// 可选：补充通道 / 自定义标记接口 / 过滤器
+config.Scan(assembly, "System.Models");  // 命名空间前缀（召回未实现接口的老实体）
+config.Scan<IMyMarker>(assembly);              // 自定义标记接口
+config.Scan(assembly, o => o.ExcludeTypes.Add(typeof(TempRow)));
+
+```
+
 
 
 #### 11、增加路由导航
